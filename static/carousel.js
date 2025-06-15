@@ -1,125 +1,127 @@
-// carousel.js
-// Testimonials and Services Carousel Functionality
-document.addEventListener('DOMContentLoaded', function() {
-    // Testimonials Carousel
-    const testimonialTrack = document.getElementById('testimonialTrack');
-    const testimonialPrevBtn = document.getElementById('prevBtn');
-    const testimonialNextBtn = document.getElementById('nextBtn');
-    const testimonials = document.querySelectorAll('.testimonial-item');
-    
-    if (testimonialTrack && testimonialPrevBtn && testimonialNextBtn) {
-        let testimonialCurrentIndex = 0;
-        let testimonialItemsToShow = getTestimonialItemsToShow();
-        
-        function getTestimonialItemsToShow() {
-            if (window.innerWidth <= 768) return 1;
-            if (window.innerWidth <= 1024) return 2;
-            return 3;
-        }
-        
-        function updateTestimonialCarousel() {
-            const itemWidth = 100 / testimonialItemsToShow;
-            const translateX = -(testimonialCurrentIndex * itemWidth);
-            testimonialTrack.style.transform = `translateX(${translateX}%)`;
-        }
-        
-        function nextTestimonialSlide() {
-            testimonialCurrentIndex = (testimonialCurrentIndex + 1) % testimonials.length;
-            updateTestimonialCarousel();
-        }
-        
-        function prevTestimonialSlide() {
-            testimonialCurrentIndex = (testimonialCurrentIndex - 1 + testimonials.length) % testimonials.length;
-            updateTestimonialCarousel();
-        }
-        
-        // Event listeners
-        testimonialNextBtn.addEventListener('click', nextTestimonialSlide);
-        testimonialPrevBtn.addEventListener('click', prevTestimonialSlide);
-        
-        // Handle window resize
-        window.addEventListener('resize', function() {
-            testimonialItemsToShow = getTestimonialItemsToShow();
-            updateTestimonialCarousel();
-        });
-        
-        // Auto-play carousel (advances every 5 seconds)
-        let testimonialAutoPlayInterval = setInterval(nextTestimonialSlide, 5000);
-        
-        // Pause auto-play on hover
-        const testimonialCarouselContainer = document.querySelector('.testimonials-carousel');
-        if (testimonialCarouselContainer) {
-            testimonialCarouselContainer.addEventListener('mouseenter', function() {
-                clearInterval(testimonialAutoPlayInterval);
-            });
-            
-            testimonialCarouselContainer.addEventListener('mouseleave', function() {
-                testimonialAutoPlayInterval = setInterval(nextTestimonialSlide, 5000);
-            });
-        }
-        
-        // Initialize carousel
-        updateTestimonialCarousel();
+// carousel.js - Refactored with Carousel class
+document.addEventListener('DOMContentLoaded', () => {
+  class Carousel {
+    constructor(config) {
+      // Initialize elements
+      this.track = document.getElementById(config.trackId);
+      this.prevBtn = document.getElementById(config.prevBtnId);
+      this.nextBtn = document.getElementById(config.nextBtnId);
+      this.container = config.containerSelector 
+        ? document.querySelector(config.containerSelector) 
+        : null;
+      
+      // Get items and validate
+      this.items = Array.from(this.track?.querySelectorAll(config.itemSelector) || []);
+      
+      // Configuration
+      this.autoPlayDelay = config.autoPlayDelay;
+      this.itemsToShow = this.getItemsToShow();
+      this.currentIndex = 0;
+      this.autoPlayInterval = null;
+      this.resizeTimeout = null;
+
+      // Initialize if valid
+      if (this.track && this.prevBtn && this.nextBtn && this.items.length > 0) {
+        this.init();
+      } else {
+        console.warn(`Carousel initialization skipped for ${config.trackId}`);
+      }
     }
 
-    // Services Carousel
-    const servicesTrack = document.getElementById('servicesTrack');
-    const servicesPrevBtn = document.getElementById('servicesPrevBtn');
-    const servicesNextBtn = document.getElementById('servicesNextBtn');
-    const services = document.querySelectorAll('.service-item');
-    
-    if (servicesTrack && servicesPrevBtn && servicesNextBtn) {
-        let servicesCurrentIndex = 0;
-        let servicesItemsToShow = getServicesItemsToShow();
-        
-        function getServicesItemsToShow() {
-            if (window.innerWidth <= 768) return 1;
-            if (window.innerWidth <= 1024) return 2;
-            return 3;
-        }
-        
-        function updateServicesCarousel() {
-            const itemWidth = 100 / servicesItemsToShow;
-            const translateX = -(servicesCurrentIndex * itemWidth);
-            servicesTrack.style.transform = `translateX(${translateX}%)`;
-        }
-        
-        function nextServicesSlide() {
-            servicesCurrentIndex = (servicesCurrentIndex + 1) % services.length;
-            updateServicesCarousel();
-        }
-        
-        function prevServicesSlide() {
-            servicesCurrentIndex = (servicesCurrentIndex - 1 + services.length) % services.length;
-            updateServicesCarousel();
-        }
-        
-        // Event listeners
-        servicesNextBtn.addEventListener('click', nextServicesSlide);
-        servicesPrevBtn.addEventListener('click', prevServicesSlide);
-        
-        // Handle window resize
-        window.addEventListener('resize', function() {
-            servicesItemsToShow = getServicesItemsToShow();
-            updateServicesCarousel();
-        });
-        
-        // Auto-play carousel (advances every 6 seconds - slightly different from testimonials)
-        let servicesAutoPlayInterval = setInterval(nextServicesSlide, 6000);
-        
-        // Pause auto-play on hover
-        const servicesCarouselContainer = document.querySelector('.services-carousel');
-        if (servicesCarouselContainer) {
-            servicesCarouselContainer.addEventListener('mouseenter', function() {
-                clearInterval(servicesAutoPlayInterval);
-            });
-            
-            servicesCarouselContainer.addEventListener('mouseleave', function() {
-                servicesAutoPlayInterval = setInterval(nextServicesSlide, 6000);
-            });
-        }
-        
-        // Initialize carousel
-        updateServicesCarousel();
+    init() {
+      // Set initial state
+      this.updateCarousel();
+      
+      // Event listeners
+      this.prevBtn.addEventListener('click', () => this.slidePrev());
+      this.nextBtn.addEventListener('click', () => this.slideNext());
+      
+      // Auto-play setup
+      this.startAutoPlay();
+      
+      // Pause on hover if container exists
+      if (this.container) {
+        this.container.addEventListener('mouseenter', () => this.stopAutoPlay());
+        this.container.addEventListener('mouseleave', () => this.startAutoPlay());
+      }
+      
+      // Responsive handling with debounce
+      window.addEventListener('resize', () => {
+        clearTimeout(this.resizeTimeout);
+        this.resizeTimeout = setTimeout(() => {
+          this.itemsToShow = this.getItemsToShow();
+          this.updateCarousel();
+        }, 250);
+      });
     }
+
+    getItemsToShow() {
+      if (window.innerWidth <= 768) return 1;
+      if (window.innerWidth <= 1024) return 2;
+      return 3;
+    }
+
+    updateCarousel() {
+      // Disable movement if not enough items
+      if (this.items.length <= this.itemsToShow) {
+        this.track.style.transform = 'translateX(0)';
+        this.stopAutoPlay();
+        return;
+      }
+      
+      // Calculate and apply new position
+      const itemWidth = 100 / this.itemsToShow;
+      const translateX = -(this.currentIndex * itemWidth);
+      this.track.style.transform = `translateX(${translateX}%)`;
+    }
+
+    slideNext() {
+      if (this.items.length <= this.itemsToShow) return;
+      this.currentIndex = (this.currentIndex + 1) % this.items.length;
+      this.updateCarousel();
+    }
+
+    slidePrev() {
+      if (this.items.length <= this.itemsToShow) return;
+      this.currentIndex = (this.currentIndex - 1 + this.items.length) % this.items.length;
+      this.updateCarousel();
+    }
+
+    startAutoPlay() {
+      this.stopAutoPlay(); // Clear existing interval
+      if (this.items.length > this.itemsToShow) {
+        this.autoPlayInterval = setInterval(
+          () => this.slideNext(), 
+          this.autoPlayDelay
+        );
+      }
+    }
+
+    stopAutoPlay() {
+      if (this.autoPlayInterval) {
+        clearInterval(this.autoPlayInterval);
+        this.autoPlayInterval = null;
+      }
+    }
+  }
+
+  // Initialize Testimonials Carousel
+  new Carousel({
+    trackId: 'testimonialTrack',
+    prevBtnId: 'prevBtn',
+    nextBtnId: 'nextBtn',
+    itemSelector: '.testimonial-item',
+    containerSelector: '.testimonials-carousel',
+    autoPlayDelay: 5000
+  });
+
+  // Initialize Services Carousel
+  new Carousel({
+    trackId: 'servicesTrack',
+    prevBtnId: 'servicesPrevBtn',
+    nextBtnId: 'servicesNextBtn',
+    itemSelector: '.service-item',
+    containerSelector: '.services-carousel',
+    autoPlayDelay: 6000
+  });
 });
