@@ -1,0 +1,99 @@
+<!--
+title: Your Blog Post Title Here
+date: YYYY-MM-DD
+excerpt: A brief one-sentence summary of your post that will appear in the blog listing.
+tags: tag1, tag2, tag3
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Blog Post Title Here - Amri Rasyidi</title>
+    <link rel="stylesheet" href="../static/style.css">
+</head>
+<body>
+    <div class="header">
+        <nav class="nav">
+            <div class="nav-links">
+                <a href="../index.html">About</a>
+                <a href="../blog.html" class="active">Blog</a>
+                <a href="../services.html">Services</a>
+                <a href="../tags.html">Tags</a>
+            </div>
+            <button id="dark-mode-toggle" class="dark-mode-toggle">🌙 Dark</button>
+        </nav>
+    </div>
+
+    <div class="back-link">
+        <a href="../blog.html">← Back to Blog</a>
+    </div>
+
+    <h1>Your Blog Post Title Here</h1>
+    
+    <div class="post-meta">
+        Published on [Month DD, YYYY]
+    </div>
+
+    <div class="post-content">
+        <p>Your opening paragraph should hook the reader and introduce the main topic. Keep it engaging and direct.</p>
+
+        <h2>Main Section Heading</h2>
+        
+        <p>Your main content goes here. Break it into digestible sections with clear headings.</p>
+
+        <p>You can include:</p>
+        <ul>
+            <li>Bullet points for lists</li>
+            <li>Code examples (see below)</li>
+            <li>Images and media</li>
+            <li>Quotes and insights</li>
+        </ul>
+
+        <h3>Subsection Heading</h3>
+        
+        <p>Use h3 for subsections within your main sections.</p>
+
+        <pre><code>// Code examples look like this
+function example() {
+    return "This is a code block";
+}
+
+# Or for other languages
+import pandas as pd
+df = pd.read_csv('data.csv')</code></pre>
+
+        <p>You can also use inline code like <code>variable_name</code> or <code>function()</code>.</p>
+
+        <blockquote>
+            <p>Use blockquotes for important quotes or key insights you want to highlight.</p>
+        </blockquote>
+
+        <h2>Another Main Section</h2>
+
+        <p>Continue your content with more sections as needed. Keep paragraphs focused and readable.</p>
+
+        <h2>Conclusion</h2>
+
+        <p>Wrap up your post with key takeaways or a call to action. What should readers do next?</p>
+
+        <!-- For images, use: -->
+        <!-- <img src="../static/images/your-image.jpg" alt="Description"> -->
+
+        <!-- For videos, use: -->
+        <!-- <video controls>
+            <source src="../static/videos/your-video.mp4" type="video/mp4">
+            Your browser doesn't support video.
+        </video> -->
+    </div>
+
+    <div class="tags-section">
+        <strong>Tags:</strong>
+        <a href="../tags.html#tag1" class="tag">tag1</a>
+        <a href="../tags.html#tag2" class="tag">tag2</a>
+        <a href="../tags.html#tag3" class="tag">tag3</a>
+    </div>
+
+    <script src="../static/dark-mode.js"></script>
+</body>
+</html>

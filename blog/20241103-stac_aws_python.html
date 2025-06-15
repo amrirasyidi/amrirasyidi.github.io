@@ -1,0 +1,366 @@
+<!--
+title: Exploring Cloud-Optimized GeoTIFF with STAC in Python
+date: 2024-11-03
+excerpt: Spatial queries, quick visualization, and open source data.
+tags: data-science, how-to, python, geospatial
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exploring Cloud-Optimized GeoTIFF with STAC in Python - Amri Rasyidi</title>
+    <link rel="stylesheet" href="../static/style.css">
+</head>
+<body>
+    <div class="header">
+        <nav class="nav">
+            <div class="nav-links">
+                <a href="../index.html">About</a>
+                <a href="../blog.html" class="active">Blog</a>
+                <a href="../services.html">Services</a>
+                <a href="../tags.html">Tags</a>
+            </div>
+            <button id="dark-mode-toggle" class="dark-mode-toggle">🌙 Dark</button>
+        </nav>
+    </div>
+
+    <div class="back-link">
+        <a href="../blog.html">← Back to Blog</a>
+    </div>
+
+    <h1>Exploring Cloud-Optimized GeoTIFF with STAC in Python</h1>
+    
+    <div class="post-meta">
+        Published on November 3, 2024
+    </div>
+
+    <div class="post-content">
+        <h2>The End Result</h2>
+
+        <p>This is what we are going to make today.</p>
+
+        <figure>
+            <img src="../assets/images/20241103_1_final_result.png" alt="Final result">
+        </figure>
+
+        <p>
+            You can access my code 
+            <a href="https://gitlab.com/comrades_0/data_reading/-/blob/master/notebook/2_sentinel_from_copernicus.ipynb?ref_type=heads">here</a>
+        </p>
+
+        <h2>Some Intro First</h2>
+
+        <p>
+            Have you ever dealt with many images at once which somehow need to be queried
+            based on some criteria. Let's say you have images of animals. One way to manage
+            it is to make folders, using the animal name as the folder name. Images with
+            cats in it will go to "cat" folder and so on. Easy right? But now some images
+            contain multiple animals, should you put the image in multiple folder or do you
+            make another folder with multiple animal name? To add some more complexity, what
+            if you want to query something goofy, the "state" of the animal, is it walking?
+            sleeping? standing up? drinking?
+        </p>
+
+        <p>
+            Have you? No? Okay. At least entertain your thought that you are important
+            enough to deal with this kind of problem now.
+        </p>
+
+        <p>
+            Another way to approach this problem is by using 
+            <a href="https://www.pinecone.io/learn/vector-database/">vector database</a>.
+            But at this point, our "many images" is not that many it doesn't really qualify
+            as big data, vector database might be overly complex and an overkill.
+        </p>
+
+        <p>
+            You have this query problem in geospatial context you say? Enter 
+            <a href="https://stacspec.org/en/tutorials/intro-to-stac/">STAC</a>.
+        </p>
+
+        <h3>STAC - Spatio-Temporal Asset Catalogue</h3>
+
+        <figure>
+            <img src="https://imgs.xkcd.com/comics/standards.png" alt="xkcd - standards">
+        </figure>
+
+        <p>
+            When looking for a satellite imagery, you might want to filter it by some kind
+            of properties. You are given a task to analyse a site before and after a
+            landslide to see the impacted neighborhood. It doesn't make sense to analyse
+            the imagery 1 year after the landslide, the site most probably already fully
+            recovered, you might be interested in the imageries a day to a week after the
+            landslide. You might also want to consider the cloud coverage to make sure the
+            imageries can be analysed.
+        </p>
+
+        <p>This is exactly what STAC is useful for.</p>
+
+        <p>
+            STAC is basically a standard on how to organize satellite imagery, or as the
+            name state spario-temporal assets. Since the 
+            <a href="https://stacspec.org/en/tutorials/intro-to-stac/">documentation</a>
+            did a great job explaining it, I won't explain about STAC here.
+        </p>
+
+        <figure id="stac-structure">
+            <img src="https://stacspec.org/public/images-original/intro-images/Catalog-layout.jpeg" alt="most relevant image for this post">
+            <figcaption>most relevant image for this post</figcaption>
+        </figure>
+
+        <h3>COG - Cloud-Optimized GeoTIFF</h3>
+
+        <p>A <code>.tiff</code> is an image format.</p>
+
+        <p>
+            A geo-<code>.tiff</code> is a <code>.tiff</code> with some additional tags
+            containing information about where the image exists on earth. This includes
+            things like map projections, coordinate systems, datums, etc. Basically lots
+            of interesting geospatial relevant info that provides a spatial reference
+            (<a href="https://developers.planet.com/docs/planetschool/an-introduction-to-cloud-optimized-geotiffs-cogs-part-1-overview/">source</a>).
+        </p>
+
+        <p>
+            A COG is a geotiff file that has been optimized to live in the cloud. Mostly
+            it revolves around how the image is "assembled" and stored. Since
+            cloud-based-anything has been ubiquitous nowadays, COG importance is
+            unneglectable.
+        </p>
+
+        <h2>Da Code</h2>
+
+        <p>To simplify the process, these are the steps that we are going to do:</p>
+
+        <ol>
+            <li>Connect to the STAC client, and look for the suitable STAC collection</li>
+            <li>From the collection, filter to get our item of interest</li>
+            <li>From the STAC item, get the asset and open it using raterio.</li>
+        </ol>
+
+        <p>Simple enough right? Let's get to it!</p>
+
+        <h3>Stack</h3>
+
+        <p>Libraries will be needed:</p>
+
+        <ol>
+            <li>
+                <a href="https://pystac.readthedocs.io/">pystac_client</a> - to connect
+                with the STAC client
+            </li>
+            <li>
+                <a href="https://rasterio.readthedocs.io/en/stable/">rasterio</a> - for the
+                imagery analysis and previewing.
+            </li>
+            <li>
+                <a href="https://geopandas.org/en/stable/docs.html">geopandas</a> - a minor
+                dataframe-based analysis will be done, "normal" pandas will also do.
+            </li>
+            <li>
+                <a href="https://duckdb.org/">duckdb</a> - optional - I'm using this
+                because previously I also used duckdb to store some relevant geospatial
+                information.
+            </li>
+        </ol>
+
+        <h3>Connecting with a client</h3>
+
+        <p>There are options of STAC client, I guess among the most popular one are:</p>
+
+        <ol>
+            <li>
+                AWS COG by Element84 - <code>https://earth-search.aws.element84.com/v1</code>
+            </li>
+            <li>
+                Microsoft Planetary - <code>https://planetarycomputer.microsoft.com/api/stac/v1</code>
+            </li>
+        </ol>
+
+        <p>
+            There also <em>might</em> be from <a href="https://source.coop/">source.coop</a>,
+            but I'm not sure do they have their own STAC client or they will refer you to
+            other links.
+        </p>
+
+        <p>Connecting is easy, just import the library and open the url</p>
+
+        <pre><code>from pystac_client import Client
+
+api_url = "https://earth-search.aws.element84.com/v1"
+client = Client.open(api_url)</code></pre>
+
+        <p>Then you can check, what are the available collections in that specific client.</p>
+
+        <pre><code>for collection in client.get_collections():
+    print(collection)</code></pre>
+
+        <pre><code>&lt;CollectionClient id=sentinel-2-pre-c1-l2a&gt;
+&lt;CollectionClient id=cop-dem-glo-30&gt;
+&lt;CollectionClient id=naip&gt;
+&lt;CollectionClient id=cop-dem-glo-90&gt;
+&lt;CollectionClient id=landsat-c2-l2&gt;
+&lt;CollectionClient id=sentinel-2-l2a&gt;
+&lt;CollectionClient id=sentinel-2-l1c&gt;
+&lt;CollectionClient id=sentinel-2-c1-l2a&gt;
+&lt;CollectionClient id=sentinel-1-grd&gt;</code></pre>
+
+        <h3>Searching for the item</h3>
+
+        <p>
+            As its basic usage, you can filter your collection by using location attribute
+            and the name of the collection, in this post I'm interested in searching at the
+            <code>sentinel-2-l2a</code> collection. As for the coordinate, you can create a
+            <code>shapely</code> point geometry using longitude and latitude in WGS84
+            coordinate reference system (WKID: 4326)
+        </p>
+
+        <pre><code># initiate the variable for query
+collection = "sentinel-2-l2a"
+point = Point(longitude, latitude)
+
+search = client.search(
+    collections=[collection],
+    intersects=point,
+    query={"eo:cloud_cover": {"lt": 1}}
+)</code></pre>
+
+        <p>
+            The search object contains some items inside it (refer to the 
+            <a href="#stac-structure">structure</a> if you are not sure), you can look at
+            it by iterating through it.
+        </p>
+
+        <pre><code>items = search.item_collection()
+for item in items:
+    print(item)</code></pre>
+
+        <p>It will print these lines</p>
+
+        <pre><code>&lt;Item id=S2A_48MXT_20210812_1_L2A&gt;
+&lt;Item id=S2A_48MXT_20210812_0_L2A&gt;
+&lt;Item id=S2A_48MXT_20210424_0_L2A&gt;
+&lt;Item id=S2B_48MXT_20190619_0_L2A&gt;</code></pre>
+
+        <p>
+            We will use this item id to find the <code>asset</code>. This <code>asset</code>
+            contains the actual link to our imagery. Now, depending on your use-case, you
+            might only interested in a specific imagery or maybe some of them. For example,
+            if you want to make a timeseries analysis, you certainly need more than 1 imagery.
+        </p>
+
+        <p>
+            Since the search object contains several item id, there are variety of ways to
+            get the imagery that suits your need, the most common attribute to be looked at
+            is probably the <strong>cloud coverage</strong>. Imagery with high cloud coverage
+            usually are harder to analyze. Another crucial attribute is the 
+            <strong>acquisition date</strong>. For natural disaster-related use case, it is
+            super crucial to find the imageries that relevant to the event. These 2 attributes
+            and many other attributes are recorded as part of the STAC metadata, and can be
+            used as a query parameter.
+        </p>
+
+        <p>
+            In my example, I only use the cloud coverage as my query parameter. To be more
+            specific, from my search result, I took the imagery that has the least cloud
+            coverage.
+        </p>
+
+        <h3>Get the asset</h3>
+
+        <p>
+            Now that we have the item id that we are interested in, we can use that item id
+            as our query parameter to search in the STAC url.
+        </p>
+
+        <pre><code>items = client.search(ids=[lowest_cloud_item_id]).item_collection()</code></pre>
+
+        <p>
+            This <code>items</code> is a <code>List</code>, at this point, since we're using
+            a specific item id, the list will only have 1 item. This item have some assets
+            inside, depending on the item you have, different number of asset will be included
+            inside it. In this case, the Sentinel-2-L2A has 35 assets inside, that is 12
+            bands of sentinel 2 bands, in 2 formats, <code>jp2</code> and <code>tiff</code>
+            and some other additional information such as <code>thumbnail</code> and 
+            <code>tileinfo_metadata</code>.
+        </p>
+
+        <pre><code># Check if the item was found
+if len(items) == 0:
+    print(f"No item found with ID: {lowest_cloud_item_id}")
+else:
+    item = items[0]
+    print(f"Found item: {item.id}")
+
+    # Retrieve the asset URLs
+    for asset_key, asset in item.assets.items():
+        print(f"Asset Key: {asset_key} - {asset.title}, URL: {asset.href}")</code></pre>
+
+        <p>
+            If your item includes <code>thumbnail</code> as its asset, you're in luck! Since
+            sattelite imageries is usually very large, a thumbnail can help you preview if
+            it is the correct (or the suitable) imagery for your use case.
+        </p>
+
+        <p>To check it you can do it like so</p>
+
+        <pre><code># URL of the image
+thumbnail_url = item.assets['thumbnail'].href
+
+# Open the JP2 file using rasterio
+with rasterio.open(thumbnail_url) as dataset:
+    # Read the red, green, and blue bands (usually 1, 2, and 3)
+    red = dataset.read(1)
+    green = dataset.read(2)
+    blue = dataset.read(3)
+
+    # Stack the bands into an RGB image (normalize to [0, 255] range)
+    rgb = np.dstack((red, green, blue))
+
+    # # Normalize the RGB image (optional if the values are not in the [0, 255] range)
+    # rgb_normalized = np.clip(rgb / np.max(rgb) * 255, 0, 255).astype(np.uint8)
+
+    # Plot the image using matplotlib
+    plt.figure(figsize=(5, 5))
+    plt.imshow(rgb)
+    plt.title('JP2 RGB Image Preview')
+    plt.axis('off')  # Hide the axes
+    plt.show()</code></pre>
+
+        <p>Then something like this should appear</p>
+
+        <figure id="thumbnail-example">
+            <img src="../assets/images/20241103_2_thumbnail_example.png" alt="da thumbnail">
+            <figcaption>da thumbnail</figcaption>
+        </figure>
+
+        <h2>Dasit!</h2>
+
+        <p>
+            That's that. You can ofcourse continue by using the real asset you're interested
+            in, if you want to create an image composite such as NDVI, you may want to use
+            the red and near-infrared assets. You wan to visualize the real-color imagery?
+            Use the red, green, and blue bands. You do you.
+        </p>
+
+        <p>
+            To get the final result like at the <a href="#the-end-result">start of this post</a>
+            you only need to use the near-infrared band then overlay the geometry on top of
+            the imagery plot. As always, you can check the complete code on 
+            <a href="https://gitlab.com/comrades_0/data_reading/-/blob/master/notebook/2_sentinel_from_copernicus.ipynb?ref_type=heads">my repository</a>.
+        </p>
+
+        <p>That's all for this post. See you later!</p>
+    </div>
+    
+    <div class="tags-section">
+        <strong>Tags:</strong>
+        <a href="../tags.html#data-science" class="tag">data-science</a>
+        <a href="../tags.html#how-to" class="tag">how-to</a>
+        <a href="../tags.html#python" class="tag">python</a>
+        <a href="../tags.html#geospatial" class="tag">geospatial</a>
+    </div>
+    
+    <script src="../static/dark-mode.js"></script>
+</body>
+</html>

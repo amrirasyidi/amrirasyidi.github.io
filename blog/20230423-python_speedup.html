@@ -1,0 +1,506 @@
+<!--
+title: 3 Things To Do To Speed Up Your Python Script
+date: 2023-04-23
+excerpt: This post recaps my data science project experience and how I tried alternatives to speed up my python script. Go straight to the "The Alternatives" part to see what I tried.
+tags: data-science, python, how-to, series:python-speedup
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3 Things To Do To Speed Up Your Python Script - Amri Rasyidi</title>
+    <link rel="stylesheet" href="../static/style.css">
+</head>
+<body>
+    <div class="header">
+        <nav class="nav">
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="../blog.html" class="active">Blog</a>
+                <a href="../services.html">Services</a>
+                <a href="../tags.html">Tags</a>
+            </div>
+            <button id="dark-mode-toggle" class="dark-mode-toggle">🌙 Dark</button>
+        </nav>
+    </div>
+
+    <div class="back-link">
+        <a href="../blog.html">← Back to Blog</a>
+    </div>
+
+    <h1>3 Things To Do To Speed Up Your Python Script</h1>
+    
+    <div class="post-meta">
+        Published on April 23, 2023
+    </div>
+
+    <div class="post-content">
+        <figure>
+            <img src="../assets/images/20230423_1_programming_lang_comparison.png" alt="bar graph"
+                 style="border-radius: 8px; width: 100%;">
+            <figcaption>Recreated from this repo<a href="#link1">[1]</a></figcaption>
+        </figure>
+
+        <h2>Summary</h2>
+
+        <p>
+            If you are using python, after a while you'll notice that your speed is
+            "decreasing". Don't get me wrong, it is still more than capable to process
+            thousands rows of data with no problem and no significant waiting time. The
+            story changes after the data get more complicated and the size increases by
+            100x.
+        </p>
+
+        <p>Realizing this, I immediately change my whole script to C.</p>
+
+        <p>
+            No, of course not. After all, I got my own reasons to choose python as my
+            first serious programming language (easy to understand is one of the top
+            reasons. I'm dumb, and python facilitates dumb people to code).
+        </p>
+
+        <p>
+            This post recaps my data science project experience and how I tried
+            alternatives to speed up my python script.
+        </p>
+
+        <p>TL;DR this is what I've tried:</p>
+
+        <ol>
+            <li>Use a better (more suitable) file format</li>
+            <li>Use faster packages/libraries</li>
+            <li>Python multi-processing</li>
+            <li>(Additional) Leverage big data capability</li>
+        </ol>
+
+        <p>
+            <strong>Disclaimer</strong>: this post only covers on speeding up the python
+            script, i.e. the technical side. What I mean by this is, I'm sure there must
+            be other non-technical practices that can speed up the workflow in general,
+            such as a thorough planning, make sure to only use the necessary data and
+            columns, etc.
+        </p>
+
+        <hr>
+
+        <h2>How the story starts</h2>
+
+        <p>
+            I've been working on a relatively simple data science project for the past 2
+            months.
+        </p>
+
+        <p>
+            Imagine you have 2 datasets, each of them have their own id, let say
+            customer_id and product_id. This data science project is basically ask to
+            count how many unique product_id corresponds to each customer_id. If you are
+            familiar with python, this whole project can be summed up in a
+            <strong>one liner</strong> 🤷‍♂️.
+        </p>
+
+        <pre><code>invoice_table[["customer_id","product_id"]].groupby("customer_id").nunique()</code></pre>
+
+        <p>If only it is that simple.</p>
+
+        <p>
+            It won't take months to work on and I probably won't create this post. There
+            are at least 2 reasons why that is not the case:
+        </p>
+
+        <ol>
+            <li>
+                The dataset is humongous. One of the dataset contains 180 million
+                records. The csv version of the data is about 27GB.
+            </li>
+            <li>It is geospatial data.</li>
+        </ol>
+
+        <div class="columns">
+            <div class="column">
+                <p>Remember this quote on the right? I wrote that.</p>
+                <p>
+                    Geospatial data by nature complicates the normal/tabular data,
+                    because it adds a geometry (basically a shape, point, line, or
+                    polygon) to the data—or rather, transform the data as geometry—and
+                    embed it into a coordinate reference system (lets you know where is
+                    the data located in our earth).
+                </p>
+            </div>
+            <div class="column">
+                <blockquote>
+                    <br><br>
+                    <p>"The story changes after the data get more complicated and the 
+                       size increases by 100x"</p>
+                    <footer>Me</footer>
+                </blockquote>
+            </div>
+        </div>
+
+        <p>This is actually a good thing because it introduces the data to spatial 
+           operations.</p>
+
+        <p>
+            But of course there's no free lunch (I'm starving btw, this is the last day
+            of Ramadhan).
+        </p>
+
+        <p>
+            After writing the script equivalent to that one liner above, I run the
+            process to estimate how long does it take.
+        </p>
+
+        <p>There's actually 2 steps to get the desired result.</p>
+
+        <p>
+            Before I do the one liner, I have to do a process called "spatial join". The
+            spatial join and one liner turns out take about 4 second for each records.
+            Sounds pretty quick right? <strong>WRONG!</strong>
+        </p>
+
+        <p>
+            I worked with 2 dataset, one of them is that 180 mil data (we will call this
+            the "point data"). The other one is just ~400k records (this one is "polygon
+            data"). The task requires me to do that 2 steps for each records in the
+            second dataset. That means to complete the task, it will take me 400.000 x 4
+            seconds. That is ~1.600.000 seconds. That 4 second now have became
+            <strong>18 DAYS</strong>.
+        </p>
+
+        <hr>
+
+        <h2>The Alternatives</h2>
+
+        <p>
+            There's no way I would wait for 18 days for the process to be finished. Why?
+        </p>
+
+        <ol>
+            <li>
+                If you think about it, this is a very simple problem. Just find how many
+                unique point inside a polygon, why does it have to take 18 days to
+                finish? This is unacceptable for me.
+            </li>
+            <li>
+                It is impossible to push this kind of solution into production stage. In
+                no world there's a client that would like to wait 18 days for a process
+                to be finished.
+            </li>
+        </ol>
+
+        <p>
+            So I tried some alternatives that I can think of. With the help of god,
+            stackoverflow, and chatGPT, here's the recap of my findings (or at least some
+            of it)…
+        </p>
+
+        <h3>Use Faster Libraries</h3>
+
+        <p>🤦‍♂️ You don't say.</p>
+
+        <p>
+            The problem is, this is not an intuitive solution for a novice data scientist
+            like me. How would I know there's a "blazingly fast DataFrame library
+            completely written in Rust, using the Apache Arrow memory model". (No, those
+            are not my words, that is what you'll get if you google "polars dataframe").
+        </p>
+
+        <p>Blazingly fast.</p>
+
+        <p>WTH 😆</p>
+
+        <p>But it really is Blazingly fast.</p>
+
+        <p>
+            Since I'm working mostly on tabular data, I mainly use pandas for both data
+            preprocessing and analysis. Turns out, there are many other alternatives to
+            pandas, namely:
+        </p>
+
+        <div class="columns">
+            <div class="column">
+                <ul>
+                    <li><a href="https://github.com/duckdb/duckdb" target="_blank" 
+                           rel="noreferrer noopener">duckdb</a></li>
+                    <li><a href="https://github.com/apache/spark" target="_blank" 
+                           rel="noreferrer noopener">spark</a></li>
+                    <li><a href="https://github.com/pola-rs/polars" target="_blank" 
+                           rel="noreferrer noopener">polars</a></li>
+                </ul>
+            </div>
+            <div class="column">
+                <ul>
+                    <li><a href="https://github.com/dask/dask" target="_blank" 
+                           rel="noreferrer noopener">Dask</a></li>
+                    <li><a href="https://github.com/vaexio/vaex" target="_blank" 
+                           rel="noreferrer noopener">Vaex</a></li>
+                    <li><a href="https://github.com/modin-project/modin" target="_blank" 
+                           rel="noreferrer noopener">modin</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <p>
+            Out of those 6 mentioned, I've only tried spark a little and polars. This is
+            the comparison of many pandas-like libraries.
+        </p>
+
+        <figure>
+            <img src="../assets/images/20230423_2_benchmark_read.png" width="700" alt="Reading benchmark">
+            <figcaption>time taken on reading 5GB of file <a href="#link2">[2]</a></figcaption>
+        </figure>
+
+        <figure>
+            <img src="../assets/images/20230423_3_benchmark_query.png" width="700" alt="Query benchmark">
+            <figcaption>time taken on a simple query <a href="#link2">[2]</a></figcaption>
+        </figure>
+
+        <p>
+            Pandas is probably doing better now since 
+            <a href="https://pandas.pydata.org/docs/dev/whatsnew/v2.0.0.html" target="_blank" 
+               rel="noreferrer noopener">pandas 2.0</a> support arrow as it 
+            <code>dtype_backend</code> and many other enhancement on the library.
+        </p>
+
+        <p>
+            Nowadays, this is how I do my preprocessing and analysis (especially when the
+            data is huge)
+        </p>
+
+        <ul>
+            <li>
+                <strong>Pandas.</strong><br>
+                I use pandas mainly for data exploration. Pandas is one of the first
+                libraries I ever learn, hence my mindset is attached with pandas syntax
+                when doing the exploration.
+            </li>
+            <li>
+                <strong>Polars.</strong><br>
+                This is to accelerate the data preprocessing stage. After exploring with
+                pandas, I got some idea what kind of preprocessing I need to do. I
+                translate that idea into polars syntaxes.
+            </li>
+        </ul>
+
+        <div class="callout-idea">
+            <div class="callout-icon">💡</div>
+            <div class="callout-content">
+                <p>
+                    I also just stumbled upon a YouTube video that showcasing 
+                    <a rel="noreferrer noopener" href="https://github.com/pytorch/pytorch" 
+                       target="_blank">pytorch</a> as 
+                    <a rel="noreferrer noopener" href="https://github.com/numpy/numpy" 
+                       target="_blank">numpy</a> replacement.<br>
+                    <strong>So, next time you are given a data science task, consider
+                    exploring the alternatives for the python libraries you are
+                    already familiar with.</strong>
+                </p>
+            </div>
+        </div>
+
+        <p>
+            And don't forget to use the libraries built-in optimization strategies. I'm
+            not really sure if "<em>built-in optimization strategies</em>" is the correct
+            terminology, but I'll give you an example of that.
+        </p>
+
+        <p>
+            Take GeoPandas as an example, the library has dependencies with other
+            libraries such as shapely. There's also options of engine available to be
+            used alongside GeoPandas such as fiona and pyogrio. In GeoPandas' case, what
+            I mean by <em>built-in optimization strategies</em> is to upgrade shapely to
+            version 2.0 and use pyogrio instead of fiona as its engine.
+        </p>
+
+        <figure>
+            <img src="../assets/images/20230423_4_gpd_sjoin.png" alt="Spatial join" height="200">
+            <figcaption>Spatial Join Comparison using different version of shapely<a href="#link3">[3]</a></figcaption>
+        </figure>
+
+        <figure>
+            <img src="../assets/images/20230423_5_gpd_engine.png" alt="GeoPandas engine" height="200">
+            <figcaption>.gpkg file reading comparison using fiona and pyogrio as the engine <a href="#link3">[3]</a></figcaption>
+        </figure>
+
+        <h3>Better File Format 🗒️</h3>
+
+        <p>
+            Extending the previous part on optimization strategies, it also worth to try
+            other data format, like parquet.
+        </p>
+
+        <figure>
+            <img src="../assets/images/20230423_6_gpd_format.png" height="200" alt="File format">
+            <figcaption>Time taken to read various file format using GeoPandas and their size comparison<a href="#link3">[3]</a></figcaption>
+        </figure>
+
+        <p>
+            As a beginner, besides taught pandas as a main driver for data processing, I
+            also got familiarized with csv file format. This makes sense because csv and
+            excel file are easy to read and access. You only need a spreadsheet reader
+            software, not even python is required at this point.
+        </p>
+
+        <p>
+            The entry gate of using python instead of a spreadsheet software is actually
+            similar to transitioning from csv to parquet (or other more memory-efficient
+            file formats), that is, data size.
+        </p>
+
+        <p>
+            After passing certain size of data, spreadsheet software's efficiency on
+            handling the data is reduced. This case also true for csv files. This is
+            where parquet come to the rescue.
+        </p>
+
+        <div class="callout-idea">
+            <div class="callout-icon">💡</div>
+            <div class="callout-content">
+                <p>
+                    The point data that is ~27GB as a csv file, now only ~2.5GB as a
+                    parquet file, reduced by 90% 😱.<br>
+                    Takeaway: try other data format.
+                </p>
+            </div>
+        </div>
+
+        <p>
+            Data size is not the only benefit I got by converting from to parquet, if you
+            see the left side of the graph above, the time take to read the file also
+            reduced significantly.
+        </p>
+
+        <h3>Multi-processing or Multi-threading 🎶</h3>
+
+        <p>I haven't really successfully tried out this alternative.</p>
+
+        <p>
+            One of the main reason is that, I usually do all the data science stuff
+            inside a jupyter notebook. And there is a know issue of running
+            multi-processing on a jupyter notebook file, tl;dr it is not as
+            straightforward.
+        </p>
+
+        <p>
+            One of the most straight forward solution is create a python file that
+            replicate the steps in the jupyter notebook.
+        </p>
+
+        <p>
+            Another reason is that I'm not familiar with the concept of multi-processing
+            and multi-threading, nor the practical side of it. My current attempt to run
+            the script inside a python file haven't really come into fruition.
+        </p>
+
+        <p>
+            Conceptually, by default, python (or jupyter notebook) scripts only utilizes
+            one core from our machine. Whereas, our machine usually have multiple cores.
+            Of course we want to utilizes more than just one of them to speed up our
+            processes.
+        </p>
+
+        <figure>
+            <img src="../assets/images/20230423_7_singleprocessing.png" height="200" alt="single processing">
+            <figcaption>Illustration of what happened when you run a python script WITHOUT multi-processing<a href="#link4">[4]</a></figcaption>
+        </figure>
+
+        <figure>
+            <img src="../assets/images/20230423_8_multiprocessing.png" height="200" alt="multi processing">
+            <figcaption>Illustration of what happened when you run a python script WITH multi-processing<a href="#link4">[4]</a></figcaption>
+        </figure>
+
+        <p>
+            You can see from the 2 graphs above, while not using multi-processing, the
+            process only take place on one core at a time (the y axis in the left graph
+            indicates the core number), that is why the graph seems patchy (many blank
+            spots). While on the bottom one, all the cores are utilized simultaneously to
+            execute the process.
+        </p>
+
+        <h3>Leverage Big Data Capabilities ⚡</h3>
+
+        <p>
+            This is somewhat an extension to the multi-processing strategy. When I say
+            leverage big data capabilities, I simply mean to process the task in a
+            multi-node or multi-cluster environment.
+        </p>
+
+        <p>What is node?</p>
+
+        <p>What is cluster?</p>
+
+        <p>What environment am I talking about?</p>
+
+        <p>Trust me, I'm just as lost as you are lil bro 💀.</p>
+
+        <p>
+            That is in brief using more computational power to execute the task. Hence I
+            said it is somewhat an extension to the previous strat.
+        </p>
+
+        <p>
+            One thing I tried is to use 
+            <a href="https://github.com/apache/sedona" target="_blank" 
+               rel="noreferrer noopener">apache-sedona</a>. The initial result is
+            promising, a 3x speed up compared to the utilized script!
+        </p>
+
+        <p>Should I know this earlier, I probably spent more time exploring this library (╯°□°)╯︵ ┻━┻</p>
+
+        <p>
+            I didn't put it in the "try faster library" strat because I think this one is
+            a little bit different. Apache's product such as hadoop and spark are well
+            known to be able to handle large-scale data processing due to its cluster
+            computing. That is why I think this one have more depth rather than just
+            using another library.
+        </p>
+
+        <hr>
+
+        <h2>The end</h2>
+
+        <p>
+            My effort on reducing the estimated time to finish the process is somehow
+            successful.
+        </p>
+
+        <p>From 4 seconds per record to less than 1 second per record.</p>
+
+        <p>That is from 18 days to ~3 days of running a script.</p>
+
+        <p>
+            I personally still can't accept this and still curious about how will it be
+            if I successfully apply the 3rd and/or 4th strategy.
+        </p>
+
+        <p>But I'll take this little victory ¯\(ツ)/¯.</p>
+
+        <p>
+            I'll write an update on my journey to find the fastest solution. Later!
+        </p>
+
+        <img src="../assets/images/20230423_9_meme.png" 
+             style="height:400px; display: block; margin: 0 auto;">
+
+        <h2>Sources</h2>
+
+        <p><a id="link1">[1]:</a><a href="https://github.com/niklas-heer/speed-comparison">Programming Language Speed Comparison</a></p>
+
+        <p><a id="link2">[2]:</a><a href="https://h2oai.github.io/db-benchmark/">Database-like ops benchmark</a></p>
+
+        <p><a id="link3">[3]:</a><a href="https://jorisvandenbossche.github.io/talks/2022_FOSS4G_geopandas/#1">State of GeoPandas and friends</a></p>
+
+        <p><a id="link4">[4]:</a><a href="https://www.youtube.com/watch?v=AZnGRKFUU0c">Threading vs multiprocessing in python</a></p>
+    </div>
+    
+    <div class="tags-section">
+        <strong>Tags:</strong>
+        <a href="../tags.html#data-science" class="tag">data-science</a>
+        <a href="../tags.html#python" class="tag">python</a>
+        <a href="../tags.html#how-to" class="tag">how-to</a>
+        <a href="../tags.html#series:python-speedup" class="tag">series: python-speedup</a>
+    </div>
+    
+    <script src="../static/dark-mode.js"></script>
+</body>
+</html>

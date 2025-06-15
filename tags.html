@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tags - Amri Rasyidi</title>
+    <link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+    <div class="header">
+        <nav class="nav">
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="blog.html">Blog</a>
+                <a href="services.html">Services</a>
+                <a href="tags.html" class="active">Tags</a>
+            </div>
+            <button id="dark-mode-toggle" class="dark-mode-toggle">🌙 Dark</button>
+        </nav>
+    </div>
+
+    <h1>Tags</h1>
+    
+    <p>Browse posts by topic:</p>
+
+    <div id="tag-cloud" style="margin-top: 30px;">
+        <div class="loading">Loading tags...</div>
+    </div>
+
+    <div id="tag-sections">
+        <!-- Tag sections will be populated automatically -->
+    </div>
+
+    <script src="static/blog-posts.js"></script>
+    <script src="static/tags.js"></script>
+    <script src="static/dark-mode.js"></script>
+</body>
+</html>
