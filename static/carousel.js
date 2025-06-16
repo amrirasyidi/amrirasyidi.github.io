@@ -1,4 +1,4 @@
-// carousel.js - Refactored with Carousel class
+// carousel.js - Fixed infinite loop behavior
 document.addEventListener('DOMContentLoaded', () => {
   class Carousel {
     constructor(config) {
@@ -50,6 +50,8 @@ document.addEventListener('DOMContentLoaded', () => {
         clearTimeout(this.resizeTimeout);
         this.resizeTimeout = setTimeout(() => {
           this.itemsToShow = this.getItemsToShow();
+          // Reset to valid index after resize
+          this.currentIndex = Math.min(this.currentIndex, this.getMaxIndex());
           this.updateCarousel();
         }, 250);
       });
@@ -59,6 +61,11 @@ document.addEventListener('DOMContentLoaded', () => {
       if (window.innerWidth <= 768) return 1;
       if (window.innerWidth <= 1024) return 2;
       return 3;
+    }
+
+    getMaxIndex() {
+      // Maximum index where we can still show itemsToShow complete items
+      return Math.max(0, this.items.length - this.itemsToShow);
     }
 
     updateCarousel() {
@@ -77,13 +84,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
     slideNext() {
       if (this.items.length <= this.itemsToShow) return;
-      this.currentIndex = (this.currentIndex + 1) % this.items.length;
+      
+      const maxIndex = this.getMaxIndex();
+      
+      if (this.currentIndex >= maxIndex) {
+        // At the last valid position, wrap to beginning
+        this.currentIndex = 0;
+      } else {
+        // Normal increment
+        this.currentIndex++;
+      }
+      
       this.updateCarousel();
     }
 
     slidePrev() {
       if (this.items.length <= this.itemsToShow) return;
-      this.currentIndex = (this.currentIndex - 1 + this.items.length) % this.items.length;
+      
+      const maxIndex = this.getMaxIndex();
+      
+      if (this.currentIndex <= 0) {
+        // At the beginning, wrap to last valid position
+        this.currentIndex = maxIndex;
+      } else {
+        // Normal decrement
+        this.currentIndex--;
+      }
+      
       this.updateCarousel();
     }
 
