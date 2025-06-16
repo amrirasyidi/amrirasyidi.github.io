@@ -43,18 +43,6 @@
                 <div class="stat-number">5+</div>
                 <div class="stat-label">Years of Professional Works</div>
             </div>
-            <!-- <div class="stat-item">
-                <div class="stat-number">193M</div>
-                <div class="stat-label">Records Processed</div>
-            </div> -->
-            <!-- <div class="stat-item">
-                <div class="stat-number">72%</div>
-                <div class="stat-label">Process Time Reduction</div>
-            </div> -->
-            <!-- <div class="stat-item">
-                <div class="stat-number">100%</div>
-                <div class="stat-label">Upwork Success Rate</div>
-            </div> -->
         </div>
     </div>
 
@@ -73,16 +61,6 @@
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- <div class="testimonial-item">
-                        <div class="testimonial-content">
-                            <p>"Very impressive, planning to rehire him again."</p>
-                            <div class="testimonial-meta">
-                                <strong>Spatial analy</strong>
-                                <span>$100 • Same-Day Delivery</span>
-                            </div>
-                        </div>
-                    </div> -->
                     
                     <div class="testimonial-item">
                         <div class="testimonial-content">
@@ -124,12 +102,12 @@
         <p>Whether you have satellite imagery, GPS data, or spatial datasets collecting dust—let's explore how to extract business value from it.</p>
         
         <div class="contact-options">
-            <a href="mailto:amri.geodesy@gmail.com" class="primary-cta">Discuss Your Project</a>
+            <a href="#get-in-touch" class="primary-cta">Discuss Your Project</a>
             <a href="#core-services" class="secondary-cta">See Technical Examples →</a>
         </div>
         
         <div class="cta-note">
-            <p><small>💡 <strong>Free consultation:</strong> I offer proof-of-concept development to validate your solution's feasibility—no strings attached.</small></p>
+            <p><small>💡 <strong>Free consultation:</strong> I offer proof-of-concept development to validate your solution's feasibility—no strings attached!</small></p>
         </div>
     </div>
 
@@ -257,19 +235,19 @@
 
     <div class="how-i-work">
         <h2>How I Work</h2>
-        <p>I focus on <strong>efficient, tailored solutions</strong> that integrate seamlessly with your existing workflows. Most projects follow this approach:</p>
+        <p>I focus on <strong>efficient, tailored solutions</strong> that integrate seamlessly with your existing workflows. Most of my past projects follow this approach:</p>
         
         <div class="work-process">
             <div class="process-step">
-                <strong>Data Assessment (1-2 days)</strong>
+                <strong>Data Assessment</strong>
                 <p>Understand your spatial data landscape and identify the highest-impact opportunities for analysis</p>
             </div>
             <div class="process-step">
-                <strong>Proof of Concept (1 week)</strong>
+                <strong>Proof of Concept</strong>
                 <p>Develop tailored prototype using your actual data to validate approach and demonstrate potential ROI</p>
             </div>
             <div class="process-step">
-                <strong>Custom Implementation (2-6 weeks)</strong>
+                <strong>Custom Implementation</strong>
                 <p>Build efficient, production-ready solution with documentation and team training for long-term success</p>
             </div>
         </div>
@@ -277,7 +255,62 @@
         <p><strong>My approach prioritizes:</strong> Clean, maintainable code • Seamless integration • Clear documentation • Knowledge transfer to your team</p>
     </div>
 
+    <div class="contact-form-section" id="get-in-touch">
+        <h2>Get In Touch</h2>
+        <p>Ready to discuss your project? Fill out the form below and I'll get back to you within 24 hours.</p>
+        
+        <form action="https://api.web3forms.com/submit" method="POST" class="contact-form" id="contact-form">
+            <!-- Replace YOUR_ACCESS_KEY_HERE with your actual Web3Forms access key -->
+            <input type="hidden" name="access_key" value="da02619a-a1d2-4727-96ba-9f5cd57ae45d">
+            
+            <!-- Form fields -->
+            <div class="form-group">
+                <label for="name">Name *</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email *</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="company">Company/Organization</label>
+                <input type="text" id="company" name="company">
+            </div>
+            
+            <div class="form-group">
+                <label for="subject">Subject *</label>
+                <input type="text" id="subject" name="subject" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="message">Message *</label>
+                <textarea id="message" name="message" rows="6" required placeholder="Tell me about your project, timeline, and specific requirements..."></textarea>
+            </div>
+            
+            <!-- Honeypot field for spam protection -->
+            <input type="checkbox" name="botcheck" class="hidden" style="display: none;">
+            
+            <button type="submit" class="submit-btn">
+                <span class="btn-text">Send Message</span>
+                <span class="btn-loading" style="display: none;">Sending...</span>
+            </button>
+        </form>
+        
+        <!-- Success Popup -->
+        <div class="popup-overlay" id="success-popup">
+            <div class="popup-content">
+                <div class="popup-icon">✓</div>
+                <h3>Message Sent Successfully!</h3>
+                <p>Thank you for reaching out. I'll get back to you within 24 hours.</p>
+                <button class="popup-close-btn" onclick="closePopup()">Close</button>
+            </div>
+        </div>
+    </div>
+
     <script src="static/dark-mode.js"></script>
     <script src="static/carousel.js"></script>
+    <script src="static/contact-form.js"></script>
 </body>
 </html>
