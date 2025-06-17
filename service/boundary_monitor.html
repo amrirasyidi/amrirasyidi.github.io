@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detect Unauthorized Land Activities - Amri Rasyidi</title>
+    <link rel="stylesheet" href="../static/style.css">
+</head>
+<body class="wide-page">
+    <div class="header">
+        <nav class="nav">
+            <div class="nav-links">
+                <a href="../index.html">About</a>
+                <a href="../services.html" class="active">Services</a>
+                <a href="../blog.html">Blog</a>
+                <a href="../tags.html">Tags</a>
+            </div>
+            <button id="dark-mode-toggle" class="dark-mode-toggle">🌙 Dark</button>
+        </nav>
+    </div>
+
+    <div class="back-link">
+        <a href="../services.html">← Back to Services</a>
+    </div>
+
+    <h1>Satellite Imagery Analysis</h1>
+    
+    <div class="post-meta">
+        STAC • COG • Sentinel • Landsat • Rasterio
+    </div>
+
+    <div class="post-content">
+        <div class="service-demo-section">
+            <h2>Capability Overview</h2>
+            
+            <!-- Demo Media Carousel -->
+            <div class="demo-carousel">
+                <button class="carousel-btn prev-btn" id="demoPrevBtn">‹</button>
+                <div class="demo-container">
+                    <div class="demo-track" id="demoTrack">
+                        <div class="demo-item">
+                            <img src="../assets/images/portfolio/tree_counting_demo.jpg" alt="Tree Counting Analysis Demo" class="demo-media">
+                        </div>
+                        <div class="demo-item">
+                            <video class="demo-media" controls>
+                                <source src="../assets/videos/portfolio/unet_deploy.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                        <div class="demo-item">
+                            <img src="../assets/images/portfolio/tree_counting_demo.jpg" alt="Tree Counting Analysis Demo" class="demo-media">
+                        </div>
+                    </div>
+                </div>
+                <button class="carousel-btn next-btn" id="demoNextBtn">›</button>
+            </div>
+            
+            <div class="capability-highlights">
+                <div class="highlight-item">
+                    <strong>Automated Data Discovery:</strong>
+                    <p>Connect to STAC catalogs to automatically find and filter relevant satellite imagery based on location, date range, and cloud coverage criteria.</p>
+                </div>
+                
+                <div class="highlight-item">
+                    <strong>Cloud-Optimized Processing:</strong>
+                    <p>Process COG (Cloud-Optimized GeoTIFF) files efficiently without downloading entire datasets, enabling analysis of terabytes of imagery.</p>
+                </div>
+                
+                <div class="highlight-item">
+                    <strong>Vegetation Monitoring:</strong>
+                    <p>Calculate NDVI, EVI, and custom vegetation indices for crop monitoring, deforestation detection, and environmental compliance.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="business-value-section">
+            <h2>Business Value</h2>
+            
+            <div class="value-grid">
+                <div class="value-item">
+                    <h3>🌿 Environmental Compliance</h3>
+                    <p>Automated monitoring of vegetation changes for carbon credit verification and environmental impact assessments.</p>
+                </div>
+                
+                <div class="value-item">
+                    <h3>🚜 Agricultural Optimization</h3>
+                    <p>Track crop health, predict yields, and optimize irrigation schedules using multispectral satellite data.</p>
+                </div>
+                
+                <div class="value-item">
+                    <h3>📊 Scalable Analysis</h3>
+                    <p>Process satellite imagery at scale without the overhead of traditional GIS desktop software.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="results-section">
+            <h2>Proven Results</h2>
+            <div class="result-highlight">
+                <div class="result-metric">95%</div>
+                <div class="result-description">Accuracy achieved in automated tree counting for carbon credit verification projects</div>
+            </div>
+            
+            <div class="result-highlight">
+                <div class="result-metric">10TB+</div>
+                <div class="result-description">Satellite imagery processed monthly for ongoing environmental monitoring clients</div>
+            </div>
+        </div>
+
+        <div class="tech-details-section">
+            <h2>Technical Implementation</h2>
+            <ul>
+                <li><strong>Data Sources:</strong> Sentinel-2, Landsat 8/9, Planet Labs, custom drone imagery</li>
+                <li><strong>Processing Pipeline:</strong> STAC API → COG optimization → Rasterio analysis → Results delivery</li>
+                <li><strong>Output Formats:</strong> Interactive dashboards, GeoTIFF exports, time-series analysis, automated reports</li>
+                <li><strong>Integration:</strong> REST APIs, webhook notifications, cloud storage integration</li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="cta-section">
+        <h2>Ready to Start Your Satellite Analysis Project?</h2>
+        <p>Let's discuss how satellite imagery analysis can provide insights for your specific use case.</p>
+        
+        <div class="contact-options">
+            <a href="../services.html#get-in-touch" class="primary-cta">Discuss This Serivce</a>
+            <a href="../services.html" class="secondary-cta">← All Services</a>
+        </div>
+    </div>
+    
+    <script src="../static/dark-mode.js"></script>
+    <script src="../static/carousel.js"></script>
+</body>
+</html>

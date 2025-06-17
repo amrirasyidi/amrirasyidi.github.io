@@ -1,4 +1,4 @@
-// carousel.js - Fixed infinite loop behavior
+// carousel.js - Enhanced with Demo Carousel and Video Support
 document.addEventListener('DOMContentLoaded', () => {
   class Carousel {
     constructor(config) {
@@ -15,10 +15,12 @@ document.addEventListener('DOMContentLoaded', () => {
       
       // Configuration
       this.autoPlayDelay = config.autoPlayDelay;
-      this.itemsToShow = this.getItemsToShow();
+      this.isSingleItem = config.singleItem || false;
+      this.itemsToShow = this.isSingleItem ? 1 : this.getItemsToShow();
       this.currentIndex = 0;
       this.autoPlayInterval = null;
       this.resizeTimeout = null;
+      this.isVideoPlaying = false;
 
       // Initialize if valid
       if (this.track && this.prevBtn && this.nextBtn && this.items.length > 0) {
@@ -36,6 +38,11 @@ document.addEventListener('DOMContentLoaded', () => {
       this.prevBtn.addEventListener('click', () => this.slidePrev());
       this.nextBtn.addEventListener('click', () => this.slideNext());
       
+      // Video event listeners if this is a single item carousel
+      if (this.isSingleItem) {
+        this.setupVideoListeners();
+      }
+      
       // Auto-play setup
       this.startAutoPlay();
       
@@ -45,15 +52,49 @@ document.addEventListener('DOMContentLoaded', () => {
         this.container.addEventListener('mouseleave', () => this.startAutoPlay());
       }
       
-      // Responsive handling with debounce
-      window.addEventListener('resize', () => {
-        clearTimeout(this.resizeTimeout);
-        this.resizeTimeout = setTimeout(() => {
-          this.itemsToShow = this.getItemsToShow();
-          // Reset to valid index after resize
-          this.currentIndex = Math.min(this.currentIndex, this.getMaxIndex());
-          this.updateCarousel();
-        }, 250);
+      // Responsive handling with debounce (only for multi-item carousels)
+      if (!this.isSingleItem) {
+        window.addEventListener('resize', () => {
+          clearTimeout(this.resizeTimeout);
+          this.resizeTimeout = setTimeout(() => {
+            this.itemsToShow = this.getItemsToShow();
+            // Reset to valid index after resize
+            this.currentIndex = Math.min(this.currentIndex, this.getMaxIndex());
+            this.updateCarousel();
+          }, 250);
+        });
+      }
+    }
+
+    setupVideoListeners() {
+      // Add event listeners to all videos in the carousel
+      this.items.forEach((item, index) => {
+        const video = item.querySelector('video');
+        if (video) {
+          // When video starts playing
+          video.addEventListener('play', () => {
+            if (index === this.currentIndex) {
+              this.isVideoPlaying = true;
+              this.stopAutoPlay();
+            }
+          });
+
+          // When video ends
+          video.addEventListener('ended', () => {
+            if (index === this.currentIndex) {
+              this.isVideoPlaying = false;
+              this.startAutoPlay();
+            }
+          });
+
+          // When video is paused
+          video.addEventListener('pause', () => {
+            if (index === this.currentIndex) {
+              this.isVideoPlaying = false;
+              this.startAutoPlay();
+            }
+          });
+        }
       });
     }
 
@@ -80,6 +121,40 @@ document.addEventListener('DOMContentLoaded', () => {
       const itemWidth = 100 / this.itemsToShow;
       const translateX = -(this.currentIndex * itemWidth);
       this.track.style.transform = `translateX(${translateX}%)`;
+
+      // Handle video state changes for single item carousels
+      if (this.isSingleItem) {
+        this.handleVideoStateChange();
+      }
+    }
+
+    handleVideoStateChange() {
+      // Pause all videos except the current one
+      this.items.forEach((item, index) => {
+        const video = item.querySelector('video');
+        if (video && index !== this.currentIndex) {
+          video.pause();
+        }
+      });
+
+      // Check if current item has a video and update auto-play accordingly
+      const currentItem = this.items[this.currentIndex];
+      const currentVideo = currentItem?.querySelector('video');
+      
+      // Auto-play current video if it exists
+      if (currentVideo) {
+        currentVideo.play().catch(e => console.log('Autoplay failed:', e));
+      }
+      
+      if (currentVideo && !currentVideo.paused) {
+        this.isVideoPlaying = true;
+        this.stopAutoPlay();
+      } else {
+        this.isVideoPlaying = false;
+        if (!this.container || !this.container.matches(':hover')) {
+          this.startAutoPlay();
+        }
+      }
     }
 
     slideNext() {
@@ -116,12 +191,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startAutoPlay() {
       this.stopAutoPlay(); // Clear existing interval
-      if (this.items.length > this.itemsToShow) {
-        this.autoPlayInterval = setInterval(
-          () => this.slideNext(), 
-          this.autoPlayDelay
-        );
+      
+      // Don't start auto-play if video is playing or not enough items
+      if (this.isVideoPlaying || this.items.length <= this.itemsToShow) {
+        return;
       }
+      
+      this.autoPlayInterval = setInterval(
+        () => this.slideNext(), 
+        this.autoPlayDelay
+      );
     }
 
     stopAutoPlay() {
@@ -150,5 +229,17 @@ document.addEventListener('DOMContentLoaded', () => {
     itemSelector: '.service-item',
     containerSelector: '.services-carousel',
     autoPlayDelay: 6000
+  });
+
+  // Initialize Demo Carousel (Single Item with Video Support)
+  new Carousel({
+    trackId: 'demoTrack',
+    prevBtnId: 'demoPrevBtn',
+    nextBtnId: 'demoNextBtn',
+    itemSelector: '.demo-item',
+    containerSelector: '.demo-carousel',
+    autoPlayDelay: 4000,
+    singleItem: true,
+    autoPlayVideos: true
   });
 });

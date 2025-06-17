@@ -758,6 +758,104 @@ img, video, iframe { max-width: 100%; height: auto; }
     }
 }
 
+/* Demo Carousel (Single Item) */
+.demo-carousel {
+    position: relative;
+    max-width: 100%;
+    margin: 20px 0 30px;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    background: var(--bg-secondary);
+}
+
+.demo-container {
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+    height: 400px;
+}
+
+.demo-track {
+    display: flex;
+    transition: transform 0.3s ease;
+    height: 100%;
+}
+
+.demo-item {
+    flex: 0 0 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.demo-media {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    border-radius: var(--border-radius);
+    object-fit: contain;
+}
+
+.demo-media video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Demo carousel buttons */
+.demo-carousel .carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 102, 204, 0.8);
+    color: white;
+    border: none;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    font-size: 22px;
+    cursor: pointer;
+    z-index: 10;
+    transition: all var(--transition-fast);
+    backdrop-filter: blur(10px);
+}
+
+.demo-carousel .carousel-btn:hover {
+    background: rgba(51, 51, 51, 0.9);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.demo-carousel .prev-btn {
+    left: 15px;
+}
+
+.demo-carousel .next-btn {
+    right: 15px;
+}
+
+/* Responsive adjustments for demo carousel */
+@media (max-width: 768px) {
+    .demo-container {
+        height: 250px;
+    }
+    
+    .demo-carousel .carousel-btn {
+        width: 35px;
+        height: 35px;
+        font-size: 18px;
+    }
+    
+    .demo-carousel .prev-btn {
+        left: 10px;
+    }
+    
+    .demo-carousel .next-btn {
+        right: 10px;
+    }
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     body { padding: 20px 15px; }
