@@ -1,4 +1,4 @@
-// carousel.js - Enhanced with Demo Carousel and Video Support
+// carousel.js - Enhanced with Demo Carousel, Video Support, and Visibility Tracking
 document.addEventListener('DOMContentLoaded', () => {
   class Carousel {
     constructor(config) {
@@ -16,15 +16,22 @@ document.addEventListener('DOMContentLoaded', () => {
       // Configuration
       this.autoPlayDelay = config.autoPlayDelay;
       this.isSingleItem = config.singleItem || false;
+      this.autoPlayVideos = config.autoPlayVideos || false;
       this.itemsToShow = this.isSingleItem ? 1 : this.getItemsToShow();
       this.currentIndex = 0;
       this.autoPlayInterval = null;
       this.resizeTimeout = null;
       this.isVideoPlaying = false;
+      
+      // Visibility tracking
+      this.isVisible = true;
+      this.isInViewport = true;
+      this.observer = null;
 
       // Initialize if valid
       if (this.track && this.prevBtn && this.nextBtn && this.items.length > 0) {
         this.init();
+        this.setupVisibilityTracking();
       } else {
         console.warn(`Carousel initialization skipped for ${config.trackId}`);
       }
@@ -49,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Pause on hover if container exists
       if (this.container) {
         this.container.addEventListener('mouseenter', () => this.stopAutoPlay());
-        this.container.addEventListener('mouseleave', () => this.startAutoPlay());
+        this.container.addEventListener('mouseleave', () => this.updateAutoPlayState());
       }
       
       // Responsive handling with debounce (only for multi-item carousels)
@@ -63,6 +70,36 @@ document.addEventListener('DOMContentLoaded', () => {
             this.updateCarousel();
           }, 250);
         });
+      }
+    }
+
+    setupVisibilityTracking() {
+      // Track document visibility (tab switching)
+      document.addEventListener('visibilitychange', () => {
+        this.isVisible = !document.hidden;
+        this.updateAutoPlayState();
+      });
+
+      // Track viewport visibility (scrolling)
+      if ('IntersectionObserver' in window && this.container) {
+        this.observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            this.isInViewport = entry.isIntersecting;
+            this.updateAutoPlayState();
+          });
+        }, { threshold: 0.1 });
+        
+        this.observer.observe(this.container);
+      }
+    }
+
+    updateAutoPlayState() {
+      if (this.isVisible && this.isInViewport && !this.isVideoPlaying) {
+        if (!this.container || !this.container.matches(':hover')) {
+          this.startAutoPlay();
+        }
+      } else {
+        this.stopAutoPlay();
       }
     }
 
@@ -83,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
           video.addEventListener('ended', () => {
             if (index === this.currentIndex) {
               this.isVideoPlaying = false;
-              this.startAutoPlay();
+              this.updateAutoPlayState();
             }
           });
 
@@ -91,7 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
           video.addEventListener('pause', () => {
             if (index === this.currentIndex) {
               this.isVideoPlaying = false;
-              this.startAutoPlay();
+              this.updateAutoPlayState();
             }
           });
         }
@@ -141,8 +178,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const currentItem = this.items[this.currentIndex];
       const currentVideo = currentItem?.querySelector('video');
       
-      // Auto-play current video if it exists
-      if (currentVideo) {
+      // Auto-play current video if it exists and autoPlayVideos is enabled
+      if (this.autoPlayVideos && currentVideo) {
         currentVideo.play().catch(e => console.log('Autoplay failed:', e));
       }
       
@@ -151,9 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
         this.stopAutoPlay();
       } else {
         this.isVideoPlaying = false;
-        if (!this.container || !this.container.matches(':hover')) {
-          this.startAutoPlay();
-        }
+        this.updateAutoPlayState();
       }
     }
 
@@ -192,8 +227,8 @@ document.addEventListener('DOMContentLoaded', () => {
     startAutoPlay() {
       this.stopAutoPlay(); // Clear existing interval
       
-      // Don't start auto-play if video is playing or not enough items
-      if (this.isVideoPlaying || this.items.length <= this.itemsToShow) {
+      // Don't start auto-play if not visible, video playing, or not enough items
+      if (!this.isVisible || !this.isInViewport || this.isVideoPlaying || this.items.length <= this.itemsToShow) {
         return;
       }
       
@@ -207,6 +242,14 @@ document.addEventListener('DOMContentLoaded', () => {
       if (this.autoPlayInterval) {
         clearInterval(this.autoPlayInterval);
         this.autoPlayInterval = null;
+      }
+    }
+
+    // Cleanup method for proper disposal
+    destroy() {
+      this.stopAutoPlay();
+      if (this.observer) {
+        this.observer.disconnect();
       }
     }
   }
