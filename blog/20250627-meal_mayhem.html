@@ -37,10 +37,10 @@ tags: data-science, python, geospatial, gis, policy
 
     <div class="post-content">
         <p>
-            If I'm a student receiving government hail-mary program "Makan <del>Beracun</del> 
-            Bergizi Gratis" or as some people called it, "MBG", I would treat it like winning 
-            a jackpot from online gambling (judol) site, the chance is low, but what the heck, 
-            I will keep doing it anyway, hoping to (not) getting the "jackpot". Mr. President 
+            If I were a student receiving the government's hail-mary program "Makan <del>Beracun</del> 
+            Bergizi Gratis" or as some people call it, "MBG", I would treat it like winning 
+            a jackpot from an online gambling (judol) site—the chance is low, but what the heck, 
+            I will keep doing it anyway, hoping to (not) get the "jackpot". Mr. President 
             <a href="https://www.dw.com/id/kasus-keracunan-mbg-prabowo-200-orang-dari-3-juta-penerima-manfaat/a-72443595">said it himself</a> 
             "the failure rate is <em>only</em> 0.005%".
         </p>
@@ -52,29 +52,29 @@ tags: data-science, python, geospatial, gis, policy
         </figure>
 
         <p>
-            Despite the dumb execution, I still <em>want</em> to think that the <em>intention</em> 
-            is good. Naturally, the fruition to the intention can be in a completely different 
-            form, but "nasi sudah menjadi bubur" as our people said, so it is what it is. In 
-            this post, I'm not going to yapp on the political/regulation side, but rather I'll 
-            talk about it from an angle I'm quite familiar with, spatial.
+            Despite the poor execution, I still <em>want</em> to think that the <em>intention</em> 
+            is good. Naturally, the fruition of the intention can be in a completely different 
+            form, but "nasi sudah menjadi bubur" as our people say, so it is what it is. In 
+            this post, I'm not going to yap about the political/regulation side, but rather I'll 
+            talk about it from an angle I'm quite familiar with: spatial.
         </p>
 
         <p>
-            Spatial (or maybe commonly referred as GIS), an industry I'm currently involved in, 
-            revolves around one question, "where?". That's basically it. It's cool because it 
-            is specific and there's so much different approach to face that one question. But 
+            Spatial (or maybe commonly referred to as GIS), an industry I'm currently involved in, 
+            revolves around one question: "where?". That's basically it. It's cool because it 
+            is specific and there are so many different approaches to face that one question. But 
             it is also sad because, well, that's it, that's my sky.
         </p>
 
         <p>
-            One possible reason that the food got bad is that it is not prepared properly, the 
-            ingredients might got bad or the food got bad after it is prepared (be warned, that 
-            this is baseless, I'm just talking about a <em>possible</em> reason, and again, I'm 
+            One possible reason that the food went bad is that it was not prepared properly—the 
+            ingredients might have gone bad or the food went bad after it was prepared (be warned, 
+            this is baseless; I'm just talking about a <em>possible</em> reason, and again, I'm 
             not going to touch on the political/regulation side). So <em>maybe</em>, a possible 
-            solution to that is to minimize the gap between raw ingredient, preparation, and the 
-            distribution of meal. To store the raw ingredient in a place where it has a good 
+            solution to that is to minimize the gap between raw ingredients, preparation, and the 
+            distribution of meals. To store the raw ingredients in a place where they have good 
             access to be prepared in the kitchen and to be distributed to the students later. 
-            And this is where spatial perspective come in.
+            And this is where spatial perspective comes in.
         </p>
 
         <p>
@@ -82,7 +82,7 @@ tags: data-science, python, geospatial, gis, policy
         </p>
 
         <p>
-            We will dive in on one approach to find an alternative to that very question. 
+            We will dive into one approach to find an alternative to that very question. 
             Let's cook!
         </p>
 
@@ -96,22 +96,22 @@ tags: data-science, python, geospatial, gis, policy
 
         <ol>
             <li>
-                For simplicity sake, let's assume that the "storage" (where raw ingredients 
-                will be stored) and the "kitchen" (where raw ingredients will be cooked) is 
-                under the same hood.
+                For simplicity's sake, let's assume that the "storage" (where raw ingredients 
+                will be stored) and the "kitchen" (where raw ingredients will be cooked) are 
+                under the same roof.
             </li>
             <li>
-                The meal then will be distributed directly from the kitchen to the schools.
+                The meals will then be distributed directly from the kitchen to the schools.
             </li>
             <li>
-                These storage/kitchen location already predefined.
+                These storage/kitchen locations are already predefined.
             </li>
         </ol>
 
         <p>
             Our task then will be to decide "how suitable" the location is. There are many 
-            different factors to decide the suitability of a location, for example, we can use 
-            the number of students around the location, ease of access, number of schools, etc. 
+            different factors to consider when deciding the suitability of a location—for example, 
+            we can use the number of students around the location, ease of access, number of schools, etc. 
             In this project, however, we are not going so far as to give a score of suitability, 
             but only to calculate some parameters that perhaps can be used to do suitability 
             analysis later.
@@ -119,25 +119,25 @@ tags: data-science, python, geospatial, gis, policy
 
         <h2>Data</h2>
 
-        <p>There are 3 main data that we need to have:</p>
+        <p>There are 3 main pieces of data that we need to have:</p>
 
         <ol>
             <li>School location</li>
-            <li>School composition (number of student)</li>
+            <li>School composition (number of students)</li>
             <li>Kitchen location</li>
         </ol>
 
         <p>
-            To put it briefly, we are going to calculate the distance between the kitchen to 
-            the schools in its vicinity, we will also get the insight of number of student. 
-            The number of student can help to approximate the capacity needed for the storage 
+            To put it briefly, we are going to calculate the distance between the kitchen and 
+            the schools in its vicinity, and we will also get insight into the number of students. 
+            The number of students can help to approximate the capacity needed for the storage 
             and also to measure the "impact" of the said storage.
         </p>
 
         <h2>Technical implementation</h2>
 
         <p>
-            There's this amazing python package specifically built to enable downloading, 
+            There's this amazing Python package specifically built to enable downloading, 
             modelling, analyzing, and visualizing street networks and other geospatial features 
             from OpenStreetMap. Enter <a href="https://osmnx.readthedocs.io/en/stable/">OSMnx</a>. 
             We will mainly use this package for the project. We will fetch the network data, 
@@ -145,32 +145,32 @@ tags: data-science, python, geospatial, gis, policy
         </p>
 
         <p>
-            The complete implementation is embedded into a loop, I'll pull it from the loop and 
-            walk you through the step by step. The complete implementation will be written in 
+            The complete implementation is embedded into a loop. I'll pull it from the loop and 
+            walk you through it step by step. The complete implementation will be written at 
             the end of this section.
         </p>
 
         <h3>Group the data based on their Kabupaten Name</h3>
 
         <p>
-            We are going to need the road network to do the network analysis. The way OSMnx do 
+            We are going to need the road network to do the network analysis. The way OSMnx does 
             this is basically to fetch the data from OSM in a certain scope (can be municipality, 
-            city, or country even). The time needed to fetch the data then converting it into a 
-            network will depend on how complex (and complete) the data inside the said scope. To 
-            make it efficient, we will use the most optimal scope. Upon trial and error, for area 
-            in Indonesia, I found the most optimal scope is at Kabupaten level. A more granular 
-            level would be beneficial, but I found the OSM unable to fetch the network data for a 
+            city, or country even). The time needed to fetch the data and then convert it into a 
+            network will depend on how complex (and complete) the data is inside the said scope. To 
+            make it efficient, we will use the most optimal scope. Upon trial and error, for areas 
+            in Indonesia, I found the most optimal scope is at the Kabupaten level. A more granular 
+            level would be beneficial, but I found that OSM was unable to fetch the network data for a 
             query on a level lower than Kabupaten.
         </p>
 
         <pre><code>grouped = df.groupby(['kabupaten', 'provinsi'])</code></pre>
 
-        <h3>Find the graph (explain what is graph, and why is it important)</h3>
+        <h3>Find the graph (explain what a graph is, and why it is important)</h3>
 
         <p>
             In network analysis, a graph is a mathematical representation of a road network where 
             intersections are "nodes" and road segments are "edges" connecting those nodes. Think 
-            of it as a digital map that algorithms can understand - each road junction becomes a 
+            of it as a digital map that algorithms can understand—each road junction becomes a 
             point, and each road segment becomes a line with properties like length and speed limit.
         </p>
 
@@ -191,7 +191,7 @@ G = ox.graph.graph_from_place(place_string, network_type="drive")</code></pre>
             We fill the <code>place_string</code> with different Kabupaten names, and this is 
             where we decide the "scope" of the data we would like to fetch. The 
             <code>network_type="drive"</code> ensures we only get roads accessible by cars 
-            (perhaps also motorbike).
+            (perhaps also motorcycles).
         </p>
 
         <h3>Create a pair of destination and origin</h3>
@@ -256,7 +256,7 @@ route_length = route_gdf['length'].sum()</code></pre>
         </p>
 
         <p>
-            We successfully calculated the <strong>ease of access</strong> parameter - real driving 
+            We successfully calculated the <strong>ease of access</strong> parameter—real driving 
             distances between kitchens and schools using actual road networks. We also have the 
             foundation to incorporate <strong>number of students</strong> and 
             <strong>number of schools</strong> around each location. So we've got some key 
@@ -265,10 +265,10 @@ route_length = route_gdf['length'].sum()</code></pre>
         </p>
 
         <p>
-            <strong>But let's be real</strong> - we're not fixing the MBG program overnight. This 
+            <strong>But let's be real</strong>—we're not fixing the MBG program overnight. This 
             assumes kitchen locations are predefined, OSM data is accurate, shortest route = best 
             route, and ignores traffic, road conditions, or the fact that some OSM roads are more 
-            "aspirational" than actual - we're just measuring "how far is everything from this 
+            "aspirational" than actual—we're just measuring "how far is everything from this 
             location?" It's like preparing all the ingredients but not actually cooking the meal.
         </p>
 
@@ -282,7 +282,7 @@ route_length = route_gdf['length'].sum()</code></pre>
         </ul>
 
         <p>
-            But I'm not paid to do it, so this is not my f-ing problem, I'll just leave the rest 
+            But I'm not paid to do it, so this is not my problem. I'll just leave the rest 
             to the next person in the kitchen.
         </p>
 
