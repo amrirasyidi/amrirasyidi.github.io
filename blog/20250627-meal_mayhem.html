@@ -165,7 +165,7 @@ tags: data-science, python, geospatial, gis, policy
 
         <pre><code>grouped = df.groupby(['kabupaten', 'provinsi'])</code></pre>
 
-        <h3>Find the graph (explain what a graph is, and why it is important)</h3>
+        <h3>Find the graph</h3>
 
         <p>
             In network analysis, a graph is a mathematical representation of a road network where 
@@ -212,7 +212,7 @@ asset_id = row['id_kunci']</code></pre>
             actual route between them.
         </p>
 
-        <h3>Find the nearest node (fall back to straight line if there's none)</h3>
+        <h3>Find the nearest node</h3>
 
         <pre><code># Find nearest nodes
 origin_node = ox.distance.nearest_nodes(G, float(origin_lon), float(origin_lat))
