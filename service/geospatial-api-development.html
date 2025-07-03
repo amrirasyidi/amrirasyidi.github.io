@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Maps Business Intelligence Tool - Amri Rasyidi</title>
+    <link rel="stylesheet" href="../static/style.css">
+</head>
+<body class="wide-page">
+    <div class="header">
+        <nav class="nav">
+            <div class="nav-links">
+                <a href="../index.html">About</a>
+                <a href="../services.html" class="active">Services</a>
+                <a href="../blog.html">Blog</a>
+                <a href="../tags.html">Tags</a>
+            </div>
+            <button id="dark-mode-toggle" class="dark-mode-toggle">🌙 Dark</button>
+        </nav>
+    </div>
+
+    <div class="back-link">
+        <a href="../services.html">← Back to Services</a>
+    </div>
+
+    <h1>Google Maps Business Intelligence Tool</h1>
+
+    <div class="post-content">
+        <div class="service-demo-section">
+            <h2>Capability Overview</h2>
+             
+            <!-- Demo Media Carousel -->
+            <div class="demo-carousel">
+                <button class="carousel-btn prev-btn" id="demoPrevBtn">‹</button>
+                <div class="demo-container">
+                    <div class="demo-track" id="demoTrack">
+                        <div class="demo-item">
+                            <img src="../assets/portfolio/images/geospatial_api_demo0.png" alt="Tree Counting Analysis Demo" class="demo-media">
+                        </div>
+                        <div class="demo-item">
+                            <video class="demo-media" controls>
+                                <source src="../assets/portfolio/videos/geospatial_api_demo0.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                        <div class="demo-item">
+                            <img src="../assets/portfolio/images/geospatial_api_demo1.png" alt="Tree Counting Analysis Demo" class="demo-media">
+                        </div>
+                        <div class="demo-item">
+                            <img src="../assets/portfolio/images/geospatial_api_demo2.png" alt="Tree Counting Analysis Demo" class="demo-media">
+                        </div>
+                        <div class="demo-item">
+                            <img src="../assets/portfolio/images/geospatial_api_demo3.png" alt="Tree Counting Analysis Demo" class="demo-media">
+                        </div>
+                    </div>
+                </div>
+                <button class="carousel-btn next-btn" id="demoNextBtn">›</button>
+            </div>           
+            
+            <div class="capability-highlights">
+                <div class="highlight-item">
+                    <strong>Dual Search Modes</strong>
+                    <p>Choose between simple location-based searches or comprehensive grid-based area coverage for maximum data collection efficiency.</p>
+                </div>
+                
+                <div class="highlight-item">
+                    <strong>Interactive Web Interface</strong>
+                    <p>User-friendly web application with real-time map visualization, drawing tools for area selection, and instant search preview capabilities.</p>
+                </div>
+                
+                <div class="highlight-item">
+                    <strong>Configurable Search Parameters</strong>
+                    <p>Fine-tune search radius, grid dimensions, overlap percentages, and coverage areas to match your specific business intelligence needs.</p>
+                </div>
+                
+                <div class="highlight-item">
+                    <strong>Multiple Export Formats</strong>
+                    <p>Export comprehensive business data to Excel spreadsheets or GeoJSON files with complete contact information, addresses, and geographic coordinates.</p>
+                </div>
+                
+                <div class="highlight-item">
+                    <strong>Enterprise-Grade API</strong>
+                    <p>FastAPI-powered backend with RESTful endpoints, batch processing capabilities, and scalable architecture for high-volume data collection.</p>
+                </div>
+                
+                <div class="highlight-item">
+                    <strong>Smart Grid Coverage</strong>
+                    <p>Intelligent grid-based searching with automatic dimension calculation, overlap control, and comprehensive area coverage to ensure no businesses are missed.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="business-value-section">
+            <h2>Business Value</h2>
+            
+            <div class="value-grid">
+                <div class="value-item">
+                    <h3>🎯 Lead Generation</h3>
+                    <p>Systematically discover potential customers in specific geographic areas with complete contact information and business details for targeted outreach campaigns.</p>
+                </div>
+                
+                <div class="value-item">
+                    <h3>📊 Market Research</h3>
+                    <p>Analyze competitor density, market saturation, and business distribution patterns across different locations to inform strategic expansion decisions.</p>
+                </div>
+                
+                <div class="value-item">
+                    <h3>🗺️ Location Intelligence</h3>
+                    <p>Leverage geographic business data for site selection, territory planning, and understanding local market dynamics with precise coordinate mapping.</p>
+                </div>
+                
+                <div class="value-item">
+                    <h3>⚡ Operational Efficiency</h3>
+                    <p>Replace manual business directory research with automated data collection, reducing research time from days to minutes while ensuring data accuracy.</p>
+                </div>
+                
+                <div class="value-item">
+                    <h3>📈 Sales Territory Optimization</h3>
+                    <p>Map sales territories with comprehensive business listings, enabling sales teams to maximize coverage and identify untapped opportunities.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- <div class="results-section">
+            <h2>Proven Results</h2>
+            <div class="result-highlight">
+                <div class="result-metric">Unlimited Businesses</div>
+                <div class="result-description">Extract comprehensive business data including names, addresses, phone numbers, websites, and operational status from any geographic area</div>
+            </div>
+            
+            <div class="result-highlight">
+                <div class="result-metric">99.9% Coverage</div>
+                <div class="result-description">Grid-based search patterns with configurable overlap ensure complete area coverage without missing potential businesses</div>
+            </div>
+            
+            <div class="result-highlight">
+                <div class="result-metric">Multiple Formats</div>
+                <div class="result-description">Export to Excel for immediate analysis or GeoJSON for geographic visualization and integration with mapping platforms</div>
+            </div>
+            
+            <div class="result-highlight">
+                <div class="result-metric">Real-Time Processing</div>
+                <div class="result-description">Live search results with interactive map visualization and instant data download capabilities for immediate business use</div>
+            </div>
+        </div> -->
+
+        <!-- <div class="tech-details-section">
+            <h2>Technical Implementation</h2>
+            <ul>
+                <li><strong>Google Maps Integration:</strong> Official Google Places API with detailed business information retrieval and geographic data accuracy</li>
+                <li><strong>Backend Architecture:</strong> FastAPI with asynchronous processing, RESTful endpoints, and scalable data handling for enterprise workloads</li>
+                <li><strong>Interactive Frontend:</strong> Modern web interface with Leaflet maps, drawing tools, real-time search preview, and responsive design</li>
+                <li><strong>Data Processing:</strong> GeoPandas and Pandas for spatial analysis, coordinate transformations, and efficient data manipulation</li>
+                <li><strong>Export Capabilities:</strong> Multiple format support with Excel/XlsxWriter and GeoJSON output, including automated column formatting</li>
+                <li><strong>Configuration Management:</strong> YAML-based configuration system with environment variable support and flexible parameter tuning</li>
+                <li><strong>Deployment Options:</strong> Docker containerization, command-line interface, and web application deployment for various use cases</li>
+            </ul>
+        </div> -->
+    </div>
+    
+    <div class="cta-section">
+        <h2>Ready to Start Your Business Intelligence Project?</h2>
+        <p>Let's discuss how comprehensive business data collection can accelerate your market research and lead generation efforts.</p>
+        
+        <div class="contact-options">
+            <a href="../services.html#get-in-touch" class="primary-cta">Discuss This Service</a>
+            <a href="../services.html" class="secondary-cta">← All Services</a>
+        </div>
+    </div>
+    
+    <script src="../static/dark-mode.js"></script>
+    <script src="../static/carousel.js"></script>
+</body>
+</html>

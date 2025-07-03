@@ -129,11 +129,6 @@ img, video, iframe { max-width: 100%; height: auto; }
 }
 
 /* Stats/Outcome Items - Unified */
-.stats-grid { 
-    grid-template-columns: repeat(auto-fit, minmax(180px, 10fr));
-    margin: 30px 0;
-}
-
 .stat-item {
     text-align: center;
     padding: var(--padding-large) 15px;
@@ -540,7 +535,7 @@ img, video, iframe { max-width: 100%; height: auto; }
 .stats-grid, .outcome-grid, .value-grid {
     display: grid;
     gap: 20px;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
 }
 
 .service-illustration, .profile-img {
@@ -569,6 +564,296 @@ img, video, iframe { max-width: 100%; height: auto; }
 .testimonial-item, .service-item {
     flex: 0 0 calc((100% - 50px) / 3);
     min-width: 0;
+}
+
+/* Contact Form Section */
+.contact-form-section {
+    background: var(--bg-secondary);
+    padding: 40px;
+    border-radius: var(--border-radius);
+    margin-top: 40px;
+    text-align: center;
+}
+
+.contact-form-section h2 {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.contact-form-section p {
+    color: var(--text-secondary);
+    margin-bottom: 30px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.contact-form {
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: left;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--border-medium);
+    border-radius: 6px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 14px;
+    transition: all var(--transition-fast);
+    box-sizing: border-box;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.submit-btn {
+    background: var(--accent-primary);
+    color: white;
+    border: none;
+    padding: 14px 28px;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    width: 100%;
+    margin-top: 10px;
+    position: relative;
+}
+
+.submit-btn:hover {
+    background: var(--text-primary);
+    transform: translateY(-1px);
+}
+
+.submit-btn:active {
+    transform: translateY(0);
+}
+
+.submit-btn:disabled {
+    background: var(--text-muted);
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Success Popup */
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all var(--transition-fast);
+}
+
+.popup-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.popup-content {
+    background: var(--bg-primary);
+    padding: 40px;
+    border-radius: 12px;
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    transform: scale(0.8);
+    transition: all var(--transition-fast);
+}
+
+.popup-overlay.show .popup-content {
+    transform: scale(1);
+}
+
+.popup-icon {
+    width: 60px;
+    height: 60px;
+    background: #22c55e;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    font-weight: bold;
+    margin: 0 auto 20px;
+}
+
+.popup-content h3 {
+    margin: 0 0 10px;
+    color: var(--text-primary);
+    font-size: 20px;
+}
+
+.popup-content p {
+    margin: 0 0 25px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.popup-close-btn {
+    background: var(--accent-primary);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.popup-close-btn:hover {
+    background: var(--text-primary);
+}
+
+/* Responsive adjustments for contact form */
+@media (max-width: 768px) {
+    .contact-form-section {
+        padding: 30px 20px;
+        margin-top: 30px;
+    }
+    
+    .form-group input,
+    .form-group textarea {
+        padding: 10px 14px;
+    }
+    
+    .submit-btn {
+        padding: 12px 24px;
+        font-size: 15px;
+    }
+}
+
+/* Demo Carousel (Single Item) */
+.demo-carousel {
+    position: relative;
+    max-width: 100%;
+    margin: 20px 0 30px;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    background: var(--bg-secondary);
+}
+
+.demo-container {
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+    height: 400px;
+}
+
+.demo-track {
+    display: flex;
+    transition: transform 0.3s ease;
+    height: 100%;
+}
+
+.demo-item {
+    flex: 0 0 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.demo-media {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    border-radius: var(--border-radius);
+    object-fit: contain;
+}
+
+.demo-media video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Demo carousel buttons */
+.demo-carousel .carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 102, 204, 0.8);
+    color: white;
+    border: none;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    font-size: 22px;
+    cursor: pointer;
+    z-index: 10;
+    transition: all var(--transition-fast);
+    backdrop-filter: blur(10px);
+}
+
+.demo-carousel .carousel-btn:hover {
+    background: rgba(51, 51, 51, 0.9);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.demo-carousel .prev-btn {
+    left: 15px;
+}
+
+.demo-carousel .next-btn {
+    right: 15px;
+}
+
+/* Responsive adjustments for demo carousel */
+@media (max-width: 768px) {
+    .demo-container {
+        height: 250px;
+    }
+    
+    .demo-carousel .carousel-btn {
+        width: 35px;
+        height: 35px;
+        font-size: 18px;
+    }
+    
+    .demo-carousel .prev-btn {
+        left: 10px;
+    }
+    
+    .demo-carousel .next-btn {
+        right: 10px;
+    }
 }
 
 /* Responsive */
