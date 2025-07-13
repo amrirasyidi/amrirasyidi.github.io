@@ -1,0 +1,14 @@
+{
+  "name": "amri-personal-blog",
+  "version": "1.0.0",
+  "description": "Personal blog with optimized tags system",
+  "scripts": {
+    "build": "node scripts/generate-metadata.js",
+    "dev": "python -m http.server 8000",
+    "generate-metadata": "node scripts/generate-metadata.js"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=14"
+  }
+}
