@@ -333,7 +333,7 @@ function formatDate(dateStr) {
 
 function createPostHTML(filename, metadata, readingTime) {
     const tagsHTML = metadata.tags.map(tag => 
-        `<a href="tags.html#${tag}" class="tag">${tag}</a>`
+        `<a href="tags.html?tag=${tag}" class="tag">${tag}</a>`
     ).join('');
     
     return `
