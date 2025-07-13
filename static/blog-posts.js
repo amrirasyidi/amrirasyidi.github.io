@@ -6,7 +6,7 @@ const BLOG_POSTS = [
     '20240818-overture_duckdb_building.html',
     '20240329-pandas_polars.html',
     '20230922-xgb_optuna_mlflow_timeseries.html',
-    '20230929-what_is_ds.html', // draft
+    // '20230929-what_is_ds.html', // draft
     '20230910-pytorch_exp_with_mlflow.html',
     '20230630-learn_ds_better.html',
     '20230616-why_wont_get_hired.html',
