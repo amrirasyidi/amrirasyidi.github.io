@@ -285,4 +285,22 @@ document.addEventListener('DOMContentLoaded', () => {
     singleItem: true,
     autoPlayVideos: true
   });
+
+  new Carousel({
+      trackId: 'capabilityTrack',
+      prevBtnId: 'capabilityPrevBtn',
+      nextBtnId: 'capabilityNextBtn',
+      itemSelector: '.testimonial-item',
+      containerSelector: '.capability-carousel',
+      autoPlayDelay: 5000
+  });
+
+  new Carousel({
+      trackId: 'valueTrack',
+      prevBtnId: 'valuePrevBtn',
+      nextBtnId: 'valueNextBtn',
+      itemSelector: '.testimonial-item',
+      containerSelector: '.value-carousel',
+      autoPlayDelay: 6000
+  });
 });
