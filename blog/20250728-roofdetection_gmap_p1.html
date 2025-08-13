@@ -1,0 +1,179 @@
+<!--
+title: Calculating Roof Area Using Google Map Satellite Imagery - Part 1
+date: 2025-08-13
+excerpt: A comprehensive template showing all available formatting options for blog posts including text, images, code, tables, callouts, and more.
+tags: geospatial, deep-learning, how-to, python
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculating Roof Area Using Google Map Satellite Imagery Part 1 - Amri Rasyidi</title>
+    <link rel="stylesheet" href="../static/style.css">
+    <link rel="stylesheet" href="../static/prism.css"/>
+</head>
+<body>
+    <div class="header">
+        <nav class="nav">
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <!-- <a href="../services.html">Services</a> -->
+                <a href="../blog.html" class="active">Blog</a>
+                <a href="../tags.html">Tags</a>
+            </div>
+            <button id="dark-mode-toggle" class="dark-mode-toggle">🌙 Dark</button>
+        </nav>
+    </div>
+
+    <div class="back-link">
+        <a href="../blog.html">← Back to Blog</a>
+    </div>
+
+    <h1>Calculating Roof Area Using Google Map Satellite Imagery - Part 1 - Data Fetching</h1>
+    
+    <div class="post-meta">
+        Published on August 13rd, 2025
+    </div>
+    <div class="post-content">
+        <p>
+            Like you and many other, I've using google map for quite a while. Looking at
+            places, nearby attraction, finding public transportation route, and even
+            saving places I want to visit. However, in most of those use cases, I only
+            need the vector basemap. I rarely use the other map layers google provided,
+            including the satellite imagery layer. I use this usually when I want to see
+            and imagine the visual of the place of interest. Other than that? the vector
+            basemap usually suffices.
+        </p>
+
+        <p>
+            That is until I get a lot of hands-on experience with deep 
+            learning&mdash;more specifically GeoAI.
+        </p>
+
+        <p>
+            In this series, we are going to explore the capability of computer vision
+            models to detect object&mdash;in this case building&mdash;using satellite imagery from
+            google map. We are going to cover:
+
+            <ol>
+                <li>Fetching google map satellite imagery for our training data - Part 1</li>
+                <li>Label the data in Label Studio - Part 2</li>
+                <li>Train custom YOLOv11 model to segment the building - Part 2</li>
+                <li>Deploy our model to HuggingFace Inference Endpoint - Part 3</li>
+            </ol>
+        </p>
+
+        <p>
+            In the end, it will look roughly like this:
+        </p>
+
+        <video controls style="width: 100%; max-width: 600px; display: block; margin: 0 auto;">
+            <source src="../assets/portfolio/videos/cv_geospatial_demo0.mp4">
+        </video>
+
+        <p>
+            Let's get started!
+        </p>
+
+        <h2>
+            Enabling Google Map API
+        </h2>
+
+        <p>
+            Google provides an API specifically to fetch imagery, it is covered under
+            the "Maps Static API", which you can enable by following the guide in this 
+            <a href="https://developers.google.com/maps/documentation/maps-static/get-api-key?setupProd=enable#console" target="_blank" rel="noreferrer noopener">page</a>.
+            If you're just trying things out, you shouldn't worry too much about the
+            pricing, as long as your "trying" don't exceed 10,000 API calls (if I 
+            correctly intepreted this
+            <a href="https://developers.google.com/maps/billing-and-pricing/pricing" target="_blank" rel="noreferrer noopener">page</a>).
+        </p>
+
+        <p>
+            Once you click "Enable the Maps Static API", you will need to provide some
+            information, mostly regarding the billing, then in the end, you will be
+            shown the API key. This API key will be needed to fetch the image later.
+        </p>
+
+        <h2>
+            Fetching the data
+        </h2>
+
+        <p>
+            To programmatically fetch the satellite imagery using Python, we can use 
+            <code>request</code>. On the documentation, the request url would look like 
+            this: 
+        </p>
+
+        <pre style="white-space:nowrap">
+            <code>https://maps.googleapis.com/maps/api/staticmap?center=40.714728,-73.998672&zoom=12&size=400x400&maptype=satellite&key=YOUR_API_KEY&signature=YOUR_SIGNATURE</code>
+        </pre>
+
+        <p>
+            To use it in request, we could use something like this
+            <pre><code class="language-python">import requests
+
+base_url = "https://maps.googleapis.com/maps/api/staticmap"
+
+# Build API request parameters
+params = {
+    'center': f"{latitude},{longitude}",
+    'zoom': Config.ZOOM_LEVEL,
+    'size': Config.IMAGE_SIZE,
+    'maptype': Config.MAP_TYPE,
+    'format': Config.IMAGE_FORMAT,
+    'key': Config.api_key
+}
+
+response = requests.get(base_url, params=params, timeout=30)</code></pre>
+        </p>
+
+        <p>
+            In the case above, <code>Config</code> is a python class which contains the
+            relevant parameters to be fed in the request. On top of that, you also need
+            the value for <code>latitude</code> and <code>longitude</code>.
+        </p>
+
+        <p>
+            The response is not yet an image, to make it an image, you will need to read
+            the content of the response, in this case, we can use <code>PIL.Image</code>
+            library.
+
+            <pre><code class="language-python">from PIL import Image
+
+if response.status_code == 200:
+    # Verify the response is actually an image
+    try:
+        image = Image.open(BytesIO(response.content))
+        
+        # Save the image
+        with open(filepath, 'wb') as f:
+            f.write(response.content)
+        
+    except Exception as e:
+        logger.error(f"Invalid image data received: {e}")
+        return None</code></pre>
+        </p>
+
+        <p>
+            Then that's it, there's only 2 "steps" to get the satellite imageries from
+            google map, that is to enable the api and then actually fetch the data. Once
+            you got the required data, you can start labelling the images to train our
+            custom model, which will be covered in the next part.
+        </p>
+
+        <p>
+            Until then, see you!
+        </p>
+
+    <div class="tags-section">
+        <strong>Tags:</strong>
+        <a href="../tags.html?tag=how-to" class="tag">how-to</a>
+        <a href="../tags.html?tag=python" class="tag">python</a>
+    </div>
+
+    <script src="../static/prism.js"></script>
+    <script src="../static/dark-mode.js"></script>
+</body>
+</html>
