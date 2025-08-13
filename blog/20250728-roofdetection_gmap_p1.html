@@ -11,6 +11,7 @@ tags: geospatial, deep-learning, how-to, python
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculating Roof Area Using Google Map Satellite Imagery Part 1 - Amri Rasyidi</title>
     <link rel="stylesheet" href="../static/style.css">
+    <link rel="stylesheet" href="../static/prism.css"/>
 </head>
 <body>
     <div class="header">
@@ -42,23 +43,23 @@ tags: geospatial, deep-learning, how-to, python
             need the vector basemap. I rarely use the other map layers google provided,
             including the satellite imagery layer. I use this usually when I want to see
             and imagine the visual of the place of interest. Other than that? the vector
-            basemap will suffice.
+            basemap usually suffices.
         </p>
 
         <p>
             That is until I get a lot of hands-on experience with deep 
-            learning&mdash;and more specifically GeoAI.
+            learning&mdash;more specifically GeoAI.
         </p>
 
         <p>
             In this series, we are going to explore the capability of computer vision
-            models to detect object, in this case building, using satellite imagery from
+            models to detect object&mdash;in this case building&mdash;using satellite imagery from
             google map. We are going to cover:
 
             <ol>
                 <li>Fetching google map satellite imagery for our training data - Part 1</li>
                 <li>Label the data in Label Studio - Part 2</li>
-                <li>Train custom YOLOv11 model to segment the building</li>
+                <li>Train custom YOLOv11 model to segment the building - Part 2</li>
                 <li>Deploy our model to HuggingFace Inference Endpoint - Part 3</li>
             </ol>
         </p>
@@ -76,7 +77,7 @@ tags: geospatial, deep-learning, how-to, python
         </p>
 
         <h2>
-            Fetching the data
+            Enabling Google Map API
         </h2>
 
         <p>
@@ -90,6 +91,16 @@ tags: geospatial, deep-learning, how-to, python
         </p>
 
         <p>
+            Once you click "Enable the Maps Static API", you will need to provide some
+            information, mostly regarding the billing, then in the end, you will be
+            shown the API key. This API key will be needed to fetch the image later.
+        </p>
+
+        <h2>
+            Fetching the data
+        </h2>
+
+        <p>
             To programmatically fetch the satellite imagery using Python, we can use 
             <code>request</code>. On the documentation, the request url would look like 
             this: 
@@ -101,7 +112,9 @@ tags: geospatial, deep-learning, how-to, python
 
         <p>
             To use it in request, we could use something like this
-            <pre><code>base_url = "https://maps.googleapis.com/maps/api/staticmap"
+            <pre><code class="language-python">import requests
+
+base_url = "https://maps.googleapis.com/maps/api/staticmap"
 
 # Build API request parameters
 params = {
@@ -113,369 +126,54 @@ params = {
     'key': Config.api_key
 }
 
-# Make API request
 response = requests.get(base_url, params=params, timeout=30)</code></pre>
         </p>
 
         <p>
             In the case above, <code>Config</code> is a python class which contains the
-            relevant parameters to be fed in the request.
+            relevant parameters to be fed in the request. On top of that, you also need
+            the value for <code>latitude</code> and <code>longitude</code>.
         </p>
 
         <p>
-            ================================================
-        </p>
-    </div>
+            The response is not yet an image, to make it an image, you will need to read
+            the content of the response, in this case, we can use <code>PIL.Image</code>
+            library.
 
-    <div class="post-content">
-        <p>Your opening paragraph should hook the reader and introduce the main topic. Keep it engaging and direct.</p>
+            <pre><code class="language-python">from PIL import Image
 
-        <!-- TEXT FORMATTING EXAMPLES -->
-        <h2>Text Formatting Options</h2>
+if response.status_code == 200:
+    # Verify the response is actually an image
+    try:
+        image = Image.open(BytesIO(response.content))
         
-        <p>This paragraph demonstrates various <strong>bold text</strong>, <em>italic text</em>, and <del>strikethrough text</del>. You can also use <code>inline code</code> for technical terms.</p>
-
-        <p style="color:red;">You can add colored text with inline styles.</p>
-        <p style="color:red;font-size:20px"><strong>Larger colored text for emphasis</strong></p>
-        <p style="font-style: italic; color: #666; font-size: 14px;">Smaller italic text for disclaimers or notes</p>
-        <p style="text-align:center"><strong>Centered text for important announcements</strong></p>
-
-        <!-- HEADER HIERARCHY -->
-        <h2>Header Level 2 - Main Sections</h2>
-        <h3>Header Level 3 - Subsections</h3>
-        <h4>Header Level 4 - Sub-subsections</h4>
-
-        <!-- LISTS -->
-        <h2>List Examples</h2>
+        # Save the image
+        with open(filepath, 'wb') as f:
+            f.write(response.content)
         
-        <p>Numbered lists for sequential steps:</p>
-        <ol>
-            <li>First step in the process</li>
-            <li>Second step with more detail</li>
-            <li>
-                Third step with nested items:
-                <ol>
-                    <li>Sub-step A</li>
-                    <li>Sub-step B</li>
-                </ol>
-            </li>
-        </ol>
-
-        <p>Bullet lists for non-sequential items:</p>
-        <ul>
-            <li>Key point one</li>
-            <li>Key point two</li>
-            <li>
-                Key point three with nested bullets:
-                <ul>
-                    <li>Detail A</li>
-                    <li>Detail B</li>
-                </ul>
-            </li>
-        </ul>
-
-        <!-- CODE AND TECHNICAL CONTENT -->
-        <h2>Code and Technical Examples</h2>
-
-        <p>Inline code: <code>variable_name</code>, <code>function()</code>, or <code>pip install package</code></p>
-
-        <p>Multi-language code blocks:</p>
-        <pre><code>// JavaScript example
-function example() {
-    return "This is a code block";
-}
-
-# Python example
-import pandas as pd
-df = pd.read_csv('data.csv')
-
-# SQL example with comments
-SELECT * 
-FROM table_name 
-WHERE condition = 'value';</code></pre>
-
-        <p>Installation commands:</p>
-        <pre><code>!pip install osmnx
-conda install -c conda-forge geopandas
-npm install package-name</code></pre>
-
-        <p>File/folder structure:</p>
-        <pre><code>.
-├── db
-│   ├── datareading.db
-│   └── datareading.db.tmp
-├── notebook
-│   └── analysis.ipynb
-├── readme.md
-└── sql
-    ├── query1.sql
-    └── query2.sql</code></pre>
-
-        <!-- VISUAL ELEMENTS -->
-        <h2>Images and Visual Content</h2>
-
-        <!-- Basic image -->
-        <p>Basic image with caption:</p>
-        <figure>
-            <img src="../static/images/your-image.jpg" alt="Description of image">
-            <figcaption>Caption describing the image content</figcaption>
-        </figure>
-
-        <!-- Styled images -->
-        <p>Centered image with border radius:</p>
-        <img src="../static/images/your-image.jpg" alt="Description" 
-             style="border-radius: 8px; display: block; margin: 0 auto; width: 100%; max-width: 400px;">
-
-        <!-- Image with ID for referencing -->
-        <figure id="important-diagram">
-            <img src="../static/images/diagram.jpg" alt="Important diagram">
-            <figcaption>This diagram can be referenced later in the text</figcaption>
-        </figure>
-
-        <p>You can reference the <a href="#important-diagram">diagram above</a> later in your text.</p>
-
-        <!-- GIF example -->
-        <figure>
-            <img src="../static/images/demo.gif" alt="Demo animation">
-            <figcaption>Animated demonstration</figcaption>
-        </figure>
-
-        <!-- Video example -->
-        <video controls style="width: 100%; max-width: 600px; display: block; margin: 0 auto;">
-            <source src="../static/videos/your-video.mp4" type="video/mp4">
-            Your browser doesn't support video.
-        </video>
-
-        <!-- LAYOUT AND STRUCTURE -->
-        <h2>Layout Options</h2>
-
-        <!-- Two-column layout -->
-        <div class="columns">
-            <div class="column">
-                <p>This is the left column. You can put any content here including text, images, or lists.</p>
-                <ul>
-                    <li>Point one</li>
-                    <li>Point two</li>
-                </ul>
-            </div>
-            <div class="column">
-                <p>This is the right column. Great for comparisons or side-by-side content.</p>
-                <figure>
-                    <img src="../static/images/side-image.jpg" alt="Side content" style="width: 100%;">
-                </figure>
-            </div>
-        </div>
-
-        <!-- Horizontal rule for section breaks -->
-        <hr>
-
-        <!-- TABLES -->
-        <h2>Tables</h2>
-
-        <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
-            <thead>
-                <tr style="background: var(--bg-secondary);">
-                    <th style="border: 1px solid var(--border-light); padding: 12px; text-align: left;">Column 1</th>
-                    <th style="border: 1px solid var(--border-light); padding: 12px; text-align: left;">Column 2</th>
-                    <th style="border: 1px solid var(--border-light); padding: 12px; text-align: left;">Column 3</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td style="border: 1px solid var(--border-light); padding: 12px; vertical-align: top;">Row 1, Cell 1</td>
-                    <td style="border: 1px solid var(--border-light); padding: 12px; vertical-align: top;">Row 1, Cell 2</td>
-                    <td style="border: 1px solid var(--border-light); padding: 12px; vertical-align: top;">Row 1, Cell 3</td>
-                </tr>
-                <tr>
-                    <td style="border: 1px solid var(--border-light); padding: 12px; vertical-align: top;">Row 2, Cell 1</td>
-                    <td style="border: 1px solid var(--border-light); padding: 12px; vertical-align: top;">
-                        <strong>Bold content.</strong><br>
-                        Multi-line content with formatting is possible.
-                    </td>
-                    <td style="border: 1px solid var(--border-light); padding: 12px; vertical-align: top;">Row 2, Cell 3</td>
-                </tr>
-            </tbody>
-        </table>
-
-        <!-- QUOTES AND CITATIONS -->
-        <h2>Quotes and Citations</h2>
-
-        <!-- Basic blockquote -->
-        <blockquote>
-            <p>Use blockquotes for important quotes or key insights you want to highlight.</p>
-        </blockquote>
-
-        <!-- Blockquote with attribution -->
-        <blockquote>
-            <p>"The best way to get started is to quit talking and begin doing."</p>
-            <footer>Walt Disney</footer>
-        </blockquote>
-
-        <!-- Pull quote (larger, styled quote) -->
-        <div style="font-size: 24px; font-style: italic; text-align: center; margin: 30px 0; color: #666;">
-            "This is a pull quote that stands out from the regular text"
-        </div>
-
-        <!-- SPECIAL COMPONENTS -->
-        <h2>Special Components and Callouts</h2>
-
-        <!-- Idea callout -->
-        <div class="callout-idea">
-            <div class="callout-icon">💡</div>
-            <div class="callout-content">
-                <p>This is an idea callout box. Use it for tips, insights, or important notes that deserve special attention.</p>
-            </div>
-        </div>
-
-        <!-- Warning/Alert boxes (custom styling) -->
-        <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 15px; margin: 20px 0;">
-            <div style="display: flex; align-items: flex-start;">
-                <div style="margin-right: 10px; font-size: 20px;">⚠️</div>
-                <div>
-                    <strong>Warning:</strong> This is a warning callout. Use it for important caveats or potential issues.
-                </div>
-            </div>
-        </div>
-
-        <!-- Info box -->
-        <div style="background: #d1ecf1; border: 1px solid #bee5eb; border-radius: 8px; padding: 15px; margin: 20px 0;">
-            <div style="display: flex; align-items: flex-start;">
-                <div style="margin-right: 10px; font-size: 20px;">ℹ️</div>
-                <div>
-                    <strong>Info:</strong> This is an information callout. Use it for additional context or explanations.
-                </div>
-            </div>
-        </div>
-
-        <!-- Success box -->
-        <div style="background: #d4edda; border: 1px solid #c3e6cb; border-radius: 8px; padding: 15px; margin: 20px 0;">
-            <div style="display: flex; align-items: flex-start;">
-                <div style="margin-right: 10px; font-size: 20px;">✅</div>
-                <div>
-                    <strong>Success:</strong> This is a success callout. Use it for positive outcomes or achievements.
-                </div>
-            </div>
-        </div>
-
-        <!-- Error box -->
-        <div style="background: #f8d7da; border: 1px solid #f5c6cb; border-radius: 8px; padding: 15px; margin: 20px 0;">
-            <div style="display: flex; align-items: flex-start;">
-                <div style="margin-right: 10px; font-size: 20px;">❌</div>
-                <div>
-                    <strong>Error:</strong> This is an error callout. Use it for problems or failures.
-                </div>
-            </div>
-        </div>
-
-        <!-- EMBEDDED CONTENT -->
-        <h2>Embedded Content</h2>
-
-        <!-- GitHub Gist example -->
-        <p>Embedded GitHub Gist:</p>
-        <script src="https://gist.github.com/username/gist-id.js"></script>
-
-        <!-- External link with proper attributes -->
-        <p>Links to external resources: <a href="https://example.com" target="_blank" rel="noreferrer noopener">External Link</a></p>
-
-        <!-- ADVANCED FORMATTING -->
-        <h2>Advanced Formatting</h2>
-
-        <!-- Expandable section (using details/summary) -->
-        <details style="margin: 20px 0; border: 1px solid #ddd; border-radius: 8px; padding: 15px;">
-            <summary style="cursor: pointer; font-weight: bold;">Click to expand additional details</summary>
-            <div style="margin-top: 15px;">
-                <p>This content is hidden by default and can be expanded when needed. Great for optional details, FAQs, or supplementary information.</p>
-                <ul>
-                    <li>Additional point 1</li>
-                    <li>Additional point 2</li>
-                </ul>
-            </div>
-        </details>
-
-        <!-- Progress bar -->
-        <p>Progress indicator:</p>
-        <div style="background: #e9ecef; border-radius: 10px; height: 20px; margin: 10px 0;">
-            <div style="background: #007bff; border-radius: 10px; height: 100%; width: 75%;"></div>
-        </div>
-        <p style="font-size: 14px; color: #666;">75% Complete</p>
-
-        <!-- Badge/Tag examples -->
-        <p>Inline badges: 
-            <span style="background: #007bff; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px;">NEW</span>
-            <span style="background: #28a745; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px;">UPDATED</span>
-            <span style="background: #ffc107; color: black; padding: 2px 8px; border-radius: 12px; font-size: 12px;">BETA</span>
+    except Exception as e:
+        logger.error(f"Invalid image data received: {e}")
+        return None</code></pre>
         </p>
 
-        <!-- Download button/link -->
-        <div style="text-align: center; margin: 30px 0;">
-            <a href="../static/files/download.zip" download 
-               style="background: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; display: inline-block;">
-                📥 Download File
-            </a>
-        </div>
+        <p>
+            Then that's it, there's only 2 "steps" to get the satellite imageries from
+            google map, that is to enable the api and then actually fetch the data. Once
+            you got the required data, you can start labelling the images to train our
+            custom model, which will be covered in the next part.
+        </p>
 
-        <!-- Footnotes -->
-        <h2>Footnotes and References</h2>
-        
-        <p>This text has a footnote reference<sup><a href="#footnote1">1</a></sup> and another one<sup><a href="#footnote2">2</a></sup>.</p>
-
-        <!-- Footnotes section -->
-        <div style="border-top: 1px solid #ddd; margin-top: 40px; padding-top: 20px; font-size: 14px;">
-            <p id="footnote1"><sup>1</sup> This is the first footnote explanation.</p>
-            <p id="footnote2"><sup>2</sup> This is the second footnote explanation.</p>
-        </div>
-
-        <!-- TL;DR Section -->
-        <h2>TL;DR</h2>
-        <div style="background: #f8f9fa; border-left: 4px solid #007bff; padding: 20px; margin: 20px 0;">
-            <p><strong>Too Long; Didn't Read:</strong></p>
-            <ul>
-                <li>Key takeaway 1</li>
-                <li>Key takeaway 2</li>
-                <li>Key takeaway 3</li>
-            </ul>
-        </div>
-
-        <!-- CONCLUSION -->
-        <h2>Conclusion</h2>
-
-        <p>Wrap up your post with key takeaways or a call to action. What should readers do next?</p>
-
-        <p>Remember to:</p>
-        <ul>
-            <li>Keep paragraphs focused and readable</li>
-            <li>Use headers to structure your content</li>
-            <li>Include visuals to break up text</li>
-            <li>Test all links and images before publishing</li>
-        </ul>
-
-        <!-- USAGE NOTES -->
-        <hr>
-
-        <h2>Template Usage Notes</h2>
-        
-        <div class="callout-idea">
-            <div class="callout-icon">📝</div>
-            <div class="callout-content">
-                <p><strong>How to use this template:</strong></p>
-                <ol>
-                    <li>Update the metadata at the top (title, date, excerpt, tags)</li>
-                    <li>Replace placeholder content with your actual content</li>
-                    <li>Delete sections you don't need</li>
-                    <li>Update image paths to point to your actual images</li>
-                    <li>Test all links and formatting before publishing</li>
-                </ol>
-            </div>
-        </div>
-    </div>
+        <p>
+            Until then, see you!
+        </p>
 
     <div class="tags-section">
         <strong>Tags:</strong>
-        <a href="../tags.html?tag=template" class="tag">template</a>
-        <a href="../tags.html?tag=formatting" class="tag">formatting</a>
-        <a href="../tags.html?tag=guide" class="tag">guide</a>
+        <a href="../tags.html?tag=how-to" class="tag">how-to</a>
+        <a href="../tags.html?tag=python" class="tag">python</a>
     </div>
 
+    <script src="../static/prism.js"></script>
     <script src="../static/dark-mode.js"></script>
 </body>
 </html>
