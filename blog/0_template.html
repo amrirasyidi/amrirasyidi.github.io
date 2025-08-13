@@ -11,6 +11,7 @@ tags: template, formatting, guide
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blog Post Template - All Formatting Options - Amri Rasyidi</title>
     <link rel="stylesheet" href="../static/style.css">
+    <link rel="stylesheet" href="../static/prism.css"/>
 </head>
 <body>
     <div class="header">
@@ -88,7 +89,7 @@ tags: template, formatting, guide
         <p>Inline code: <code>variable_name</code>, <code>function()</code>, or <code>pip install package</code></p>
 
         <p>Multi-language code blocks:</p>
-        <pre><code>// JavaScript example
+        <pre><code class="language-python">// JavaScript example
 function example() {
     return "This is a code block";
 }
@@ -385,5 +386,6 @@ npm install package-name</code></pre>
     </div>
 
     <script src="../static/dark-mode.js"></script>
+    <script src="../static/prism.js"></script>
 </body>
 </html>
