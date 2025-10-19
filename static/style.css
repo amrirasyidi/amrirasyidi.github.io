@@ -69,8 +69,18 @@ ul {
     padding-left: 20px; 
 }
 
+ol {
+  counter-reset: item
+}
+
 li { 
+    display: block;
     margin-bottom: 8px; 
+}
+
+li:before {
+  content: counters(item, ".") ".";
+  counter-increment: item
 }
 
 img, video, iframe { 
