@@ -1,7 +1,7 @@
 // Single source of truth for all blog posts
 // Add new blog post filenames here - both blog.js and tags.js will use this list
 const BLOG_POSTS = [
-    // '20251019_sg1.html',
+    '20251019_sg1.html',
     '20250728-roofdetection_gmap_p1.html',
     '20250627-meal_mayhem.html',
     '20241103-stac_aws_python.html',
