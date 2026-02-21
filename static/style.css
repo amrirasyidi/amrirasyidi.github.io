@@ -45,6 +45,14 @@ body.wide-page {
     max-width: 1200px; 
 }
 
+figcaption {
+    font-style: italic;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 12px;
+    margin-top: 5px;
+}
+
 /* Typography */
 h1 { 
     font-size: 24px; 
