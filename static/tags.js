@@ -3,7 +3,7 @@
 
 // Configuration
 const TAGS_CONFIG = {
-    POSTS_PER_PAGE: 3,
+    POSTS_PER_PAGE: 5,
     SHOW_PAGE_NUMBERS: true,
     SHOW_PREV_NEXT: true,
     MAX_PAGE_BUTTONS: 5
