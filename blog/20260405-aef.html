@@ -24,7 +24,6 @@ tags: python, deep-learning
         <nav class="nav">
             <div class="nav-links">
                 <a href="../index.html">Home</a>
-                <a href="../services.html">Services</a>
                 <a href="../blog.html" class="active">Blog</a>
                 <a href="../tags.html">Tags</a>
             </div>
@@ -43,12 +42,136 @@ tags: python, deep-learning
     </div>
 
     <div class="post-content">
+      <!-- Intro
+      Had to use gee to calculate median
+      No luck in downloading aef data programmatically
+      Storage take so much
+      Use vrt approach - research on this
+      Training is straightforward
+      Params detail
+      Result
+      Observation/analysis
+      Conclusion -->
         <p>
             For months I keep hearing about "Earth Embeddings". Something that is not exactly
             new because I remember the first earth embeddings I heard was <a href="https://huggingface.co/Major-TOM">MajorTOM</a>
             which comes from the combination of Sentinel 1 and 2. I'm not sure if this
-            is the first Earth embeddings though.
+            is the first Earth embeddings though. Google's AlphaEarth Embeddings is definitely
+            the first one I read about on a bit more technical level, and the idea to compress
+            information from different sensor into a single embedding is really an interesting
+            one.
         </p>
+
+        <figure>
+          <img src="../assets/blog/images/20260405_aef_summary.png" alt="AlphaEarth Embeddings Summary">
+          <figcaption><a href="https://arxiv.org/abs/2601.13451">AlphaEarth Embeddings: A
+            Unified Vector Representation for Earth Observation</a>: "AEF reconciles
+            multiple sparse, non-uniformly sampled observation records into a continuous
+            record, regardless of fluctuations in availability."</figcaption>
+        </figure>
+
+        <p>
+          The initial plan is to compare mangrove detection (binary semantic segmentation
+          task) using data from Sentinel 2, AlphaEarth Embeddings, and 
+          <a href="https://geotessera.org/about/">TESSERA</a>. Unfortunately though, TESSERA
+          dataset is not available on the AOI I'm using. Currently, on global scale,
+          the readily available data for TESSERA is mostly for 2024. Meanwhile, my mask/label
+          (<a href="https://gee-community-catalog.org/projects/mangrove/">Global Mangrove Watch Dataset</a>)
+          is only available up to 2020. Maybe I'll look for an area where both TESSERA and
+          my mask/label are available for my next experiment.
+        </p>
+
+        <hr>
+
+        <h2>Data Preparation</h2>
+
+        <p>
+          Since I won't be doing so much hyperparameter tuning, acquiring and preparing
+          the data became the most time-consuming part. Here's a summary of the data
+          preparation process (and some lessons learned):
+        </p>
+
+        <h3>Global Mangrove Watch (GMW) Mask/Label</h3>
+
+        <p>
+          GMW is the most straightforward data to prepare. It's a binary mask/label
+          of mangrove extent, which is already in the form of a single image. So I
+          just need to clip it to my AOI and export it. The size of the raster is also
+          the smallest compared with the other data.
+        </p>
+
+        <ul>
+          <li>
+            Source: 2020 annual mangrove extent from awesome-gee-community-catalog
+            <a href="https://gee-community-catalog.org/projects/mangrove/">Global Mangrove Watch Dataset</a>
+            (<code>projects/sat-io/open-datasets/GMW/annual-extent/GMW_MNG_2020</code>).
+          </li>
+          <li>
+            Processing: mosaic the <code>ImageCollection</code> to one image, then
+            <code>clip</code> to my AOI before export.
+          </li>
+          <li>
+            Export: <code>Export.image.toDrive</code> per patch, description / file prefix
+            <code>gmw_extent_aoi</code>, folder <code>GEE_Exports</code>.
+          </li>
+          <li>
+            Parameters: <code>region</code> = my AOI geometry, <code>crs</code> =
+            <code>EPSG:4326</code>, <code>scale</code> = 10&nbsp;m, <code>maxPixels</code> =
+            <code>1e13</code> (aligned with the 10&nbsp;m Sentinel-2 tiles).
+          </li>
+        </ul>
+
+        <h3>Sentinel 2</h3>
+
+        <p>
+          For Sentinel 2, I adapted some of the process from this <a href="https://www.mdpi.com/2072-4292/14/10/2291">
+          paper</a> by Davide Lomeo. This one is also relatively straightforward. GEE obviously
+          helps a lot by providing the data and the compute so I don't have to locally
+          compute the median and the spectral indices. That would be a storage and computation
+          nightmare.
+        </p>
+
+        <ul>
+          <li>
+            Source: <code>COPERNICUS/S2_HARMONIZED</code>, filtered to my AOI
+            (<code>filterBounds</code>) and to 1&nbsp;Nov&nbsp;2020–31&nbsp;Jan&nbsp;2021
+            (<code>filterDate</code>), keeping scenes with
+            <code>CLOUDY_PIXEL_PERCENTAGE &lt; 30</code>.
+          </li>
+          <li>
+            Cloud mask: <code>QA60</code> bits 10 (opaque clouds) and 11 (cirrus) masked out;
+            surface reflectance scaled by dividing band values by <code>10000</code>.
+          </li>
+          <li>
+            Composite: pixel-wise <code>median()</code> across the filtered collection, then
+            spectral indices added on that median image: <code>NDVI</code>, <code>NDWI</code>,
+            <code>MNDWI</code>, <code>NDSI</code>, <code>NDMI</code>, <code>EVI</code>,
+            <code>EVI2</code>, <code>GOSAVI</code>, <code>SAVI</code>.
+          </li>
+          <li>
+            Bands exported (all as <code>float</code>):
+            <code>B1</code>, <code>B2</code>, <code>B3</code>, <code>B4</code>, <code>B5</code>,
+            <code>B6</code>, <code>B7</code>, <code>B8</code>, <code>B8A</code>, <code>B9</code>,
+            <code>B11</code>, <code>B12</code>, plus the indices above.
+          </li>
+          <li>
+            Export: <code>Export.image.toDrive</code> clipped to my AOI, description / file prefix
+            <code>s2_aoi</code>, folder <code>GEE_Exports</code>.
+          </li>
+          <li>
+            Parameters: <code>region</code> = AOI geometry, <code>crs</code> =
+            <code>EPSG:4326</code>, <code>scale</code> = 10&nbsp;m, <code>maxPixels</code> =
+            <code>1e13</code>.
+          </li>
+        </ul>
+
+        <h3>AlphaEarth Embeddings</h3>
+
+        <p>
+          For AlphaEarth Embeddings
+        </p>
+        <ul>
+      
         <!-- Training Metrics Charts -->
         <div class="chart-grid">
           <div class="chart-box"><div id="chart-train-loss"></div></div>
