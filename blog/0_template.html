@@ -49,6 +49,17 @@ tags: template, formatting, guide
         <p style="font-style: italic; color: #666; font-size: 14px;">Smaller italic text for disclaimers or notes</p>
         <p style="text-align:center"><strong>Centered text for important announcements</strong></p>
 
+        <p><strong>Tooltip</strong></p>
+        <span class="tooltip">
+          <strong>Barlow Twins</strong>
+          <span class="tooltip-text">
+            <strong>Barlow Twins Loss:</strong> TESSERA minimizes the cross-correlation matrix between two different "views" of the same pixel location.<br><br>
+            <strong>Mechanism:</strong> Includes an invariance term for similarity and a redundancy reduction term for unique information.<br><br>
+            <em>Implication:</em> Creates efficient, compact features robust to clouds or orbital patterns.
+          </span>
+        </span>
+
+
         <!-- HEADER HIERARCHY -->
         <h2>Header Level 2 - Main Sections</h2>
         <h3>Header Level 3 - Subsections</h3>
@@ -183,25 +194,25 @@ npm install package-name</code></pre>
 
         <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
             <thead>
-                <tr style="background: var(--bg-secondary);">
-                    <th style="border: 1px solid var(--border-light); padding: 12px; text-align: left;">Column 1</th>
-                    <th style="border: 1px solid var(--border-light); padding: 12px; text-align: left;">Column 2</th>
-                    <th style="border: 1px solid var(--border-light); padding: 12px; text-align: left;">Column 3</th>
+                <tr>
+                    <th>Column 1</th>
+                    <th>Column 2</th>
+                    <th>Column 3</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td style="border: 1px solid var(--border-light); padding: 12px; vertical-align: top;">Row 1, Cell 1</td>
-                    <td style="border: 1px solid var(--border-light); padding: 12px; vertical-align: top;">Row 1, Cell 2</td>
-                    <td style="border: 1px solid var(--border-light); padding: 12px; vertical-align: top;">Row 1, Cell 3</td>
+                    <td >Row 1, Cell 1</td>
+                    <td >Row 1, Cell 2</td>
+                    <td >Row 1, Cell 3</td>
                 </tr>
                 <tr>
-                    <td style="border: 1px solid var(--border-light); padding: 12px; vertical-align: top;">Row 2, Cell 1</td>
-                    <td style="border: 1px solid var(--border-light); padding: 12px; vertical-align: top;">
+                    <td >Row 2, Cell 1</td>
+                    <td >
                         <strong>Bold content.</strong><br>
                         Multi-line content with formatting is possible.
                     </td>
-                    <td style="border: 1px solid var(--border-light); padding: 12px; vertical-align: top;">Row 2, Cell 3</td>
+                    <td >Row 2, Cell 3</td>
                 </tr>
             </tbody>
         </table>
