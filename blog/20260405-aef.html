@@ -43,61 +43,224 @@ tags: python, deep-learning
 
     <div class="post-content">
       <!-- Intro
-      Had to use gee to calculate median
-      No luck in downloading aef data programmatically
       Storage take so much
       Use vrt approach - research on this
-      Training is straightforward
-      Params detail
-      Result
-      Observation/analysis
-      Conclusion -->
+      -->
         <p>
-            For months I keep hearing about "Earth Embeddings". Something that is not exactly
-            new because I remember the first earth embeddings I heard was <a href="https://huggingface.co/Major-TOM">MajorTOM</a>
-            which comes from the combination of Sentinel 1 and 2. I'm not sure if this
-            is the first Earth embeddings though. Google's AlphaEarth Embeddings is definitely
-            the first one I read about on a bit more technical level, and the idea to compress
-            information from different sensor into a single embedding is really an interesting
-            one.
-        </p>
-
-        <figure>
-          <img src="../assets/blog/images/20260405_aef_summary.png" alt="AlphaEarth Embeddings Summary">
-          <figcaption><a href="https://arxiv.org/abs/2601.13451">AlphaEarth Embeddings: A
-            Unified Vector Representation for Earth Observation</a>: "AEF reconciles
-            multiple sparse, non-uniformly sampled observation records into a continuous
-            record, regardless of fluctuations in availability."</figcaption>
-        </figure>
-
-        <p>
-          The initial plan is to compare mangrove detection (binary semantic segmentation
-          task) using data from Sentinel 2, AlphaEarth Embeddings, and 
-          <a href="https://geotessera.org/about/">TESSERA</a>. Unfortunately though, TESSERA
-          dataset is not available on the AOI I'm using. Currently, on global scale,
-          the readily available data for TESSERA is mostly for 2024. Meanwhile, my mask/label
-          (<a href="https://gee-community-catalog.org/projects/mangrove/">Global Mangrove Watch Dataset</a>)
-          is only available up to 2020. Maybe I'll look for an area where both TESSERA and
-          my mask/label are available for my next experiment.
+          Jump <a href="#exp-result">here</a> if you want to see the experiment result.
         </p>
 
         <hr>
 
-        <h2>Data Preparation</h2>
+        <p>
+            For months I keep hearing about "Earth Embeddings". Something that is not exactly
+            new because I remember the first earth embeddings I heard was <a href="https://huggingface.co/Major-TOM">MajorTOM</a>
+            which comes from the combination of Sentinel 1 and 2. I'm not sure if this
+            is the first Earth embeddings though.
+            <a href="https://deepmind.google/blog/alphaearth-foundations-helps-map-our-planet-in-unprecedented-detail/">AlphaEarth Embeddings</a>
+            is definitely the first one I read about on a bit more technical level, and
+            the idea to compress information from different sensor into a single
+            embedding is really an interesting one. The other one I'm quite interested
+            is <a href="https://geotessera.org/about/">TESSERA</a>.
+        </p>
+        
+        <details style="margin: 20px 0; border: 1px solid #ddd; border-radius: 8px; padding: 15px;">
+          <summary style="cursor: pointer; font-weight: bold;">AlphaEarth Embeddings</summary>
+            <div style="margin-top: 15px;">
+              <figure>
+                <img src="../assets/blog/images/20260405_aef_summary.png" alt="AlphaEarth Embeddings Summary">
+                <figcaption><a href="https://arxiv.org/pdf/2507.22291">AlphaEarth Embeddings: A
+                  Unified Vector Representation for Earth Observation</a>: "AEF reconciles
+                  multiple sparse, non-uniformly sampled observation records into a continuous
+                  record, regardless of fluctuations in availability."</figcaption>
+              </figure>
+            </div>
+        </details>
+
+        <details style="margin: 20px 0; border: 1px solid #ddd; border-radius: 8px; padding: 15px;">
+          <summary style="cursor: pointer; font-weight: bold;">TESSERA Embeddings</summary>
+            <div style="margin-top: 15px;">
+              <figure>
+                <img src="../assets/blog/images/20260405_tessera_summary.png" alt="Tessera Embeddings Summary">
+                <figcaption><a href="https://arxiv.org/pdf/2506.20380">TESSERA</a>: "advances
+                  the embedding-as-data approach for Earth Observation. It delivers (a)
+                  analysis-ready global-scale products, (b) pixel-wise, high-fidelity
+                  representations, and has (c) state-of-the-art downstream accuracy."
+                </figcaption>
+              </figure>
+            </div>
+        </details>
+
+        <p>
+          Here's a quick summary of similarities and differences between the 2 embeddings.
+        </p>    
+
+        <p><strong>Similarities</strong></p>
+        <ul>
+          <li>
+            Embedding-as-Data Paradigm: both models deliver precomputed, task-agnostic
+            features that can be used directly with lightweight adaptation heads, such
+            as small MLPs, for downstream tasks like classification and regression.
+          </li>
+          <li>
+            Global and Annual Coverage: both projects have released global, annual
+            embedding maps at a 10m spatial resolution covering the years 2017 through
+            2024 (with a note <a href="#get-data">here</a>).
+          </li>
+          <li>
+            Multi-Modal Time Series: both models leverage multi-temporal satellite data,
+            specifically integrating optical (Sentinel-2) and radar (Sentinel-1)
+            observations.
+          </li>
+          <li>
+            Label Efficiency: a primary focus for both is delivering high performance in
+            <span class="tooltip">
+              <strong>"low-shot"</strong>
+              <span class="tooltip-text">
+                Refers to a machine learning regime where a model is trained or adapted
+                using an extremely limited amount of labeled data.
+                <br><br>
+                AEF defines "low-shot" as using tens to hundreds of samples to simulate
+                performance in data-scarce environments.  To test the limits of the
+                model, they evaluate "very-low shot" or "extreme data sparsity" using as
+                few as 1 or 10 labeled samples per class.
+                <br><br>
+                TESSERA evaluates label efficiency by looking at specific label ratios,
+                demonstrating that the model remains highly effective even when using
+                only 1% of the available labels in a dataset. They define a "challenging
+                few-shot scenario" more specifically as training with only 1 to 20 
+                labeled samples per class.
+              </span>
+            </span>   
+            regimes, where only a small amount of labeled data is available
+            for training
+          </li>
+          <li>
+            Quantization: both use 8-bit integer (int8) quantization to significantly
+            reduce the storage and bandwidth requirements of their massive global
+            datasets while maintaining high accuracy.
+          </li>
+        </ul>  
+
+        <p><strong>Differences:</strong></p>
+        <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+          <thead>
+              <tr>
+                  <th>Feature</th>
+                  <th>TESSERA Embeddings</th>
+                  <th>AlphaEarth Foundations (AEF)</th>
+              </tr>    
+          </thead>    
+          <tbody>
+              <tr>
+                  <td><strong>Primary Data Sources</strong></td>
+                  <td>Sentinel-1 and Sentinel-2</td>
+                  <td>
+                    Sentinel-1, Sentinel-2, Landsat 8/9, PALSAR-2, GEDI, ERA5-Land,
+                    GRACE, GLO-30, NLCD, and Text
+                  </td>
+              </tr>    
+              <tr>
+                  <td><strong>Training Objective</strong></td>
+                  
+                  <td>Redundancy reduction:
+                    <span class="tooltip">
+                      <strong>Barlow Twins loss</strong>
+                      <span class="tooltip-text">
+                        <strong>Barlow Twins Loss:</strong> TESSERA minimizes the 
+                        cross-correlation matrix between two different "views" of the
+                        same pixel location.<br><br>
+                        
+                        <strong>Mechanism:</strong> Includes an invariance term for
+                        similarity and a redundancy reduction term for unique
+                        information.<br><br>
+                        
+                        <em>Implication:</em> Creates efficient, compact features robust 
+                        to clouds or orbital patterns.
+                      </span>  
+                    </span>   
+                  </td>
+                  
+                  <td>
+                    Multi-objective: Contrastive (teacher-student), data reconstruction,
+                    and text alignment
+                  </td>
+              </tr>    
+              <tr>
+                  <td><strong>Encoder Size</strong></td>
+                  <td>~46 Million parameters</td>
+                  <td>~480 Million parameters</td>
+              </tr>    
+              <tr>
+                  <td><strong>Open Source Status</strong></td>
+                  <td>Fully open (weights, code, and embeddings)</td>
+                  <td>Weights not fully open; embeddings released under open license</td>
+              </tr>    
+              <tr>
+                  <td><strong>Temporal Handling</strong></td>
+                  <td>Sparse random temporal sampling invariance (fixed 40 timesteps)</td>
+                  <td>Implicit decoder treating time as a continuous variable</td>
+              </tr>    
+              <tr>
+                  <td><strong>Embedding Size</strong></td>
+                  <td>128 dimensions</td>
+                  <td>64 dimensions</td>
+              </tr>    
+              <tr>
+                  <td><strong>Geographic Logic</strong></td>
+                  <td>Pixel-wise modeling with global shuffling to break spatial autocorrelation</td>
+                  <td>Embedding field model using a von Mises-Fisher (VMF) spatial bottleneck</td>
+              </tr>    
+          </tbody>    
+        </table>  
+        
+
+        <p>
+          So in this post, I'm going to write the experiment result I was running. The
+          big idea is to compare the performance of the same deep learning model given
+          different data. The aforementioned data are: Sentinel-2 (with additional bands),
+          AlphaEarth Foundation Embeddings (AEF), and TESSERA Embeddings. The task is
+          binary semantic segmentation task, trying to predict mangrove land cover.
+        </p>
+
+        <hr>
+
+        <h2 id="get-data">Getting the data</h2>
 
         <p>
           Since I won't be doing so much hyperparameter tuning, acquiring and preparing
-          the data became the most time-consuming part. Here's a summary of the data
-          preparation process (and some lessons learned):
+          the data became the most time-consuming part.
+        </p>
+
+        <p>
+          <strong>An important note</strong> on selecting the AOI: in this experiment,
+          there are at least 1 constrain, that is the availability of the ground
+          truth/label, in other words the coverage of GMW data on the said years.
+          However, there are another thing to consider, the availability of TESSERA.
+          TESSERA is relatively new, and unlike AlphaEarth Embeddings which is developed
+          by a tech-giant (google), it was mainly driven by University of Cambridge. For
+          TESSERA, on global scale the most covered year is 2024 (it is available for
+          the entire globe if I'm not mistaken). On the other hand, GMW data is limited
+          up to 2020 (at least the one I have access to). The solution is to find a 
+          location where both GMW and TESSERA (on 2020) are available. Luckily, the 
+          developer provided a way to check availability of TESSERA through this repository:
+          <a href="https://github.com/ucam-eo/geotessera">https://github.com/ucam-eo/geotessera</a>.
+        </p>
+        
+        <p>The availability for Sentinel-2 and AEF wont be big a problem.</p>
+        
+        <p>
+          Now that the data availability problem has been solved, here's a summary of
+          the data preparation process (and some lessons learned):
         </p>
 
         <h3>Global Mangrove Watch (GMW) Mask/Label</h3>
 
         <p>
-          GMW is the most straightforward data to prepare. It's a binary mask/label
+          GMW is the most straightforward data to get. It's a binary mask/label
           of mangrove extent, which is already in the form of a single image. So I
           just need to clip it to my AOI and export it. The size of the raster is also
-          the smallest compared with the other data.
+          the smallest compared with the other data (not even 1 MB).
         </p>
 
         <ul>
@@ -111,13 +274,12 @@ tags: python, deep-learning
             <code>clip</code> to my AOI before export.
           </li>
           <li>
-            Export: <code>Export.image.toDrive</code> per patch, description / file prefix
-            <code>gmw_extent_aoi</code>, folder <code>GEE_Exports</code>.
-          </li>
-          <li>
             Parameters: <code>region</code> = my AOI geometry, <code>crs</code> =
             <code>EPSG:4326</code>, <code>scale</code> = 10&nbsp;m, <code>maxPixels</code> =
             <code>1e13</code> (aligned with the 10&nbsp;m Sentinel-2 tiles).
+          </li>
+          <li>
+            Size: less than 2 Mb total.
           </li>
         </ul>
 
@@ -134,7 +296,7 @@ tags: python, deep-learning
         <ul>
           <li>
             Source: <code>COPERNICUS/S2_HARMONIZED</code>, filtered to my AOI
-            (<code>filterBounds</code>) and to 1&nbsp;Nov&nbsp;2020–31&nbsp;Jan&nbsp;2021
+            (<code>filterBounds</code>) and to 1 Jan 2020 – 1 Jan 2021
             (<code>filterDate</code>), keeping scenes with
             <code>CLOUDY_PIXEL_PERCENTAGE &lt; 30</code>.
           </li>
@@ -155,23 +317,148 @@ tags: python, deep-learning
             <code>B11</code>, <code>B12</code>, plus the indices above.
           </li>
           <li>
-            Export: <code>Export.image.toDrive</code> clipped to my AOI, description / file prefix
-            <code>s2_aoi</code>, folder <code>GEE_Exports</code>.
-          </li>
-          <li>
             Parameters: <code>region</code> = AOI geometry, <code>crs</code> =
             <code>EPSG:4326</code>, <code>scale</code> = 10&nbsp;m, <code>maxPixels</code> =
             <code>1e13</code>.
+          </li>
+          <li>
+            Size: ~6,9 GB.
           </li>
         </ul>
 
         <h3>AlphaEarth Embeddings</h3>
 
         <p>
-          For AlphaEarth Embeddings
+          AlphaEarth Embeddings' is also easy to get using GEE, basically just filter
+          according to my AOI and the correct date, then mosaic and convert the data to
+          float.
         </p>
         <ul>
+          <li>
+            Source: <code>GOOGLE/SATELLITE_EMBEDDING/V1/ANNUAL</code>, filtered to my AOI
+            (<code>filterBounds</code>) and to 1 Jan 2020 – 1 Jan 2021
+            (<code>filterDate</code>).
+          </li>
+          <li>
+            Bands exported (64, all as <code>float</code>):
+          </li>
+          <li>
+            Parameters: <code>region</code> = AOI geometry, <code>crs</code> =
+            <code>EPSG:4326</code>, <code>scale</code> = 10&nbsp;m, <code>maxPixels</code> =
+            <code>1e13</code>.
+          </li>
+          <li>
+            Size: ~6.9 GB.
+          </li>
+        </ul>
+
+        <p>
+          Before using GEE, I also explored the COG data for AEF from <a href="https://source.coop/tge-labs/aef">source.coop</a>,
+          upon trying, I always get request timeout, perhaps because the server location.
+          I tried this because I want to have as seamless development experience as
+          possible, since I can use python to access data from source coop. Of course
+          there's also Python API for GEE, but it still require authentication and the
+          downloaded data is stored in google drive instead of directly locally. In fact
+          the very first plan is to utilize the cloud-optimize-geotiff format served in
+          source.coop. The idea is to only retrieve the necessary data ('on-the-fly'
+          is even possible) according to my AOI and data bounds, so I don't have to 
+          store big files locally.<br>
+          In the end, GEE come to the rescue.
+        </p>
+
+        <h3>TESSERA Embeddings</h3>
+        <p>
+          This one is unfortunatelly not available in GEE (to my knowledge), the developer
+          is kind enough to enable data request through the github repo though. As a note,
+          since they made the model publicly available, if you have a good machine to run
+          the model, you can even generate your own embeddings, I tried this on colab, 
+          but my AOI is quite huge and my patience is very thin. In the end I just look
+          for the data that is already available.
+        </p>
+
+        <ul>
+          <li>
+            Github repo for data download: <a href="https://github.com/ucam-eo/geotessera">https://github.com/ucam-eo/geotessera</a>.
+          </li>
+          <li>
+            My download procedure: create a download tiles (bounding box) according to
+            the AOI, then loop through the tiles to download the data.
+          </li>
+          <li>
+            <code>band</code> to export: all (128 bands). <code>compression</code> used:
+            <code>lzw</code>. Output <code>format</code>: <code>GeoTIFF</code>.
+          </li>
+          <li>
+            Size: ~30 GB.
+          </li>
+        </ul>
+        
+        <details style="margin: 20px 0; border: 1px solid #ddd; border-radius: 8px; padding: 15px;">
+            <summary style="cursor: pointer; font-weight: bold;">Confession</summary>
+            <div style="margin-top: 15px;">
+                <p>
+                  I initially selected an AOI where TESSERA is not available for
+                  2020. This is because I naively assume that just like AEF, TESSERA would also
+                  be globally available for each year. Why wouldn't I, right? LOL.<br>
+                  I spent (read: waste) quite some time to get the TESSERA embeddings on that
+                  AOI before finally accept reality.
+                </p>
+            </div>
+        </details>
+
+        <h2>Data Processing</h2>
+
+        <p>
+          Now that I have all the necessary data accessible, I need to fit them into the
+          format that torchgeo model can take.
+        </p>
+
+        <figure>
+            <img src="../assets/blog/images/20260405_aoi_example.png" alt="AOI example">
+            <figcaption>AOI example (yellow). Green is GMW label's coverage.</figcaption>
+        </figure>
+
+        <p>
+          Some more technical lessons-learned:
+          <ul>
+            <li>
+              Torchgeo helps a lot. Previously, the paradigm I have to train a deep
+              learning model is to generate the image patches first to be fed to the model
+              during training. This is quite a problem for me since I have a limited storage
+              capacity. Generating image patches practicaly mean generating a "duplicate"
+              image, because the information stored in the mosaic (or tiled) imagery and the
+              patches are the same.
+            </li>
+            <li>
+              during the exploration, I somehow landed on `.vrt` first, before finally utilizing
+              torchgeo `RasterDataset`. The `.vrt` alternative is actually not a bad one, considering
+              it needs a negligible storage footprint (~160 KB for my ~11 GB of total data)
+            </li>
+          </ul>
+
+        </p>
+
+        <h2>Training</h2>
+        <!-- Training is straightforward
+         unet: 37 M params
+         segformer: 41 M params
+         deeplabv3+: 67M params
+        Params detail -->
+
+
+        <h2 id="exp-result">
+          Experiment Result
+        </h2>
       
+        <!-- Compare toggle -->
+        <div style="margin: 20px 0; display: flex; align-items: center; gap: 12px;">
+          <label for="compare-select" style="font-weight: bold;">Compare:</label>
+          <select id="compare-select" style="background: #161b22; color: #c9d1d9; border: 1px solid #30363d; border-radius: 6px; padding: 6px 12px; font-size: 14px; cursor: pointer;">
+            <option value="dataset">Dataset comparison (UNet / ResNet50)</option>
+            <option value="model">Model comparison (TESSERA)</option>
+          </select>
+        </div>
+
         <!-- Training Metrics Charts -->
         <div class="chart-grid">
           <div class="chart-box"><div id="chart-train-loss"></div></div>
@@ -180,11 +467,20 @@ tags: python, deep-learning
           <div class="chart-box"><div id="chart-val-iou"></div></div>
         </div>
         <script>
-        const data = {"AlphaEarth Embeddings": {"train_loss": {"epochs": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], "values": [0.19244089362121397, 0.12377483157380935, 0.10542681993496034, 0.0997557086088965, 0.09923111238787251, 0.08968597987005787, 0.09354863291786562, 0.09072758714037557, 0.09066812177338908, 0.0857867137078316, 0.08528378377518346, 0.08725888246009426, 0.08703275818017221, 0.08352574069173105]}, "val_loss": {"epochs": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], "values": [0.14592421054840088, 0.13917812705039978, 0.1302810162305832, 0.13096913695335388, 0.1292092502117157, 0.12446442246437073, 0.1372901052236557, 0.12585921585559845, 0.11626419425010681, 0.1214534193277359, 0.11655744910240173, 0.11855567246675491, 0.12277243286371231, 0.12807008624076843]}, "train_OverallJaccardIndex": {"epochs": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], "values": [0.8708204627037048, 0.9220193028450012, 0.9331631660461426, 0.9357001781463623, 0.9348266124725342, 0.9408513903617859, 0.9389240741729736, 0.942680835723877, 0.9415552020072937, 0.9421606063842773, 0.9442834258079529, 0.9421640634536743, 0.9453727006912231, 0.9443501830101013]}, "val_OverallJaccardIndex": {"epochs": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], "values": [0.9365848898887634, 0.9351022839546204, 0.9414691925048828, 0.9413127899169922, 0.9426112771034241, 0.944999098777771, 0.9358232021331787, 0.9452928900718689, 0.9473694562911987, 0.9457886219024658, 0.9471580386161804, 0.9474053978919983, 0.9462599754333496, 0.9471527338027954]}}, "Sentinel 2": {"train_loss": {"epochs": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17], "values": [0.23796833787233598, 0.18101736182166683, 0.16518407278964597, 0.16669554984377277, 0.15547636139296717, 0.14157163219586497, 0.13981038440139062, 0.12788058637130645, 0.13149858458388236, 0.12453576213409824, 0.1193769417943493, 0.12588374436863006, 0.12512368336319923, 0.11426241239232401, 0.11485818785525137, 0.11437304558292512, 0.11713949951433367, 0.1051462541424459]}, "val_loss": {"epochs": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17], "values": [0.19741705060005188, 0.20776300132274628, 0.1647297739982605, 0.26075392961502075, 0.1582743376493454, 0.16023989021778107, 0.1533331722021103, 0.16286204755306244, 0.386149138212204, 0.1498194932937622, 0.15511837601661682, 0.17328965663909912, 0.15180642902851105, 0.15139921009540558, 0.19077126681804657, 0.16195838153362274, 0.16851051151752472, 0.15530478954315186]}, "train_OverallJaccardIndex": {"epochs": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17], "values": [0.8125185370445251, 0.8654667735099792, 0.8789772987365723, 0.8783931136131287, 0.8937042951583862, 0.9013796448707581, 0.9042542576789856, 0.9093079566955566, 0.9104199409484863, 0.9151877164840698, 0.921520471572876, 0.9147754311561584, 0.918785035610199, 0.9223648905754089, 0.9207873940467834, 0.9211540818214417, 0.9219182133674622, 0.9297887682914734]}, "val_OverallJaccardIndex": {"epochs": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17], "values": [0.9054760336875916, 0.8984585404396057, 0.9229514598846436, 0.7803187966346741, 0.9279919862747192, 0.9249916076660156, 0.9286924600601196, 0.9250004887580872, 0.8421857357025146, 0.929350733757019, 0.928892195224762, 0.9293138384819031, 0.9330242872238159, 0.9311338663101196, 0.9042913317680359, 0.9317461252212524, 0.919169008731842, 0.9309327006340027]}}};
+        const dataByDataset = {"Sentinel 2": {"train_loss": {"epochs": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "values": [0.5168274641036987, 0.5097542405128479, 0.502551794052124, 0.5005017518997192, 0.5008671879768372, 0.5028573870658875, 0.499512255191803, 0.5000346899032593, 0.5010677576065063, 0.49935755133628845, 0.4997992217540741]}, "val_loss": {"epochs": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "values": [0.12028136104345322, 0.09033918380737305, 0.12427929788827896, 0.22177045047283173, 0.08381687849760056, 0.03686193749308586, 0.08197679370641708, 0.08817970752716064, 0.10136296600103378, 0.1079641804099083, 0.051152389496564865]}, "train_OverallJaccardIndex": {"epochs": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "values": [0.8808063864707947, 0.9383400082588196, 0.941306471824646, 0.9581446051597595, 0.9609299302101135, 0.9605910778045654, 0.9645517468452454, 0.9652412533760071, 0.9534006118774414, 0.9536598920822144, 0.960656464099884]}, "val_OverallJaccardIndex": {"epochs": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "values": [0.9344443082809448, 0.9421098232269287, 0.9021775126457214, 0.8326165676116943, 0.9441443085670471, 0.9745297431945801, 0.9462790489196777, 0.9433146715164185, 0.9253144860267639, 0.9217914342880249, 0.965749204158783]}}, "AlphaEarth Embeddings": {"train_loss": {"epochs": [0, 1, 2, 3, 4, 5, 6, 7], "values": [0.5097643136978149, 0.5020012855529785, 0.5016348361968994, 0.5003931522369385, 0.49985355138778687, 0.5000098943710327, 0.49946197867393494, 0.49960291385650635]}, "val_loss": {"epochs": [0, 1, 2, 3, 4, 5, 6, 7], "values": [0.04624691233038902, 0.021600473672151566, 0.018169736489653587, 0.01714181900024414, 0.015811147168278694, 0.014089454896748066, 0.014108257368206978, 0.013571176677942276]}, "train_OverallJaccardIndex": {"epochs": [0, 1, 2, 3, 4, 5, 6, 7], "values": [0.8716476559638977, 0.9658392071723938, 0.9740706086158752, 0.9790107607841492, 0.9787590503692627, 0.9797449707984924, 0.9796156883239746, 0.9795064330101013]}, "val_OverallJaccardIndex": {"epochs": [0, 1, 2, 3, 4, 5, 6, 7], "values": [0.9825456738471985, 0.987956166267395, 0.9891744256019592, 0.9879093170166016, 0.9889851212501526, 0.9899747371673584, 0.9897071123123169, 0.9900519251823425]}}, "TESSERA": {"train_loss": {"epochs": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], "values": [0.08646133542060852, 0.05254301428794861, 0.04579061269760132, 0.04639536142349243, 0.03489166498184204, 0.040574222803115845, 0.032911866903305054, 0.036723583936691284, 0.03498202562332153, 0.032648712396621704]}, "val_loss": {"epochs": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], "values": [0.30425989627838135, 0.16962410509586334, 0.16331087052822113, 0.1582367718219757, 0.15671035647392273, 0.1580539345741272, 0.14879199862480164, 0.1579591929912567, 0.1563362032175064, 0.15679720044136047]}, "train_OverallJaccardIndex": {"epochs": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], "values": [0.8696470856666565, 0.9168364405632019, 0.9255262613296509, 0.9304395914077759, 0.928593099117279, 0.933601438999176, 0.9360781311988831, 0.9290453195571899, 0.9333987832069397, 0.9321470856666565]}, "val_OverallJaccardIndex": {"epochs": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], "values": [0.5972232222557068, 0.9035895466804504, 0.9035334587097168, 0.9038994312286377, 0.9074640274047852, 0.9026592373847961, 0.908450722694397, 0.9037461876869202, 0.9040020108222961, 0.9039071202278137]}}};
 
-        const colors = {
+        const dataByModel = {"UNet / ResNet50": {"train_loss": {"epochs": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], "values": [0.08646133542060852, 0.05254301428794861, 0.04579061269760132, 0.04639536142349243, 0.03489166498184204, 0.040574222803115845, 0.032911866903305054, 0.036723583936691284, 0.03498202562332153, 0.032648712396621704]}, "val_loss": {"epochs": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], "values": [0.30425989627838135, 0.16962410509586334, 0.16331087052822113, 0.1582367718219757, 0.15671035647392273, 0.1580539345741272, 0.14879199862480164, 0.1579591929912567, 0.1563362032175064, 0.15679720044136047]}, "train_OverallJaccardIndex": {"epochs": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], "values": [0.8696470856666565, 0.9168364405632019, 0.9255262613296509, 0.9304395914077759, 0.928593099117279, 0.933601438999176, 0.9360781311988831, 0.9290453195571899, 0.9333987832069397, 0.9321470856666565]}, "val_OverallJaccardIndex": {"epochs": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], "values": [0.5972232222557068, 0.9035895466804504, 0.9035334587097168, 0.9038994312286377, 0.9074640274047852, 0.9026592373847961, 0.908450722694397, 0.9037461876869202, 0.9040020108222961, 0.9039071202278137]}}, "DeepLabV3+ / ResNet152": {"train_loss": {"epochs": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16], "values": [0.09095913171768188, 0.07394355535507202, 0.062475621700286865, 0.055643320083618164, 0.056909412145614624, 0.04458349943161011, 0.03962099552154541, 0.04100343585014343, 0.03798606991767883, 0.035500556230545044, 0.03429287672042847, 0.038580626249313354, 0.03687924146652222, 0.03298366069793701, 0.03629481792449951, 0.03394797444343567, 0.035214751958847046]}, "val_loss": {"epochs": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16], "values": [0.2779092788696289, 0.16802118718624115, 0.1648133546113968, 0.16252952814102173, 0.17189884185791016, 0.16240602731704712, 0.1614333540201187, 0.15596430003643036, 0.15743586421012878, 0.1556926965713501, 0.15624448657035828, 0.1534443199634552, 0.15345783531665802, 0.15765142440795898, 0.15536367893218994, 0.15131253004074097, 0.15645818412303925]}, "train_OverallJaccardIndex": {"epochs": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16], "values": [0.7821962833404541, 0.8991794586181641, 0.9110801219940186, 0.9183292984962463, 0.9236089587211609, 0.9267764091491699, 0.928699791431427, 0.9308991432189941, 0.9313319325447083, 0.9319735765457153, 0.93282151222229, 0.9305192232131958, 0.9324315190315247, 0.9340993762016296, 0.9322190880775452, 0.9341360926628113, 0.9229293465614319]}, "val_OverallJaccardIndex": {"epochs": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16], "values": [0.8565475344657898, 0.8993766903877258, 0.9004277586936951, 0.9014719724655151, 0.8983328342437744, 0.9017068147659302, 0.9028088450431824, 0.9050955176353455, 0.9038917422294617, 0.9044888019561768, 0.9049624800682068, 0.9064513444900513, 0.9063250422477722, 0.9026994705200195, 0.9056695103645325, 0.906640887260437, 0.904587984085083]}}, "Segformer": {"train_loss": {"epochs": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14], "values": [0.05770346522331238, 0.048565953969955444, 0.042941123247146606, 0.03962147235870361, 0.04004684090614319, 0.03569939732551575, 0.03603196144104004, 0.035698115825653076, 0.03556874394416809, 0.03560653328895569, 0.03573930263519287, 0.03236621618270874, 0.03287824988365173, 0.03293600678443909, 0.030725419521331787]}, "val_loss": {"epochs": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14], "values": [0.16055507957935333, 0.1594570130109787, 0.159258633852005, 0.1575503647327423, 0.15790945291519165, 0.157404825091362, 0.15840566158294678, 0.15613587200641632, 0.15351586043834686, 0.14929434657096863, 0.15241147577762604, 0.1478242576122284, 0.14810459315776825, 0.14957566559314728, 0.15039131045341492]}, "train_OverallJaccardIndex": {"epochs": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14], "values": [0.8667263388633728, 0.9256431460380554, 0.9274256825447083, 0.9267743229866028, 0.92536461353302, 0.9264994859695435, 0.9282135963439941, 0.9294384121894836, 0.9303885698318481, 0.9337554574012756, 0.9345625042915344, 0.9356783032417297, 0.9358595013618469, 0.9368931651115417, 0.9362379312515259]}, "val_OverallJaccardIndex": {"epochs": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14], "values": [0.9026147127151489, 0.9034309387207031, 0.9032002687454224, 0.9035384654998779, 0.9037147164344788, 0.9036974310874939, 0.9037177562713623, 0.9046352505683899, 0.9061490893363953, 0.9087680578231812, 0.906883955001831, 0.9084067344665527, 0.9084665775299072, 0.9079595804214478, 0.9073198437690735]}}};
+
+        const colorsByDataset = {
+          "Sentinel 2": "#e3b341",
           "AlphaEarth Embeddings": "#58a6ff",
-          "Sentinel 2": "#e3b341"
+          "TESSERA": "#f97583"
+        };
+
+        const colorsByModel = {
+          "UNet / ResNet50": "#f97583",
+          "DeepLabV3+ / ResNet152": "#a5d6ff",
+          "Segformer": "#7ee787"
         };
 
         const chartLayout = {
@@ -194,49 +490,70 @@ tags: python, deep-learning
           font: { color: "#c9d1d9", size: 12 },
           margin: { t: 36, r: 16, b: 44, l: 52 },
           legend: { orientation: "h", y: -0.22, x: 0.5, xanchor: "center", font: { size: 11 } },
-          <!-- xaxis: { gridcolor: "#21262d", zeroline: false, dtick: 2, showspikes: false }, -->
           xaxis: { gridcolor: "#21262d", zeroline: false, dtick: 2, showspikes: false, showtickprefix: "first" },
           yaxis: { gridcolor: "#21262d", zeroline: false },
           hovermode: "x unified",
           hoverlabel: { bgcolor: "#000", font: { color: "#fff" } },
         };
 
-        function makeTraces(metric, yLabel) {
-          const traces = [];
-          for (const [name, metrics] of Object.entries(data)) {
-            traces.push({
-              x: metrics[metric].epochs,
-              y: metrics[metric].values,
-              name: name,
-              mode: "lines+markers",
-              line: { color: colors[name], width: 2 },
-              marker: { size: 5 },
-              hovertemplate: "%{y:.4f}"
-            });
-          }
-          return [traces, { ...chartLayout, yaxis: { ...chartLayout.yaxis, title: yLabel } }];
-        }
-
-        const charts = [
+        const chartDefs = [
           ["chart-train-loss", "train_loss", "Train Loss", "Loss"],
           ["chart-val-loss", "val_loss", "Val Loss", "Loss"],
           ["chart-train-iou", "train_OverallJaccardIndex", "Train IoU", "IoU"],
           ["chart-val-iou", "val_OverallJaccardIndex", "Val IoU", "IoU"],
         ];
 
-        for (const [id, metric, title, yLabel] of charts) {
-          const [traces, l] = makeTraces(metric, yLabel);
-          l.title = { text: title, font: { size: 14 } };
-          Plotly.newPlot(id, traces, l, { responsive: true, displayModeBar: false });
+        function renderCharts(data, colors) {
+          for (const [id, metric, title, yLabel] of chartDefs) {
+            const traces = [];
+            for (const [name, metrics] of Object.entries(data)) {
+              traces.push({
+                x: metrics[metric].epochs,
+                y: metrics[metric].values,
+                name: name,
+                mode: "lines+markers",
+                line: { color: colors[name], width: 2 },
+                marker: { size: 5 },
+                hovertemplate: "%{y:.4f}"
+              });
+            }
+            const layout = {
+              ...chartLayout,
+              title: { text: title, font: { size: 14 } },
+              yaxis: { ...chartLayout.yaxis, title: yLabel },
+            };
+            Plotly.react(id, traces, layout, { responsive: true, displayModeBar: false });
+          }
         }
+
+        // Initial render
+        renderCharts(dataByDataset, colorsByDataset);
+
+        // Toggle handler
+        document.getElementById("compare-select").addEventListener("change", function () {
+          const isDataset = this.value === "dataset";
+          if (isDataset) {
+            renderCharts(dataByDataset, colorsByDataset);
+          } else {
+            renderCharts(dataByModel, colorsByModel);
+          }
+          document.getElementById("fig-dataset").style.display = isDataset ? "block" : "none";
+          document.getElementById("fig-model").style.display = isDataset ? "none" : "block";
+        });
         </script>
 
-        <figure>
-            <img src="../assets/blog/images/20260405_combined_sample_1.png" alt="Description of image">
-            <img src="../assets/blog/images/20260405_combined_sample_2.png" alt="Description of image">
-            <img src="../assets/blog/images/20260405_combined_sample_3.png" alt="Description of image">
-            <figcaption>Prediction comparison</figcaption>
+        <figure id="fig-dataset">
+            <img src="../assets/blog/images/20260405_comparison_unet.png" alt="Dataset comparison predictions">
+            <figcaption>Prediction comparison across datasets (UNet / ResNet50)</figcaption>
         </figure>
+        <figure id="fig-model" style="display: none;">
+            <img src="../assets/blog/images/20260405_comparison_tessera.png" alt="Model comparison predictions on TESSERA">
+            <figcaption>Prediction comparison across models (TESSERA)</figcaption>
+        </figure>
+
+        <h2>Observaton/Analysis</h2>
+
+        <h2>Conclusion</h2>
 
 
     <div class="tags-section">
