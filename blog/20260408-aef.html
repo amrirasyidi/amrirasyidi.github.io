@@ -1,15 +1,15 @@
 <!--
-title: Google's AlphaEarth Embeddings for Semantic Segmentation
-date: 2026-04-05
-excerpt: Trying out the AlphaEarth Embeddings for Deep Learning.
-tags: python, deep-learning
+title: Earth Embeddings for Semantic Segmentation
+date: 2026-04-08
+excerpt: Trying out the AlphaEarth and TESSERA Embeddings for Deep Learning.
+tags: python, deep-learning, guide, geospatial
 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Google's AlphaEarth Embeddings for Semantic Segmentation</title>
+    <title>Earth Embeddings for Semantic Segmentation</title>
     <link rel="stylesheet" href="../static/style.css">
     <link rel="stylesheet" href="../static/prism.css"/>
     <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
@@ -38,7 +38,7 @@ tags: python, deep-learning
     <h1>Google's AlphaEarth Embeddings for Semantic Segmentation</h1>
 
     <div class="post-meta">
-        Published on [April 5th, 2026]
+        Published on [April 8th, 2026]
     </div>
 
     <div class="post-content">
@@ -68,7 +68,7 @@ tags: python, deep-learning
           <summary style="cursor: pointer; font-weight: bold;">AlphaEarth Embeddings</summary>
             <div style="margin-top: 15px;">
               <figure>
-                <img src="../assets/blog/images/20260405_aef_summary.png" alt="AlphaEarth Embeddings Summary">
+                <img src="../assets/blog/images/20260408_aef_summary.png" alt="AlphaEarth Embeddings Summary">
                 <figcaption><a href="https://arxiv.org/pdf/2507.22291">AlphaEarth Embeddings: A
                   Unified Vector Representation for Earth Observation</a>: "AEF reconciles
                   multiple sparse, non-uniformly sampled observation records into a continuous
@@ -81,7 +81,7 @@ tags: python, deep-learning
           <summary style="cursor: pointer; font-weight: bold;">TESSERA Embeddings</summary>
             <div style="margin-top: 15px;">
               <figure>
-                <img src="../assets/blog/images/20260405_tessera_summary.png" alt="Tessera Embeddings Summary">
+                <img src="../assets/blog/images/20260408_tessera_summary.png" alt="Tessera Embeddings Summary">
                 <figcaption><a href="https://arxiv.org/pdf/2506.20380">TESSERA</a>: "advances
                   the embedding-as-data approach for Earth Observation. It delivers (a)
                   analysis-ready global-scale products, (b) pixel-wise, high-fidelity
@@ -95,7 +95,7 @@ tags: python, deep-learning
           Here's a quick summary of similarities and differences between the 2 embeddings.
         </p>    
 
-        <p><strong>Similarities</strong></p>
+        <p><strong>Similarities:</strong></p>
         <ul>
           <li>
             Embedding-as-Data Paradigm: both models deliver precomputed, task-agnostic
@@ -182,8 +182,18 @@ tags: python, deep-learning
                   </td>
                   
                   <td>
-                    Multi-objective: Contrastive (teacher-student), data reconstruction,
-                    and text alignment
+                    Multi-objective: contrastive
+                    <span class="tooltip">
+                      <strong>(teacher-student)</strong>
+                      <span class="tooltip-text">
+                        Imagine a teacher who sees a perfectly clear satellite image and
+                        a student who sees one that is half-covered by clouds. AEF is
+                        trained so that the "student" must guess what the missing parts
+                        look like so well that their answer matches the "teacher's" 
+                        clear view.
+                      </span>  
+                    </span>   
+                  , data reconstruction, and text alignment
                   </td>
               </tr>    
               <tr>
@@ -198,8 +208,24 @@ tags: python, deep-learning
               </tr>    
               <tr>
                   <td><strong>Temporal Handling</strong></td>
-                  <td>Sparse random temporal sampling invariance (fixed 40 timesteps)</td>
-                  <td>Implicit decoder treating time as a continuous variable</td>
+                  <td>Sparse random temporal sampling invariance (fixed 40 timesteps)
+                  <td>Implicit decoder treating time as a
+                    <span class="tooltip">
+                      <strong>continuous variable</strong>
+                      <span class="tooltip-text">
+                        AEF employs an implicit decoder that treats time and sensor
+                        parameters as continuous variables. It can produce a temporal
+                        summary for any "valid period," whether it is a single day, a 
+                        month, or a year .<br>Implication: This allows AEF to reconcile
+                        non-uniformly sampled records into a continuous record. It can 
+                        interpolate (predict between observations) or extrapolate 
+                        (predict beyond observations) to provide "analysis-ready" 
+                        summaries for any arbitrary time window without needing to 
+                        retrain the model.
+                      </span>
+                    </span>
+                  </td>
+
               </tr>    
               <tr>
                   <td><strong>Embedding Size</strong></td>
@@ -247,7 +273,7 @@ tags: python, deep-learning
           <a href="https://github.com/ucam-eo/geotessera">https://github.com/ucam-eo/geotessera</a>.
         </p>
         
-        <p>The availability for Sentinel-2 and AEF wont be big a problem.</p>
+        <p>The availability for Sentinel-2 and AEF won't be big a problem.</p>
         
         <p>
           Now that the data availability problem has been solved, here's a summary of
@@ -353,14 +379,15 @@ tags: python, deep-learning
         </ul>
 
         <p>
-          Before using GEE, I also explored the COG data for AEF from <a href="https://source.coop/tge-labs/aef">source.coop</a>,
+          Before using GEE, I also explored the cloud-optimized-geotiff (COG) data for 
+          AEF from <a href="https://source.coop/tge-labs/aef">source.coop</a>,
           upon trying, I always get request timeout, perhaps because the server location.
           I tried this because I want to have as seamless development experience as
           possible, since I can use python to access data from source coop. Of course
           there's also Python API for GEE, but it still require authentication and the
           downloaded data is stored in google drive instead of directly locally. In fact
-          the very first plan is to utilize the cloud-optimize-geotiff format served in
-          source.coop. The idea is to only retrieve the necessary data ('on-the-fly'
+          the very first plan is to utilize the COG format served in source.coop. 
+          The idea is to only retrieve the necessary data ('on-the-fly'
           is even possible) according to my AOI and data bounds, so I don't have to 
           store big files locally.<br>
           In the end, GEE come to the rescue.
@@ -410,32 +437,97 @@ tags: python, deep-learning
 
         <p>
           Now that I have all the necessary data accessible, I need to fit them into the
-          format that torchgeo model can take.
+          format that torchgeo's models can take.
+        </p>
+
+        <p>
+          "Traditionally", the way geospatial data prepared for deep learning use case
+          is by "cutting" them into patches. This is quite a problem for me since I have 
+          a limited storage capacity. Generating image patches practicaly means generating 
+          "duplicate" images, because the information stored in the mosaic (or tiled)
+          imagery and the patches are practically the same.
+        </p>
+
+        <p>
+          This is where torchgeo is super helpful. Torchgeo has provided a "ready-to-use"
+          dataset classes. Using these data classes remove the need to create patches for
+          the training phase. The dataset will be chipped on-the-fly during training.
+          What's more, the dataset will also be aligned (e.g. alignment between image
+          and mask) during the chipping process.
+        </p>
+
+        <p>
+          In my case, I only need to create a custom dataset for the mask since it is 
+          not available in torchgeo. Also a semi-custom dataset for Sentinel-2 since the
+          file naming in my local is differ from the 
+          <span class="tooltip">
+            <strong>standard Sentinel-2 naming</strong>,
+            <span class="tooltip-text">
+              like this one (I think):<br>
+              S2A_MSIL1C_20170105T013442_N0204_R031_
+              T53NMJ_20170105T013443<br><br>
+              check <a href="https://sentiwiki.copernicus.eu/web/s2-products#S2Products-NamingConventionS2-Products-Naming-Conventiontrue>">here</a>
+              and <a href="https://github.com/torchgeo/torchgeo/blob/0e0450975cbb0e090a3c15df3b8d871347977b7a/torchgeo/datasets/sentinel.py#L266-L464">here</a>
+              for more info.
+            </span>
+          </span>
+          plus I already have additional indices bands ready on the dataset, which is 
+          not the starndard for "vanilla" Sentinel-2 L2A data.
+        </p>
+
+        <p>
+          The code itself is relatively simple, not even a 100 lines. Below is the excerpt:
+          <pre><code>class S2Dataset(RasterDataset):
+    """Sentinel-2 composite GeoTIFFs exported from GEE.
+
+    Files are named ``s2_box_*.tif`` with 21 bands (12 spectral + 9 indices).
+    """
+
+    filename_glob = "s2_box_*.*"
+    filename_regex = ".*"
+    all_bands = (
+        "B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8", "B8A", "B9", "B11", "B12",
+        "NDVI", "NDWI", "MNDWI", "NDSI", "NDMI", "EVI", "EVI2", "GOSAVI", "SAVI",
+    )
+    is_image = True
+
+
+class GMWMaskDataset(RasterDataset):
+    """Global Mangrove Watch extent mask.
+
+    Files are named ``gmw_extent_box_*.tif`` with a single binary band.
+    """
+
+    filename_glob = "gmw_extent_box_*.*"
+    filename_regex = ".*"
+    all_bands = ("mask",)
+    is_image = False</code></pre>
+        </p>
+
+        <p>
+          Another thing that needs attention is the fact that the GMW label is relatively
+          sparse compared with the image, as you can see in the example below.
         </p>
 
         <figure>
-            <img src="../assets/blog/images/20260405_aoi_example.png" alt="AOI example">
-            <figcaption>AOI example (yellow). Green is GMW label's coverage.</figcaption>
+            <img src="../assets/blog/images/20260408_aoi_example.png" alt="AOI example">
+            <figcaption>
+              AOI example (yellow). Green is GMW label's coverage. Taken from GEE.
+            </figcaption>
         </figure>
 
         <p>
-          Some more technical lessons-learned:
-          <ul>
-            <li>
-              Torchgeo helps a lot. Previously, the paradigm I have to train a deep
-              learning model is to generate the image patches first to be fed to the model
-              during training. This is quite a problem for me since I have a limited storage
-              capacity. Generating image patches practicaly mean generating a "duplicate"
-              image, because the information stored in the mosaic (or tiled) imagery and the
-              patches are the same.
-            </li>
-            <li>
-              during the exploration, I somehow landed on `.vrt` first, before finally utilizing
-              torchgeo `RasterDataset`. The `.vrt` alternative is actually not a bad one, considering
-              it needs a negligible storage footprint (~160 KB for my ~11 GB of total data)
-            </li>
-          </ul>
+          Besides that, I apply a "special" treatment for TESSERA data. During the training
+          I noticed that the run getting slower the more bands the image has. For S2 data
+          it would take around 1-3 mins per epoch, AEF maybe twice (or triple) of that,
+          but for TESSERA, one epoch could take 30 mins (unacceptable!).
+        </p>
 
+        <p>
+          I'll say it again: my patience is thin. After consulting to the council of AI,
+          I decided to convert the original tiff to COG format and set the compression to
+          none (I set the compression to <code>lzw</code> when I download it using 
+          geotessera). Thank God, this improves the training speed significantly.
         </p>
 
         <h2>Training</h2>
@@ -444,11 +536,70 @@ tags: python, deep-learning
          segformer: 41 M params
          deeplabv3+: 67M params
         Params detail -->
+        <p>
+          Once the data is prepared, the training part is a piece of cake. I used
+          config-based style so I only have to change the config file if I need to
+          change the parameters. The config file is a yaml, that look like this:
 
+          <pre><code>model_params:
+  model: unet                  # options: valid model from torchgeo
+  backbone: resnet50
+  loss: dice
+
+training_params:
+  batch_size: 4
+  epochs: 100
+  lr: 0.0005
+  workers: 4
+  early_stopping_patience: 5
+
+data:
+  source: tessera             # options: s2, aef, tessera
+  raw_dir: data/0_raw
+  chip_size: 512
+  stride: 256
+  train_ratio: 0.8
+  boxes: [0, 1]
+  only_mask: true
+
+output:
+  dir: models                 # experiment folder to be used by MLFlow
+  experiment: my_exp          # experiment name to use on MLFlow</code></pre>
+        </p>
+
+        <p>
+          The initial plan is just to use one model and train it using different data 
+          source. I also make the other training params the same for those different data
+          to make sure that differences in performance can be address to the data source.
+        </p>
+
+        <p>
+          Evaluating the process and the result of the training, something peculiar
+          came out. It seems to me that models trained using TESSERA are "underperforming".
+          I put quote there because I don't really have a benchmark to say it underperforms.
+          The closes benchmark I have is my own model trained using S2 data.
+        </p>
+
+        <p>
+          So I decided to try 2 different model, SegFormer (attention-based model) and 
+          DeepLabV3+ with ResNet152 backbone (more training parameters). I chose this 2
+          models because I was thinking maybe because TESSERA has 128 bands, UNet with
+          ResNet50 is too small for it to be properly learn from. the baseline model 
+          (UNet with ResNet50) got about 37M training parameters, while SegFormer and
+          DeepLabV3+ have around 41M and 67M parameters respectively.
+        </p>
+        
+        <p>
+          I also just want to see if attention-based model helps.
+        </p>
 
         <h2 id="exp-result">
           Experiment Result
         </h2>
+
+        <p>
+          FINALLY.
+        </p>
       
         <!-- Compare toggle -->
         <div style="margin: 20px 0; display: flex; align-items: center; gap: 12px;">
@@ -543,17 +694,91 @@ tags: python, deep-learning
         </script>
 
         <figure id="fig-dataset">
-            <img src="../assets/blog/images/20260405_comparison_unet.png" alt="Dataset comparison predictions">
+            <img src="../assets/blog/images/20260408_comparison_unet.png" alt="Dataset comparison predictions">
             <figcaption>Prediction comparison across datasets (UNet / ResNet50)</figcaption>
         </figure>
         <figure id="fig-model" style="display: none;">
-            <img src="../assets/blog/images/20260405_comparison_tessera.png" alt="Model comparison predictions on TESSERA">
+            <img src="../assets/blog/images/20260408_comparison_tessera.png" alt="Model comparison predictions on TESSERA">
             <figcaption>Prediction comparison across models (TESSERA)</figcaption>
         </figure>
 
         <h2>Observaton/Analysis</h2>
 
-        <h2>Conclusion</h2>
+        <p>
+          Here's some highlight:
+          <ul>
+            <li>
+              Model trained using S2 data, often got a spike on their validation metrics
+              (happened quite consistently)
+            </li>
+            <li>
+              These noises/spikes could indicate sensitivity to the specific validation
+              patches — possibly some patches with cloud residuals or spectral artifacts
+              in the median composite.
+            </li>
+            <li>
+              AEF generalizes remarkably well: val loss keeps decreasing steadily and
+              ends at ~0.014 — an order of magnitude lower than Tessera's. The train-val
+              gap is the smallest of all three.
+            </li>
+            <li>
+              Not only performing well on the IoU, model trained using AEF also train
+              for shorter epochs.
+            </li>
+            <li>
+              Despite TESSERA have lower train loss consistently, the inverse happened on
+              validation loss. A classic overfitting case. The large gap between train
+              and val performance is a red flag. Train loss drops the lowest (~0.033) 
+              but val loss plateaus high (~0.155) and never meaningfully improves after
+              epoch 1
+            </li>
+            <li>
+              Switching to larger/different architectures (DeepLabV3+, SegFormer) does
+              not meaningfully fix Tessera's issues. This suggests the bottleneck is in
+              the data/embeddings themselves, not model capacity.
+            </li>
+          </ul>
+        </p>
+
+        <p>
+          Looking at the prediction image, AlphaEarth Embeddings prediction looks clean
+          and accurate, almost perfectly matching the ground truth. Sentinel 2 is also
+          pretty good, but you can see some minor discrepancies. TESSERA, on the other
+          hand, has some noticeable gaps and inaccuracies, especially in the more
+          complex areas with lots of small water bodies. This totally aligns with its
+          higher loss and lower IoU in the metrics table.
+        </p>
+
+        <p>
+          Meanwhile in the TESSERA comparison, Segformer manages to pull ahead visually.
+          You can see it captures the intricate shapes of the land and water a bit
+          better than UNet and DeepLabV3+. It's not a huge difference, but those little
+          details add up, which is probably why its IoU was slightly higher. UNet and
+          DeepLabV3+ are quite similar in their predictions here.
+        </p>
+
+        <p>
+          A probable reason, why TESSERA seems underperforming is overfitting due to 
+          high dimensionality. Having 128 input channels means more parameters in the
+          first layer and higher model capacity right at the input. That perhaps mean, I 
+          need more data to properly constrain the model. Since my dataset isn’t large 
+          enough, the model perhaps: overfit to noise then fail to generalize. Which 
+          shows up exactly like what we're seeing:  decent training behavior, but worse 
+          validation performance.
+        </p>
+
+        <p>
+          I won't really put a conclusion here, but if I have to, I think TESSERA need
+          some more pre-processing before it can perform well in this case.
+        </p>
+
+        <h2>To close it</h2>
+
+        <p>
+          It was fun to finally touch this kind of project again and to be able to utilize
+          torchgeo to the fullest, especially about the fact that I don't need to generate
+          image patches.
+        </p>
 
 
     <div class="tags-section">
@@ -561,6 +786,7 @@ tags: python, deep-learning
         <a href="../tags.html?tag=python" class="tag">python</a>
         <a href="../tags.html?tag=deep-learning" class="tag">deep-learning</a>
         <a href="../tags.html?tag=guide" class="tag">guide</a>
+        <a href="../tags.html?tag=geospatial" class="tag">geospatial</a>
     </div>
 
     <script src="../static/dark-mode.js"></script>
