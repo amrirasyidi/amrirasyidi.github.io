@@ -477,36 +477,39 @@ tags: python, deep-learning, guide, geospatial
 
         <p>
           The code itself is relatively simple, not even a 100 lines. Below is the excerpt:
-          <pre><code>class S2Dataset(RasterDataset):
-    """Sentinel-2 composite GeoTIFFs exported from GEE.
-
-    Files are named ``s2_box_*.tif`` with 21 bands (12 spectral + 9 indices).
-    """
-
-    filename_glob = "s2_box_*.*"
-    filename_regex = ".*"
-    all_bands = (
-        "B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8", "B8A", "B9", "B11", "B12",
-        "NDVI", "NDWI", "MNDWI", "NDSI", "NDMI", "EVI", "EVI2", "GOSAVI", "SAVI",
-    )
-    is_image = True
-
-
-class GMWMaskDataset(RasterDataset):
-    """Global Mangrove Watch extent mask.
-
-    Files are named ``gmw_extent_box_*.tif`` with a single binary band.
-    """
-
-    filename_glob = "gmw_extent_box_*.*"
-    filename_regex = ".*"
-    all_bands = ("mask",)
-    is_image = False</code></pre>
         </p>
+
+<!-- HTML generated using hilite.me --><div style="background: #0d1117; overflow:auto;width:auto"><pre style="margin: 0; line-height: 125%;"><span></span><span style="color: #FF7B72">class</span><span style="color: #6E7681"> </span><span style="color: #F0883E; font-weight: bold">S2Dataset</span><span style="color: #E6EDF3">(RasterDataset):</span>
+<span style="color: #6E7681">    </span><span style="color: #A5D6FF">&quot;&quot;&quot;Sentinel-2 composite GeoTIFFs exported from GEE.</span>
+
+<span style="color: #A5D6FF">    Files are named ``s2_box_*.tif`` with 21 bands (12 spectral + 9 indices).</span>
+<span style="color: #A5D6FF">    &quot;&quot;&quot;</span>
+
+    <span style="color: #E6EDF3">filename_glob</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #A5D6FF">&quot;s2_box_*.*&quot;</span>
+    <span style="color: #E6EDF3">filename_regex</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #A5D6FF">&quot;.*&quot;</span>
+    <span style="color: #E6EDF3">all_bands</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #E6EDF3">(</span>
+        <span style="color: #A5D6FF">&quot;B1&quot;</span><span style="color: #E6EDF3">,</span> <span style="color: #A5D6FF">&quot;B2&quot;</span><span style="color: #E6EDF3">,</span> <span style="color: #A5D6FF">&quot;B3&quot;</span><span style="color: #E6EDF3">,</span> <span style="color: #A5D6FF">&quot;B4&quot;</span><span style="color: #E6EDF3">,</span> <span style="color: #A5D6FF">&quot;B5&quot;</span><span style="color: #E6EDF3">,</span> <span style="color: #A5D6FF">&quot;B6&quot;</span><span style="color: #E6EDF3">,</span> <span style="color: #A5D6FF">&quot;B7&quot;</span><span style="color: #E6EDF3">,</span> <span style="color: #A5D6FF">&quot;B8&quot;</span><span style="color: #E6EDF3">,</span> <span style="color: #A5D6FF">&quot;B8A&quot;</span><span style="color: #E6EDF3">,</span> <span style="color: #A5D6FF">&quot;B9&quot;</span><span style="color: #E6EDF3">,</span> <span style="color: #A5D6FF">&quot;B11&quot;</span><span style="color: #E6EDF3">,</span> <span style="color: #A5D6FF">&quot;B12&quot;</span><span style="color: #E6EDF3">,</span>
+        <span style="color: #A5D6FF">&quot;NDVI&quot;</span><span style="color: #E6EDF3">,</span> <span style="color: #A5D6FF">&quot;NDWI&quot;</span><span style="color: #E6EDF3">,</span> <span style="color: #A5D6FF">&quot;MNDWI&quot;</span><span style="color: #E6EDF3">,</span> <span style="color: #A5D6FF">&quot;NDSI&quot;</span><span style="color: #E6EDF3">,</span> <span style="color: #A5D6FF">&quot;NDMI&quot;</span><span style="color: #E6EDF3">,</span> <span style="color: #A5D6FF">&quot;EVI&quot;</span><span style="color: #E6EDF3">,</span> <span style="color: #A5D6FF">&quot;EVI2&quot;</span><span style="color: #E6EDF3">,</span> <span style="color: #A5D6FF">&quot;GOSAVI&quot;</span><span style="color: #E6EDF3">,</span> <span style="color: #A5D6FF">&quot;SAVI&quot;</span><span style="color: #E6EDF3">,</span>
+    <span style="color: #E6EDF3">)</span>
+    <span style="color: #E6EDF3">is_image</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #79C0FF">True</span>
+
+
+<span style="color: #FF7B72">class</span><span style="color: #6E7681"> </span><span style="color: #F0883E; font-weight: bold">GMWMaskDataset</span><span style="color: #E6EDF3">(RasterDataset):</span>
+<span style="color: #6E7681">    </span><span style="color: #A5D6FF">&quot;&quot;&quot;Global Mangrove Watch extent mask.</span>
+
+<span style="color: #A5D6FF">    Files are named ``gmw_extent_box_*.tif`` with a single binary band.</span>
+<span style="color: #A5D6FF">    &quot;&quot;&quot;</span>
+
+    <span style="color: #E6EDF3">filename_glob</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #A5D6FF">&quot;gmw_extent_box_*.*&quot;</span>
+    <span style="color: #E6EDF3">filename_regex</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #A5D6FF">&quot;.*&quot;</span>
+    <span style="color: #E6EDF3">all_bands</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #E6EDF3">(</span><span style="color: #A5D6FF">&quot;mask&quot;</span><span style="color: #E6EDF3">,)</span>
+    <span style="color: #E6EDF3">is_image</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #79C0FF">False</span>
+</pre></div>
 
         <p>
           Another thing that needs attention is the fact that the GMW label is relatively
-          sparse compared with the image, as you can see in the example below.
+          sparse compared with the image, as you can see in the example below. This means,
+          many of my image patches will overlap with an area with no mask.
         </p>
 
         <figure>
@@ -515,6 +518,65 @@ class GMWMaskDataset(RasterDataset):
               AOI example (yellow). Green is GMW label's coverage. Taken from GEE.
             </figcaption>
         </figure>
+
+        <p>
+          To my knowledge, torchgeo doesn't have a built-in feature currently to filter
+          out patches with no mask overlap. In the beginning, I tried to train the model
+          as-is, meaning to also include the patches where there's no label. This results
+          in a sub-optimal training metrics, so I had to create a custom script to prevent
+          patches with no mask getting into the actual training data.
+        </p>
+
+        <!-- HTML generated using hilite.me --><div style="background: #0d1117; overflow:auto;width:auto;"><pre style="margin: 0; line-height: 125%;"><span></span><span style="color: #FF7B72">def</span><span style="color: #6E7681"> </span><span style="color: #D2A8FF; font-weight: bold">filter_chips_with_mask</span><span style="color: #E6EDF3">(</span>
+    <span style="color: #E6EDF3">mask_dataset:</span> <span style="color: #E6EDF3">GeoDataset,</span>
+    <span style="color: #E6EDF3">sampler:</span> <span style="color: #E6EDF3">GridGeoSampler,</span>
+    <span style="color: #E6EDF3">n_samples:</span> <span style="color: #E6EDF3">int</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #A5D6FF">2</span><span style="color: #E6EDF3">,</span>
+<span style="color: #E6EDF3">)</span> <span style="color: #FF7B72; font-weight: bold">-&gt;</span> <span style="color: #E6EDF3">tuple[list[BoundingBox],</span> <span style="color: #E6EDF3">dict[str,</span> <span style="color: #E6EDF3">list[BoundingBox]]]:</span>
+<span style="color: #6E7681">    </span><span style="color: #A5D6FF">&quot;&quot;&quot;Keep only chips where the mask contains at least one positive pixel.</span>
+
+<span style="color: #A5D6FF">    Also collects the first ``n_samples`` chips with mask and without mask</span>
+<span style="color: #A5D6FF">    for use as fixed sample predictions.</span>
+
+<span style="color: #A5D6FF">    Args:</span>
+<span style="color: #A5D6FF">        mask_dataset: The mask-only GeoDataset (not the full intersection).</span>
+<span style="color: #A5D6FF">        sampler: A GridGeoSampler to iterate over.</span>
+<span style="color: #A5D6FF">        n_samples: Number of sample chips to collect per category.</span>
+
+<span style="color: #A5D6FF">    Returns:</span>
+<span style="color: #A5D6FF">        (valid_bboxes, sample_chips) where sample_chips has keys</span>
+<span style="color: #A5D6FF">        ``&quot;with_mask&quot;`` and ``&quot;no_mask&quot;``.</span>
+<span style="color: #A5D6FF">    &quot;&quot;&quot;</span>
+    <span style="color: #E6EDF3">valid:</span> <span style="color: #E6EDF3">list[BoundingBox]</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #E6EDF3">[]</span>
+    <span style="color: #E6EDF3">with_mask_samples:</span> <span style="color: #E6EDF3">list[BoundingBox]</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #E6EDF3">[]</span>
+    <span style="color: #E6EDF3">no_mask_samples:</span> <span style="color: #E6EDF3">list[BoundingBox]</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #E6EDF3">[]</span>
+    <span style="color: #E6EDF3">total</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #E6EDF3">len(sampler)</span>
+
+    <span style="color: #FF7B72">for</span> <span style="color: #E6EDF3">i,</span> <span style="color: #E6EDF3">bbox</span> <span style="color: #FF7B72; font-weight: bold">in</span> <span style="color: #E6EDF3">enumerate(sampler):</span>
+        <span style="color: #E6EDF3">sample</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #E6EDF3">mask_dataset[bbox]</span>
+        <span style="color: #E6EDF3">has_mask</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #E6EDF3">sample[</span><span style="color: #A5D6FF">&quot;mask&quot;</span><span style="color: #E6EDF3">]</span><span style="color: #FF7B72; font-weight: bold">.</span><span style="color: #E6EDF3">sum()</span> <span style="color: #FF7B72; font-weight: bold">&gt;</span> <span style="color: #A5D6FF">0</span>
+        <span style="color: #FF7B72">if</span> <span style="color: #E6EDF3">has_mask:</span>
+            <span style="color: #E6EDF3">valid</span><span style="color: #FF7B72; font-weight: bold">.</span><span style="color: #E6EDF3">append(bbox)</span>
+            <span style="color: #FF7B72">if</span> <span style="color: #E6EDF3">len(with_mask_samples)</span> <span style="color: #FF7B72; font-weight: bold">&lt;</span> <span style="color: #E6EDF3">n_samples:</span>
+                <span style="color: #E6EDF3">with_mask_samples</span><span style="color: #FF7B72; font-weight: bold">.</span><span style="color: #E6EDF3">append(bbox)</span>
+        <span style="color: #FF7B72">else</span><span style="color: #E6EDF3">:</span>
+            <span style="color: #FF7B72">if</span> <span style="color: #E6EDF3">len(no_mask_samples)</span> <span style="color: #FF7B72; font-weight: bold">&lt;</span> <span style="color: #E6EDF3">n_samples:</span>
+                <span style="color: #E6EDF3">no_mask_samples</span><span style="color:G #FF7B72; font-weight: bold">.</span><span style="color: #E6EDF3">append(bbox)</span>
+        <span style="color: #FF7B72">if</span> <span style="color: #E6EDF3">(i</span> <span style="color: #FF7B72; font-weight: bold">+</span> <span style="color: #A5D6FF">1</span><span style="color: #E6EDF3">)</span> <span style="color: #FF7B72; font-weight: bold">%</span> <span style="color: #A5D6FF">100</span> <span style="color: #FF7B72; font-weight: bold">==</span> <span style="color: #A5D6FF">0</span><span style="color: #E6EDF3">:</span>
+            <span style="color: #E6EDF3">logging</span><span style="color: #FF7B72; font-weight: bold">.</span><span style="color: #E6EDF3">info(</span><span style="color: #79C0FF">f</span><span style="color: #A5D6FF">&quot;Filtering chips: {</span><span style="color: #E6EDF3">i</span><span style="color: #6E7681"> </span><span style="color: #FF7B72; font-weight: bold">+</span><span style="color: #6E7681"> </span><span style="color: #A5D6FF">1}/{</span><span style="color: #E6EDF3">total</span><span style="color: #A5D6FF">} checked, {</span><span style="color: #E6EDF3">len(valid)</span><span style="color: #A5D6FF">} valid&quot;</span><span style="color: #E6EDF3">)</span>
+
+    <span style="color: #E6EDF3">logging</span><span style="color: #FF7B72; font-weight: bold">.</span><span style="color: #E6EDF3">info(</span><span style="color: #79C0FF">f</span><span style="color: #A5D6FF">&quot;Filtering complete: {</span><span style="color: #E6EDF3">len(valid)</span><span style="color: #A5D6FF">}/{</span><span style="color: #E6EDF3">total</span><span style="color: #A5D6FF">} chips have mask pixels&quot;</span><span style="color: #E6EDF3">)</span>
+    <span style="color: #E6EDF3">samples</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #E6EDF3">{</span><span style="color: #A5D6FF">&quot;with_mask&quot;</span><span style="color: #E6EDF3">:</span> <span style="color: #E6EDF3">with_mask_samples,</span> <span style="color: #A5D6FF">&quot;no_mask&quot;</span><span style="color: #E6EDF3">:</span> <span style="color: #E6EDF3">no_mask_samples}</span>
+    <span style="color: #E6EDF3">logging</span><span style="color: #FF7B72; font-weight: bold">.</span><span style="color: #E6EDF3">info(</span><span style="color: #79C0FF">f</span><span style="color: #A5D6FF">&quot;Sample chips collected: {</span><span style="color: #E6EDF3">len(with_mask_samples)</span><span style="color: #A5D6FF">} with mask, {</span><span style="color: #E6EDF3">len(no_mask_samples)</span><span style="color: #A5D6FF">} no mask&quot;</span><span style="color: #E6EDF3">)</span>
+    <span style="color: #FF7B72">return</span> <span style="color: #E6EDF3">valid,</span> <span style="color: #E6EDF3">samples</span>
+</pre></div>
+
+        <p>
+          This script is also used to collect the prediction sample. I do this as a sanity
+          check, making sure that the model is not biased towards positive labels in the
+          end. Which you can see later in the <a href="#exp-result">result</a> (second
+          row of the image), the model indeed predict nothing when there's actually an 
+          empty patch.
+        </p>
 
         <p>
           Besides that, I apply a "special" treatment for TESSERA data. During the training
@@ -540,32 +602,34 @@ class GMWMaskDataset(RasterDataset):
           Once the data is prepared, the training part is a piece of cake. I used
           config-based style so I only have to change the config file if I need to
           change the parameters. The config file is a yaml, that look like this:
-
-          <pre><code>model_params:
-  model: unet                  # options: valid model from torchgeo
-  backbone: resnet50
-  loss: dice
-
-training_params:
-  batch_size: 4
-  epochs: 100
-  lr: 0.0005
-  workers: 4
-  early_stopping_patience: 5
-
-data:
-  source: tessera             # options: s2, aef, tessera
-  raw_dir: data/0_raw
-  chip_size: 512
-  stride: 256
-  train_ratio: 0.8
-  boxes: [0, 1]
-  only_mask: true
-
-output:
-  dir: models                 # experiment folder to be used by MLFlow
-  experiment: my_exp          # experiment name to use on MLFlow</code></pre>
         </p>
+
+<!-- HTML generated using hilite.me --><div style="background: #0d1117; overflow:auto;width:auto;"><pre style="margin: 0; line-height: 125%;"><span></span><span style="color: #7EE787">model_params</span><span style="color: #E6EDF3">:</span>
+<span style="color: #6E7681">  </span><span style="color: #7EE787">model</span><span style="color: #E6EDF3">:</span><span style="color: #6E7681"> </span><span style="color: #A5D6FF">unet</span><span style="color: #6E7681">                  </span><span style="color: #8B949E; font-style: italic"># options: valid model from torchgeo</span>
+<span style="color: #6E7681">  </span><span style="color: #7EE787">backbone</span><span style="color: #E6EDF3">:</span><span style="color: #6E7681"> </span><span style="color: #A5D6FF">resnet50</span>
+<span style="color: #6E7681">  </span><span style="color: #7EE787">loss</span><span style="color: #E6EDF3">:</span><span style="color: #6E7681"> </span><span style="color: #A5D6FF">dice</span>
+
+<span style="color: #7EE787">training_params</span><span style="color: #E6EDF3">:</span>
+<span style="color: #6E7681">  </span><span style="color: #7EE787">batch_size</span><span style="color: #E6EDF3">:</span><span style="color: #6E7681"> </span><span style="color: #A5D6FF">4</span>
+<span style="color: #6E7681">  </span><span style="color: #7EE787">epochs</span><span style="color: #E6EDF3">:</span><span style="color: #6E7681"> </span><span style="color: #A5D6FF">100</span>
+<span style="color: #6E7681">  </span><span style="color: #7EE787">lr</span><span style="color: #E6EDF3">:</span><span style="color: #6E7681"> </span><span style="color: #A5D6FF">0.0005</span>
+<span style="color: #6E7681">  </span><span style="color: #7EE787">workers</span><span style="color: #E6EDF3">:</span><span style="color: #6E7681"> </span><span style="color: #A5D6FF">4</span>
+<span style="color: #6E7681">  </span><span style="color: #7EE787">early_stopping_patience</span><span style="color: #E6EDF3">:</span><span style="color: #6E7681"> </span><span style="color: #A5D6FF">5</span>
+
+<span style="color: #7EE787">data</span><span style="color: #E6EDF3">:</span>
+<span style="color: #6E7681">  </span><span style="color: #7EE787">source</span><span style="color: #E6EDF3">:</span><span style="color: #6E7681"> </span><span style="color: #A5D6FF">tessera</span><span style="color: #6E7681">             </span><span style="color: #8B949E; font-style: italic"># options: s2, aef, tessera</span>
+<span style="color: #6E7681">  </span><span style="color: #7EE787">raw_dir</span><span style="color: #E6EDF3">:</span><span style="color: #6E7681"> </span><span style="color: #A5D6FF">data/0_raw</span>
+<span style="color: #6E7681">  </span><span style="color: #7EE787">chip_size</span><span style="color: #E6EDF3">:</span><span style="color: #6E7681"> </span><span style="color: #A5D6FF">512</span>
+<span style="color: #6E7681">  </span><span style="color: #7EE787">stride</span><span style="color: #E6EDF3">:</span><span style="color: #6E7681"> </span><span style="color: #A5D6FF">256</span>
+<span style="color: #6E7681">  </span><span style="color: #7EE787">train_ratio</span><span style="color: #E6EDF3">:</span><span style="color: #6E7681"> </span><span style="color: #A5D6FF">0.8</span>
+<span style="color: #6E7681">  </span><span style="color: #7EE787">boxes</span><span style="color: #E6EDF3">:</span><span style="color: #6E7681"> </span><span style="color: #E6EDF3">[</span><span style="color: #79C0FF">0</span><span style="color: #E6EDF3">,</span><span style="color: #6E7681"> </span><span style="color: #79C0FF">1</span><span style="color: #E6EDF3">]</span>
+<span style="color: #6E7681">  </span><span style="color: #7EE787">only_mask</span><span style="color: #E6EDF3">:</span><span style="color: #6E7681"> </span><span style="color: #A5D6FF">true</span>
+
+<span style="color: #7EE787">output</span><span style="color: #E6EDF3">:</span>
+<span style="color: #6E7681">  </span><span style="color: #7EE787">dir</span><span style="color: #E6EDF3">:</span><span style="color: #6E7681"> </span><span style="color: #A5D6FF">models</span><span style="color: #6E7681">                 </span><span style="color: #8B949E; font-style: italic"># experiment folder to be used by MLFlow</span>
+<span style="color: #6E7681">  </span><span style="color: #7EE787">experiment</span><span style="color: #E6EDF3">:</span><span style="color: #6E7681"> </span><span style="color: #A5D6FF">my_exp</span><span style="color: #6E7681">          </span><span style="color: #8B949E; font-style: italic"># experiment name to use on MLFlow</span>
+</pre></div>
+
 
         <p>
           The initial plan is just to use one model and train it using different data 
@@ -775,7 +839,7 @@ output:
         <h2>To close it</h2>
 
         <p>
-          It was fun to finally touch this kind of project again and to be able to utilize
+          It was fun to touch this kind of project again and to be able to utilize
           torchgeo to the fullest, especially about the fact that I don't need to generate
           image patches.
         </p>
