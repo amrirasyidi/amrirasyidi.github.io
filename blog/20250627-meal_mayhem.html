@@ -11,6 +11,7 @@ tags: data-science, python, geospatial, how-to
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Meal Mayhem - Amri Rasyidi</title>
     <link rel="stylesheet" href="../static/style.css">
+    <link rel="stylesheet" href="../static/prism.css"/>
 </head>
 <body>
     <div class="header">
@@ -163,7 +164,7 @@ tags: data-science, python, geospatial, how-to
             query on a level lower than Kabupaten.
         </p>
 
-        <pre><code>grouped = df.groupby(['kabupaten', 'provinsi'])</code></pre>
+        <pre><code class="language-python">grouped = df.groupby(['kabupaten', 'provinsi'])</code></pre>
 
         <h3>Find the graph</h3>
 
@@ -184,7 +185,7 @@ tags: data-science, python, geospatial, how-to
             The way we actually fetch the data is by using the <code>graph_from_place</code> function.
         </p>
 
-        <pre><code>place_string = f"{kabupaten}, {provinsi}, Indonesia"
+        <pre><code class="language-python">place_string = f"{kabupaten}, {provinsi}, Indonesia"
 G = ox.graph.graph_from_place(place_string, network_type="drive")</code></pre>
 
         <p>
@@ -196,7 +197,7 @@ G = ox.graph.graph_from_place(place_string, network_type="drive")</code></pre>
 
         <h3>Create a pair of destination and origin</h3>
 
-        <pre><code># Extract school coordinates (origin point)
+        <pre><code class="language-python"># Extract school coordinates (origin point)
 origin_lat = row['school_latitude']
 origin_lon = row['school_longitude'] 
 school_name = row['nearby_school_name']
@@ -214,7 +215,7 @@ asset_id = row['id_kunci']</code></pre>
 
         <h3>Find the nearest node</h3>
 
-        <pre><code># Find nearest nodes
+        <pre><code class="language-python"># Find nearest nodes
 origin_node = ox.distance.nearest_nodes(G, float(origin_lon), float(origin_lat))
 dest_node = ox.distance.nearest_nodes(G, float(dest_lon), float(dest_lat))</code></pre>
 
@@ -226,7 +227,7 @@ dest_node = ox.distance.nearest_nodes(G, float(dest_lon), float(dest_lat))</code
 
         <h3>Find the shortest path</h3>
 
-        <pre><code>route = ox.routing.shortest_path(G, origin_node, dest_node, weight="length")</code></pre>
+        <pre><code class="language-python">route = ox.routing.shortest_path(G, origin_node, dest_node, weight="length")</code></pre>
 
         <p>
             This calculates the shortest path between our two nodes using Dijkstra's algorithm, 
@@ -236,7 +237,7 @@ dest_node = ox.distance.nearest_nodes(G, float(dest_lon), float(dest_lat))</code
 
         <h3>Convert back the shortest path to gdf for visualization</h3>
 
-        <pre><code># Convert route to geographic data format
+        <pre><code class="language-python"># Convert route to geographic data format
 route_gdf = ox.routing.route_to_gdf(G, route)
 
 # Calculate total route distance
@@ -290,7 +291,7 @@ route_length = route_gdf['length'].sum()</code></pre>
 
         <h1>Complete Implementation</h1>
 
-        <pre><code>!pip install osmnx
+        <pre><code class="language-python">!pip install osmnx
 
 import pandas as pd
 import osmnx as ox
@@ -476,6 +477,7 @@ print("\n=== Analysis Complete ===")</code></pre>
         <a href="../tags.html?tag=how-to" class="tag">how-to</a>
     </div>
     
+    <script src="../static/prism.js"></script>
     <script src="../static/dark-mode.js"></script>
 </body>
 </html>

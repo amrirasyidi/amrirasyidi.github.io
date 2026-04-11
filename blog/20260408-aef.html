@@ -479,32 +479,31 @@ tags: python, deep-learning, guide, geospatial
           The code itself is relatively simple, not even a 100 lines. Below is the excerpt:
         </p>
 
-<!-- HTML generated using hilite.me --><div style="background: #0d1117; overflow:auto;width:auto"><pre style="margin: 0; line-height: 125%;"><span></span><span style="color: #FF7B72">class</span><span style="color: #6E7681"> </span><span style="color: #F0883E; font-weight: bold">S2Dataset</span><span style="color: #E6EDF3">(RasterDataset):</span>
-<span style="color: #6E7681">    </span><span style="color: #A5D6FF">&quot;&quot;&quot;Sentinel-2 composite GeoTIFFs exported from GEE.</span>
+        <pre><code class="language-python">class S2Dataset(RasterDataset):
+    """Sentinel-2 composite GeoTIFFs exported from GEE.
 
-<span style="color: #A5D6FF">    Files are named ``s2_box_*.tif`` with 21 bands (12 spectral + 9 indices).</span>
-<span style="color: #A5D6FF">    &quot;&quot;&quot;</span>
+    Files are named ``s2_box_*.tif`` with 21 bands (12 spectral + 9 indices).
+    """
 
-    <span style="color: #E6EDF3">filename_glob</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #A5D6FF">&quot;s2_box_*.*&quot;</span>
-    <span style="color: #E6EDF3">filename_regex</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #A5D6FF">&quot;.*&quot;</span>
-    <span style="color: #E6EDF3">all_bands</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #E6EDF3">(</span>
-        <span style="color: #A5D6FF">&quot;B1&quot;</span><span style="color: #E6EDF3">,</span> <span style="color: #A5D6FF">&quot;B2&quot;</span><span style="color: #E6EDF3">,</span> <span style="color: #A5D6FF">&quot;B3&quot;</span><span style="color: #E6EDF3">,</span> <span style="color: #A5D6FF">&quot;B4&quot;</span><span style="color: #E6EDF3">,</span> <span style="color: #A5D6FF">&quot;B5&quot;</span><span style="color: #E6EDF3">,</span> <span style="color: #A5D6FF">&quot;B6&quot;</span><span style="color: #E6EDF3">,</span> <span style="color: #A5D6FF">&quot;B7&quot;</span><span style="color: #E6EDF3">,</span> <span style="color: #A5D6FF">&quot;B8&quot;</span><span style="color: #E6EDF3">,</span> <span style="color: #A5D6FF">&quot;B8A&quot;</span><span style="color: #E6EDF3">,</span> <span style="color: #A5D6FF">&quot;B9&quot;</span><span style="color: #E6EDF3">,</span> <span style="color: #A5D6FF">&quot;B11&quot;</span><span style="color: #E6EDF3">,</span> <span style="color: #A5D6FF">&quot;B12&quot;</span><span style="color: #E6EDF3">,</span>
-        <span style="color: #A5D6FF">&quot;NDVI&quot;</span><span style="color: #E6EDF3">,</span> <span style="color: #A5D6FF">&quot;NDWI&quot;</span><span style="color: #E6EDF3">,</span> <span style="color: #A5D6FF">&quot;MNDWI&quot;</span><span style="color: #E6EDF3">,</span> <span style="color: #A5D6FF">&quot;NDSI&quot;</span><span style="color: #E6EDF3">,</span> <span style="color: #A5D6FF">&quot;NDMI&quot;</span><span style="color: #E6EDF3">,</span> <span style="color: #A5D6FF">&quot;EVI&quot;</span><span style="color: #E6EDF3">,</span> <span style="color: #A5D6FF">&quot;EVI2&quot;</span><span style="color: #E6EDF3">,</span> <span style="color: #A5D6FF">&quot;GOSAVI&quot;</span><span style="color: #E6EDF3">,</span> <span style="color: #A5D6FF">&quot;SAVI&quot;</span><span style="color: #E6EDF3">,</span>
-    <span style="color: #E6EDF3">)</span>
-    <span style="color: #E6EDF3">is_image</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #79C0FF">True</span>
+    filename_glob = "s2_box_*.*"
+    filename_regex = ".*"
+    all_bands = (
+        "B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8", "B8A", "B9", "B11", "B12",
+        "NDVI", "NDWI", "MNDWI", "NDSI", "NDMI", "EVI", "EVI2", "GOSAVI", "SAVI",
+    )
+    is_image = True
 
 
-<span style="color: #FF7B72">class</span><span style="color: #6E7681"> </span><span style="color: #F0883E; font-weight: bold">GMWMaskDataset</span><span style="color: #E6EDF3">(RasterDataset):</span>
-<span style="color: #6E7681">    </span><span style="color: #A5D6FF">&quot;&quot;&quot;Global Mangrove Watch extent mask.</span>
+class GMWMaskDataset(RasterDataset):
+    """Global Mangrove Watch extent mask.
 
-<span style="color: #A5D6FF">    Files are named ``gmw_extent_box_*.tif`` with a single binary band.</span>
-<span style="color: #A5D6FF">    &quot;&quot;&quot;</span>
+    Files are named ``gmw_extent_box_*.tif`` with a single binary band.
+    """
 
-    <span style="color: #E6EDF3">filename_glob</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #A5D6FF">&quot;gmw_extent_box_*.*&quot;</span>
-    <span style="color: #E6EDF3">filename_regex</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #A5D6FF">&quot;.*&quot;</span>
-    <span style="color: #E6EDF3">all_bands</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #E6EDF3">(</span><span style="color: #A5D6FF">&quot;mask&quot;</span><span style="color: #E6EDF3">,)</span>
-    <span style="color: #E6EDF3">is_image</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #79C0FF">False</span>
-</pre></div>
+    filename_glob = "gmw_extent_box_*.*"
+    filename_regex = ".*"
+    all_bands = ("mask",)
+    is_image = False</code></pre>
 
         <p>
           Another thing that needs attention is the fact that the GMW label is relatively
@@ -527,48 +526,47 @@ tags: python, deep-learning, guide, geospatial
           patches with no mask getting into the actual training data.
         </p>
 
-        <!-- HTML generated using hilite.me --><div style="background: #0d1117; overflow:auto;width:auto;"><pre style="margin: 0; line-height: 125%;"><span></span><span style="color: #FF7B72">def</span><span style="color: #6E7681"> </span><span style="color: #D2A8FF; font-weight: bold">filter_chips_with_mask</span><span style="color: #E6EDF3">(</span>
-    <span style="color: #E6EDF3">mask_dataset:</span> <span style="color: #E6EDF3">GeoDataset,</span>
-    <span style="color: #E6EDF3">sampler:</span> <span style="color: #E6EDF3">GridGeoSampler,</span>
-    <span style="color: #E6EDF3">n_samples:</span> <span style="color: #E6EDF3">int</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #A5D6FF">2</span><span style="color: #E6EDF3">,</span>
-<span style="color: #E6EDF3">)</span> <span style="color: #FF7B72; font-weight: bold">-&gt;</span> <span style="color: #E6EDF3">tuple[list[BoundingBox],</span> <span style="color: #E6EDF3">dict[str,</span> <span style="color: #E6EDF3">list[BoundingBox]]]:</span>
-<span style="color: #6E7681">    </span><span style="color: #A5D6FF">&quot;&quot;&quot;Keep only chips where the mask contains at least one positive pixel.</span>
+        <pre><code class="language-python">def filter_chips_with_mask(
+    mask_dataset: GeoDataset,
+    sampler: GridGeoSampler,
+    n_samples: int = 2,
+) -> tuple[list[BoundingBox], dict[str, list[BoundingBox]]]:
+    """Keep only chips where the mask contains at least one positive pixel.
 
-<span style="color: #A5D6FF">    Also collects the first ``n_samples`` chips with mask and without mask</span>
-<span style="color: #A5D6FF">    for use as fixed sample predictions.</span>
+    Also collects the first ``n_samples`` chips with mask and without mask
+    for use as fixed sample predictions.
 
-<span style="color: #A5D6FF">    Args:</span>
-<span style="color: #A5D6FF">        mask_dataset: The mask-only GeoDataset (not the full intersection).</span>
-<span style="color: #A5D6FF">        sampler: A GridGeoSampler to iterate over.</span>
-<span style="color: #A5D6FF">        n_samples: Number of sample chips to collect per category.</span>
+    Args:
+        mask_dataset: The mask-only GeoDataset (not the full intersection).
+        sampler: A GridGeoSampler to iterate over.
+        n_samples: Number of sample chips to collect per category.
 
-<span style="color: #A5D6FF">    Returns:</span>
-<span style="color: #A5D6FF">        (valid_bboxes, sample_chips) where sample_chips has keys</span>
-<span style="color: #A5D6FF">        ``&quot;with_mask&quot;`` and ``&quot;no_mask&quot;``.</span>
-<span style="color: #A5D6FF">    &quot;&quot;&quot;</span>
-    <span style="color: #E6EDF3">valid:</span> <span style="color: #E6EDF3">list[BoundingBox]</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #E6EDF3">[]</span>
-    <span style="color: #E6EDF3">with_mask_samples:</span> <span style="color: #E6EDF3">list[BoundingBox]</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #E6EDF3">[]</span>
-    <span style="color: #E6EDF3">no_mask_samples:</span> <span style="color: #E6EDF3">list[BoundingBox]</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #E6EDF3">[]</span>
-    <span style="color: #E6EDF3">total</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #E6EDF3">len(sampler)</span>
+    Returns:
+        (valid_bboxes, sample_chips) where sample_chips has keys
+        ``"with_mask"`` and ``"no_mask"``.
+    """
+    valid: list[BoundingBox] = []
+    with_mask_samples: list[BoundingBox] = []
+    no_mask_samples: list[BoundingBox] = []
+    total = len(sampler)
 
-    <span style="color: #FF7B72">for</span> <span style="color: #E6EDF3">i,</span> <span style="color: #E6EDF3">bbox</span> <span style="color: #FF7B72; font-weight: bold">in</span> <span style="color: #E6EDF3">enumerate(sampler):</span>
-        <span style="color: #E6EDF3">sample</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #E6EDF3">mask_dataset[bbox]</span>
-        <span style="color: #E6EDF3">has_mask</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #E6EDF3">sample[</span><span style="color: #A5D6FF">&quot;mask&quot;</span><span style="color: #E6EDF3">]</span><span style="color: #FF7B72; font-weight: bold">.</span><span style="color: #E6EDF3">sum()</span> <span style="color: #FF7B72; font-weight: bold">&gt;</span> <span style="color: #A5D6FF">0</span>
-        <span style="color: #FF7B72">if</span> <span style="color: #E6EDF3">has_mask:</span>
-            <span style="color: #E6EDF3">valid</span><span style="color: #FF7B72; font-weight: bold">.</span><span style="color: #E6EDF3">append(bbox)</span>
-            <span style="color: #FF7B72">if</span> <span style="color: #E6EDF3">len(with_mask_samples)</span> <span style="color: #FF7B72; font-weight: bold">&lt;</span> <span style="color: #E6EDF3">n_samples:</span>
-                <span style="color: #E6EDF3">with_mask_samples</span><span style="color: #FF7B72; font-weight: bold">.</span><span style="color: #E6EDF3">append(bbox)</span>
-        <span style="color: #FF7B72">else</span><span style="color: #E6EDF3">:</span>
-            <span style="color: #FF7B72">if</span> <span style="color: #E6EDF3">len(no_mask_samples)</span> <span style="color: #FF7B72; font-weight: bold">&lt;</span> <span style="color: #E6EDF3">n_samples:</span>
-                <span style="color: #E6EDF3">no_mask_samples</span><span style="color:G #FF7B72; font-weight: bold">.</span><span style="color: #E6EDF3">append(bbox)</span>
-        <span style="color: #FF7B72">if</span> <span style="color: #E6EDF3">(i</span> <span style="color: #FF7B72; font-weight: bold">+</span> <span style="color: #A5D6FF">1</span><span style="color: #E6EDF3">)</span> <span style="color: #FF7B72; font-weight: bold">%</span> <span style="color: #A5D6FF">100</span> <span style="color: #FF7B72; font-weight: bold">==</span> <span style="color: #A5D6FF">0</span><span style="color: #E6EDF3">:</span>
-            <span style="color: #E6EDF3">logging</span><span style="color: #FF7B72; font-weight: bold">.</span><span style="color: #E6EDF3">info(</span><span style="color: #79C0FF">f</span><span style="color: #A5D6FF">&quot;Filtering chips: {</span><span style="color: #E6EDF3">i</span><span style="color: #6E7681"> </span><span style="color: #FF7B72; font-weight: bold">+</span><span style="color: #6E7681"> </span><span style="color: #A5D6FF">1}/{</span><span style="color: #E6EDF3">total</span><span style="color: #A5D6FF">} checked, {</span><span style="color: #E6EDF3">len(valid)</span><span style="color: #A5D6FF">} valid&quot;</span><span style="color: #E6EDF3">)</span>
+    for i, bbox in enumerate(sampler):
+        sample = mask_dataset[bbox]
+        has_mask = sample["mask"].sum() > 0
+        if has_mask:
+            valid.append(bbox)
+            if len(with_mask_samples) < n_samples:
+                with_mask_samples.append(bbox)
+        else:
+            if len(no_mask_samples) < n_samples:
+                no_mask_samples.append(bbox)
+        if (i + 1) % 100 == 0:
+            logging.info(f"Filtering chips: {i + 1}/{total} checked, {len(valid)} valid")
 
-    <span style="color: #E6EDF3">logging</span><span style="color: #FF7B72; font-weight: bold">.</span><span style="color: #E6EDF3">info(</span><span style="color: #79C0FF">f</span><span style="color: #A5D6FF">&quot;Filtering complete: {</span><span style="color: #E6EDF3">len(valid)</span><span style="color: #A5D6FF">}/{</span><span style="color: #E6EDF3">total</span><span style="color: #A5D6FF">} chips have mask pixels&quot;</span><span style="color: #E6EDF3">)</span>
-    <span style="color: #E6EDF3">samples</span> <span style="color: #FF7B72; font-weight: bold">=</span> <span style="color: #E6EDF3">{</span><span style="color: #A5D6FF">&quot;with_mask&quot;</span><span style="color: #E6EDF3">:</span> <span style="color: #E6EDF3">with_mask_samples,</span> <span style="color: #A5D6FF">&quot;no_mask&quot;</span><span style="color: #E6EDF3">:</span> <span style="color: #E6EDF3">no_mask_samples}</span>
-    <span style="color: #E6EDF3">logging</span><span style="color: #FF7B72; font-weight: bold">.</span><span style="color: #E6EDF3">info(</span><span style="color: #79C0FF">f</span><span style="color: #A5D6FF">&quot;Sample chips collected: {</span><span style="color: #E6EDF3">len(with_mask_samples)</span><span style="color: #A5D6FF">} with mask, {</span><span style="color: #E6EDF3">len(no_mask_samples)</span><span style="color: #A5D6FF">} no mask&quot;</span><span style="color: #E6EDF3">)</span>
-    <span style="color: #FF7B72">return</span> <span style="color: #E6EDF3">valid,</span> <span style="color: #E6EDF3">samples</span>
-</pre></div>
+    logging.info(f"Filtering complete: {len(valid)}/{total} chips have mask pixels")
+    samples = {"with_mask": with_mask_samples, "no_mask": no_mask_samples}
+    logging.info(f"Sample chips collected: {len(with_mask_samples)} with mask, {len(no_mask_samples)} no mask")
+    return valid, samples</code></pre>
 
         <p>
           This script is also used to collect the prediction sample. I do this as a sanity

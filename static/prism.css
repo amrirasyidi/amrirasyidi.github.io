@@ -1,3 +1,28 @@
-/* PrismJS 1.30.0
-https://prismjs.com/download#themes=prism-solarizedlight&languages=python */
-code[class*=language-],pre[class*=language-]{color:#657b83;font-family:Consolas,Monaco,'Andale Mono','Ubuntu Mono',monospace;font-size:1em;text-align:left;white-space:pre;word-spacing:normal;word-break:normal;word-wrap:normal;line-height:1.5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-hyphens:none;-moz-hyphens:none;-ms-hyphens:none;hyphens:none}code[class*=language-] ::-moz-selection,code[class*=language-]::-moz-selection,pre[class*=language-] ::-moz-selection,pre[class*=language-]::-moz-selection{background:#073642}code[class*=language-] ::selection,code[class*=language-]::selection,pre[class*=language-] ::selection,pre[class*=language-]::selection{background:#073642}pre[class*=language-]{padding:1em;margin:.5em 0;overflow:auto;border-radius:.3em}:not(pre)>code[class*=language-],pre[class*=language-]{background-color:#fdf6e3}:not(pre)>code[class*=language-]{padding:.1em;border-radius:.3em}.token.cdata,.token.comment,.token.doctype,.token.prolog{color:#93a1a1}.token.punctuation{color:#586e75}.token.namespace{opacity:.7}.token.boolean,.token.constant,.token.deleted,.token.number,.token.property,.token.symbol,.token.tag{color:#268bd2}.token.attr-name,.token.builtin,.token.char,.token.inserted,.token.selector,.token.string,.token.url{color:#2aa198}.token.entity{color:#657b83;background:#eee8d5}.token.atrule,.token.attr-value,.token.keyword{color:#859900}.token.class-name,.token.function{color:#b58900}.token.important,.token.regex,.token.variable{color:#cb4b16}.token.bold,.token.important{font-weight:700}.token.italic{font-style:italic}.token.entity{cursor:help}
+/* PrismJS 1.30.0 — VSCode Dark Modern (Python) */
+code[class*=language-],pre[class*=language-]{color:#CCCCCC;font-family:Consolas,Monaco,'Andale Mono','Ubuntu Mono',monospace;font-size:1em;text-align:left;white-space:pre;word-spacing:normal;word-break:normal;word-wrap:normal;line-height:1.5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-hyphens:none;-moz-hyphens:none;-ms-hyphens:none;hyphens:none}
+code[class*=language-] ::-moz-selection,code[class*=language-]::-moz-selection,pre[class*=language-] ::-moz-selection,pre[class*=language-]::-moz-selection{background:#264F78}
+code[class*=language-] ::selection,code[class*=language-]::selection,pre[class*=language-] ::selection,pre[class*=language-]::selection{background:#264F78}
+pre[class*=language-]{padding:1em;margin:.5em 0;overflow:auto;border-radius:.3em}
+:not(pre)>code[class*=language-],pre[class*=language-]{background-color:#1F1F1F}
+:not(pre)>code[class*=language-]{padding:.1em;border-radius:.3em}
+.token.comment,.token.prolog,.token.doctype,.token.cdata{color:#6A9955;font-style:italic}
+.token.punctuation{color:#CCCCCC}
+.token.namespace{opacity:.7}
+.token.string,.token.char,.token.attr-value,.token.inserted{color:#CE9178}
+.token.string-interpolation{color:#CE9178}
+.token.triple-quoted-string{color:#CE9178}
+.token.number,.token.boolean,.token.constant{color:#B5CEA8}
+.token.boolean{color:#569CD6}
+.token.keyword{color:#C586C0}
+.token.operator{color:#D4D4D4;background:transparent}
+.token.function{color:#DCDCAA}
+.token.class-name{color:#4EC9B0}
+.token.builtin{color:#4EC9B0}
+.token.decorator,.token.annotation{color:#DCDCAA}
+.token.decorator .token.punctuation{color:#DCDCAA}
+.token.property,.token.tag,.token.symbol,.token.deleted{color:#9CDCFE}
+.token.selector,.token.attr-name,.token.url,.token.entity{color:#9CDCFE}
+.token.regex,.token.important,.token.variable{color:#D16969}
+.token.bold,.token.important{font-weight:700}
+.token.italic{font-style:italic}
+.token.entity{cursor:help}
