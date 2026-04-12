@@ -1,0 +1,179 @@
+<!--
+=== HTML TEMPLATE ===
+This is a reference for writing posts in raw HTML.
+You CAN use raw HTML inside .mdx files — this file exists
+so you can see the HTML equivalent of every MDX feature.
+
+In practice: use .mdx format, write markdown for prose,
+drop to raw HTML only when markdown can't do what you need
+(complex tables, inline-styled elements, etc.)
+-->
+
+<!-- ===== TEXT FORMATTING ===== -->
+
+<p><strong>bold</strong>, <em>italic</em>, <del>strikethrough</del>, <code>inline code</code></p>
+
+<p style="color: #f97583;">Colored text</p>
+<p style="text-align: center;"><strong>Centered text</strong></p>
+
+<!-- Tooltip -->
+<span class="tooltip">
+  <strong>term</strong>
+  <span class="tooltip-text">
+    Explanation with <strong>bold</strong> and <br/><br/>line breaks.
+  </span>
+</span>
+
+<!-- ===== HEADINGS ===== -->
+
+<h2>H2 — Main Section</h2>
+<h3>H3 — Subsection</h3>
+<h4>H4 — Sub-subsection</h4>
+
+<!-- ===== LISTS ===== -->
+
+<ol>
+    <li>First</li>
+    <li>Second</li>
+    <li>Third with nested:
+        <ol>
+            <li>Sub-step A</li>
+            <li>Sub-step B</li>
+        </ol>
+    </li>
+</ol>
+
+<ul>
+    <li>Bullet one</li>
+    <li>Bullet two</li>
+    <li>Nested:
+        <ul>
+            <li>Detail A</li>
+            <li>Detail B</li>
+        </ul>
+    </li>
+</ul>
+
+<!-- ===== CODE ===== -->
+
+<p>Inline: <code>variable_name</code></p>
+
+<!-- In .mdx, use fenced ``` blocks instead — Shiki highlights at build time -->
+<pre><code class="language-python">import pandas as pd
+df = pd.read_csv('data.csv')</code></pre>
+
+<!-- ===== IMAGES ===== -->
+
+<figure>
+    <img src="/assets/blog/images/your-image.jpg" alt="Description" />
+    <figcaption>Caption here</figcaption>
+</figure>
+
+<figure id="ref-diagram">
+    <img src="/assets/blog/images/diagram.jpg" alt="Diagram" />
+    <figcaption>Referenceable via <a href="#ref-diagram">link</a></figcaption>
+</figure>
+
+<img src="/assets/blog/images/styled.jpg" alt="Styled"
+     style="border-radius: 8px; display: block; margin: 0 auto; max-width: 400px;" />
+
+<!-- ===== VIDEO ===== -->
+
+<video controls style="width: 100%; max-width: 600px; display: block; margin: 0 auto;">
+    <source src="/assets/blog/videos/demo.mp4" type="video/mp4" />
+</video>
+
+<!-- ===== TWO-COLUMN ===== -->
+
+<div class="columns">
+    <div class="column">
+        <p>Left column</p>
+    </div>
+    <div class="column">
+        <p>Right column</p>
+    </div>
+</div>
+
+<!-- ===== TABLE ===== -->
+
+<table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+    <thead>
+        <tr>
+            <th>Column 1</th>
+            <th>Column 2</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Bold cell</strong></td>
+            <td>Regular cell</td>
+        </tr>
+    </tbody>
+</table>
+
+<!-- ===== QUOTES ===== -->
+
+<blockquote>
+    <p>"Quote text here."</p>
+    <footer>— Attribution</footer>
+</blockquote>
+
+<div style="font-size: 24px; font-style: italic; text-align: center; margin: 30px 0; color: var(--text-muted);">
+    "Pull quote"
+</div>
+
+<!-- ===== CALLOUTS ===== -->
+
+<!-- In .mdx, use <Callout type="idea"> component instead -->
+<div class="callout-idea">
+    <div class="callout-icon">💡</div>
+    <div class="callout-content">
+        <p>Idea/tip callout</p>
+    </div>
+</div>
+
+<!-- Warning (inline-styled — no CSS class in current stylesheet) -->
+<div style="background: #3d2e00; border: 1px solid #5c4a1a; border-radius: 8px; padding: 15px; margin: 20px 0;">
+    <div style="display: flex; align-items: flex-start;">
+        <div style="margin-right: 10px; font-size: 20px;">⚠️</div>
+        <div><strong>Warning:</strong> Caveat text here.</div>
+    </div>
+</div>
+
+<!-- ===== EXPANDABLE ===== -->
+
+<!-- In .mdx, use <Details summary="..."> component instead -->
+<details style="margin: 20px 0; border: 1px solid var(--border-medium); border-radius: 8px; padding: 15px;">
+    <summary style="cursor: pointer; font-weight: bold;">Click to expand</summary>
+    <div style="margin-top: 15px;">
+        <p>Hidden content here.</p>
+    </div>
+</details>
+
+<!-- ===== LINKS ===== -->
+
+<a href="https://example.com">Regular link</a>
+<a href="https://example.com" target="_blank" rel="noreferrer noopener">New tab link</a>
+
+<!-- ===== FOOTNOTES ===== -->
+
+<p>Text with footnote<sup><a href="#fn1">1</a></sup>.</p>
+
+<div style="border-top: 1px solid var(--border-medium); margin-top: 40px; padding-top: 20px; font-size: 14px;">
+    <p id="fn1"><sup>1</sup> Footnote explanation.</p>
+</div>
+
+<!-- ===== BADGES ===== -->
+
+<span style="background: #007bff; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px;">NEW</span>
+<span style="background: #28a745; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px;">UPDATED</span>
+
+<!-- ===== TL;DR ===== -->
+
+<div style="background: var(--bg-secondary); border-left: 4px solid var(--accent-primary); padding: 20px; margin: 20px 0;">
+    <p><strong>TL;DR:</strong></p>
+    <ul>
+        <li>Takeaway 1</li>
+        <li>Takeaway 2</li>
+    </ul>
+</div>

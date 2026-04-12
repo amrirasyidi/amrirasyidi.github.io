@@ -1,0 +1,76 @@
+---
+import { getCollection } from 'astro:content';
+import '../../styles/style.css';
+
+const posts = (await getCollection('blog')).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+
+function readingTime(body: string): number {
+  const words = body.split(/\s+/).length;
+  return Math.ceil(words / 200);
+}
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Blog posts by Amri Rasyidi" />
+    <title>Blog - Amri Rasyidi</title>
+  </head>
+  <body>
+    <div class="header">
+      <nav class="nav">
+        <div class="nav-links">
+          <a href="/">Home</a>
+          <a href="/blog" class="active">Blog</a>
+          <a href="/tags">Tags</a>
+        </div>
+      </nav>
+    </div>
+
+    <h1>Blog</h1>
+
+    <div id="search" class="search-container">
+      <link href="/pagefind/pagefind-ui.css" rel="stylesheet" />
+      <script is:inline src="/pagefind/pagefind-ui.js"></script>
+      <div id="pagefind-search"></div>
+      <script is:inline>
+        window.addEventListener('DOMContentLoaded', () => {
+          new PagefindUI({
+            element: '#pagefind-search',
+            showSubResults: true,
+            showImages: false,
+          });
+        });
+      </script>
+    </div>
+
+    <div id="blog-posts">
+      {posts.map((post) => (
+        <div class="blog-post">
+          <div class="post-date">
+            {post.data.date.toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+            })}
+            {' '}&middot;{' '}
+            {readingTime(post.body ?? '')} min read
+          </div>
+          <div class="post-title">
+            <a href={`/blog/${post.id}`}>{post.data.title}</a>
+          </div>
+          <div class="post-excerpt">{post.data.excerpt}</div>
+          <div class="tags">
+            {post.data.tags.map((tag) => (
+              <a href={`/tags?tag=${tag}`} class="tag">{tag}</a>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </body>
+</html>

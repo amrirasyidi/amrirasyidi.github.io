@@ -1,0 +1,68 @@
+---
+import '../styles/style.css';
+import TableOfContents from '../components/TableOfContents.astro';
+
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface Props {
+  title: string;
+  date: Date;
+  excerpt: string;
+  tags: string[];
+  headings?: Heading[];
+}
+
+const { title, date, excerpt, tags, headings = [] } = Astro.props;
+const published = date.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={excerpt} />
+    <title>{title} - Amri Rasyidi</title>
+  </head>
+  <body>
+    <div class="header">
+      <nav class="nav">
+        <div class="nav-links">
+          <a href="/">Home</a>
+          <a href="/blog" class="active">Blog</a>
+          <a href="/tags">Tags</a>
+        </div>
+      </nav>
+    </div>
+
+    <div class="back-link">
+      <a href="/blog">← Back to Blog</a>
+    </div>
+
+    <h1>{title}</h1>
+
+    <div class="post-meta">Published on {published}</div>
+
+    <TableOfContents headings={headings} />
+
+    <div class="post-content">
+      <slot />
+    </div>
+
+    <div class="tags-section">
+      <strong>Tags:</strong>
+      {tags.map((tag) => (
+        <a href={`/tags?tag=${tag}`} class="tag">{tag}</a>
+      ))}
+    </div>
+
+  </body>
+</html>
