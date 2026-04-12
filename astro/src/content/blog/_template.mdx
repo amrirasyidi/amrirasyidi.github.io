@@ -271,8 +271,8 @@ Wrap up your post with key takeaways.
 6. Images go in /assets/blog/images/ — reference as /assets/blog/images/filename.png
 
 7. MDX gotchas:
-   - {} is JSX expression — use \{ or {'{'} for literal braces in text
-   - HTML must be valid JSX: <br /> not <br>, <img /> not <img>
-   - Comments use {/* */} not <!-- -->
+   - curly braces are JSX expressions — escape them for literal braces in text
+   - HTML must be valid JSX: use self-closing tags like br and img
+   - Comments use JSX comment syntax, not HTML comments
    - Empty lines required before/after markdown inside HTML blocks
 */}

@@ -1,0 +1,93 @@
+---
+import { getCollection } from 'astro:content';
+import '../../styles/style.css';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+
+  // Collect all unique tags
+  const tagSet = new Set<string>();
+  for (const post of posts) {
+    for (const tag of post.data.tags) {
+      tagSet.add(tag);
+    }
+  }
+
+  return [...tagSet].map((tag) => {
+    const filtered = posts
+      .filter((p) => p.data.tags.includes(tag))
+      .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+    return {
+      params: { tag },
+      props: { tag, posts: filtered },
+    };
+  });
+}
+
+interface Props {
+  tag: string;
+  posts: any[];
+}
+
+const { tag, posts } = Astro.props;
+
+function readingTime(body: string): number {
+  const words = body.split(/\s+/).length;
+  return Math.ceil(words / 200);
+}
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={`Posts tagged "${tag}"`} />
+    <title>#{tag} - Amri Rasyidi</title>
+  </head>
+  <body>
+    <div class="header">
+      <nav class="nav">
+        <div class="nav-links">
+          <a href="/">Home</a>
+          <a href="/blog">Blog</a>
+          <a href="/tags" class="active">Tags</a>
+        </div>
+      </nav>
+    </div>
+
+    <div class="back-link">
+      <a href="/tags">← All Tags</a>
+    </div>
+
+    <h1>#{tag}</h1>
+    <p style="color: var(--text-secondary); margin-bottom: 30px;">
+      {posts.length} post{posts.length !== 1 ? 's' : ''}
+    </p>
+
+    <div id="blog-posts">
+      {posts.map((post) => (
+        <div class="blog-post">
+          <div class="post-date">
+            {post.data.date.toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+            })}
+            {' '}&middot;{' '}
+            {readingTime(post.body ?? '')} min read
+          </div>
+          <div class="post-title">
+            <a href={`/blog/${post.id}`}>{post.data.title}</a>
+          </div>
+          <div class="post-excerpt">{post.data.excerpt}</div>
+          <div class="tags">
+            {post.data.tags.map((t) => (
+              <a href={`/tags/${t}`} class={`tag${t === tag ? ' active' : ''}`}>{t}</a>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </body>
+</html>

@@ -47,21 +47,23 @@ const published = date.toLocaleDateString('en-US', {
       <a href="/blog">← Back to Blog</a>
     </div>
 
-    <h1>{title}</h1>
+    <div data-pagefind-body>
+      <h1>{title}</h1>
 
-    <div class="post-meta">Published on {published}</div>
+      <div class="post-meta">Published on {published}</div>
 
-    <TableOfContents headings={headings} />
+      <TableOfContents headings={headings} />
 
-    <div class="post-content">
-      <slot />
-    </div>
+      <div class="post-content">
+        <slot />
+      </div>
 
-    <div class="tags-section">
-      <strong>Tags:</strong>
-      {tags.map((tag) => (
-        <a href={`/tags?tag=${tag}`} class="tag">{tag}</a>
-      ))}
+      <div class="tags-section">
+        <strong>Tags:</strong>
+        {tags.map((tag) => (
+          <a href={`/tags/${tag}`} class="tag">{tag}</a>
+        ))}
+      </div>
     </div>
 
   </body>
