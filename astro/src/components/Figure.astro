@@ -21,7 +21,14 @@ if (!isRemote && !resolved) {
   {isRemote ? (
     <img src={src} alt={alt ?? ''} loading="lazy" decoding="async" />
   ) : (
-    <Image src={resolved!} alt={alt ?? ''} loading="lazy" decoding="async" />
+    <Image
+      src={resolved!}
+      alt={alt ?? ''}
+      loading="lazy"
+      decoding="async"
+      widths={[480, 960, 1440, 1920]}
+      sizes="(max-width: 768px) 100vw, 760px"
+    />
   )}
   {(caption ?? alt) && <figcaption>{caption ?? alt}</figcaption>}
 </figure>
