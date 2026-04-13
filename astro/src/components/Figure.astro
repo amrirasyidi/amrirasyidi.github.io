@@ -1,12 +1,27 @@
 ---
+import { Image } from 'astro:assets';
+import { resolveBlogImage } from '../lib/blogImages';
+
 interface Props {
   src: string;
-  alt: string;
+  alt?: string;
+  caption?: string;
   id?: string;
 }
-const { src, alt, id } = Astro.props;
+
+const { src, alt, caption, id } = Astro.props;
+const isRemote = /^https?:\/\//.test(src);
+const resolved = isRemote ? null : resolveBlogImage(src);
+
+if (!isRemote && !resolved) {
+  throw new Error(`Figure: image not found in src/assets — ${src}`);
+}
 ---
 <figure id={id}>
-  <img src={src} alt={alt} />
-  <figcaption><slot /></figcaption>
+  {isRemote ? (
+    <img src={src} alt={alt ?? ''} loading="lazy" decoding="async" />
+  ) : (
+    <Image src={resolved!} alt={alt ?? ''} loading="lazy" decoding="async" />
+  )}
+  {(caption ?? alt) && <figcaption>{caption ?? alt}</figcaption>}
 </figure>

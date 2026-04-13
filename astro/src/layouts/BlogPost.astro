@@ -37,7 +37,7 @@ const published = date.toLocaleDateString('en-US', {
       <nav class="nav">
         <div class="nav-links">
           <a href="/">Home</a>
-          <a href="/services">Services</a>
+          {import.meta.env.DEV && <a href="/services">Services</a>}
           <a href="/blog" class="active">Blog</a>
           <a href="/tags">Tags</a>
         </div>

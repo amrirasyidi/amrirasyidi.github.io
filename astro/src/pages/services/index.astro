@@ -67,13 +67,15 @@ const testimonials = [
 
     <div class="testimonials-section">
       <h2>Client Testimonials</h2>
-      <div class="testimonial-grid">
+      <div class="testimonials-grid-static">
         {testimonials.map((t) => (
-          <div class="testimonial-card">
-            <p>"{t.quote}"</p>
-            <div class="testimonial-meta">
-              <strong>{t.project}</strong>
-              <span>{t.author}</span>
+          <div class="testimonial-item">
+            <div class="testimonial-content">
+              <p>"{t.quote}"</p>
+              <div class="testimonial-meta">
+                <strong>{t.project}</strong>
+                <span>{t.author}</span>
+              </div>
             </div>
           </div>
         ))}
@@ -94,9 +96,9 @@ const testimonials = [
 
     <div class="expertise-areas" id="core-services">
       <h2>Portfolio</h2>
-      <div class="service-grid">
+      <div class="services-grid-static">
         {services.map((s) => (
-          <a href={`/services/${s.id}`} class="service-card-link">
+          <div class="service-item">
             <div class="service-card">
               <div class="service-illustration">
                 <img src={s.data.image} alt={s.data.cardTitle} class="service-demo-img" />
@@ -104,10 +106,10 @@ const testimonials = [
               <div class="service-content">
                 <div class="service-title">{s.data.cardTitle}</div>
                 <p>{s.data.excerpt}</p>
-                <span class="explore-btn">Explore More →</span>
+                <a href={`/services/${s.id}`} class="explore-btn">Explore More →</a>
               </div>
             </div>
-          </a>
+          </div>
         ))}
       </div>
     </div>

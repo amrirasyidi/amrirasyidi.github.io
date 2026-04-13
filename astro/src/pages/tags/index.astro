@@ -29,7 +29,7 @@ const sortedTags = [...tagCounts.entries()].sort((a, b) => a[0].localeCompare(b[
       <nav class="nav">
         <div class="nav-links">
           <a href="/">Home</a>
-          <a href="/services">Services</a>
+          {import.meta.env.DEV && <a href="/services">Services</a>}
           <a href="/blog">Blog</a>
           <a href="/tags" class="active">Tags</a>
         </div>

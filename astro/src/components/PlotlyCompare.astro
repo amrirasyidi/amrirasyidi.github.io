@@ -1,4 +1,5 @@
 ---
+import Figure from './Figure.astro';
 interface Props {
   datasets: Record<string, Record<string, unknown>>;
   models: Record<string, Record<string, unknown>>;
@@ -36,14 +37,12 @@ const payload = JSON.stringify({
     <div class="chart-box"><div id="chart-val-iou"></div></div>
   </div>
 
-  <figure id="fig-dataset">
-    <img src={props.datasetFigSrc} alt={props.datasetFigAlt} />
-    <figcaption>{props.datasetFigCaption}</figcaption>
-  </figure>
-  <figure id="fig-model" style="display: none;">
-    <img src={props.modelFigSrc} alt={props.modelFigAlt} />
-    <figcaption>{props.modelFigCaption}</figcaption>
-  </figure>
+  <div id="fig-dataset">
+    <Figure src={props.datasetFigSrc} alt={props.datasetFigAlt} caption={props.datasetFigCaption} />
+  </div>
+  <div id="fig-model" style="display: none;">
+    <Figure src={props.modelFigSrc} alt={props.modelFigAlt} caption={props.modelFigCaption} />
+  </div>
 </div>
 
 <script type="application/json" id="plotly-compare-data" set:html={payload} />
