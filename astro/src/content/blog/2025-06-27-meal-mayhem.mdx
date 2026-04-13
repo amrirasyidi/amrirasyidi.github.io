@@ -1,0 +1,321 @@
+---
+title: The Meal Mayhem
+date: 2025-06-27
+excerpt: Analyzing the government's school meal program through spatial perspective and network analysis
+tags: [data-science, python, geospatial, how-to]
+---
+
+import Figure from '../../components/Figure.astro';
+
+If I were a student receiving the government's hail-mary program "Makan ~~Beracun~~ Bergizi Gratis" or as some people call it, "MBG", I would treat it like winning a jackpot from an online gambling (judol) site—the chance is low, but what the heck, I will keep doing it anyway, hoping to (not) get the "jackpot". Mr. President [said it himself](https://www.dw.com/id/kasus-keracunan-mbg-prabowo-200-orang-dari-3-juta-penerima-manfaat/a-72443595) "the failure rate is *only* 0.005%".
+
+Holy mary geoise, what a mentality.
+
+<Figure src="/assets/blog/images/20241215_1_mbg_meme.png" alt="MBG program meme" />
+
+Despite the poor execution, I still *want* to think that the *intention* is good. Naturally, the fruition of the intention can be in a completely different form, but "nasi sudah menjadi bubur" as our people say, so it is what it is. In this post, I'm not going to yap about the political/regulation side, but rather I'll talk about it from an angle I'm quite familiar with: spatial.
+
+Spatial (or maybe commonly referred to as GIS), an industry I'm currently involved in, revolves around one question: "where?". That's basically it. It's cool because it is specific and there are so many different approaches to face that one question. But it is also sad because, well, that's it, that's my sky.
+
+One possible reason that the food went bad is that it was not prepared properly—the ingredients might have gone bad or the food went bad after it was prepared (be warned, this is baseless; I'm just talking about a *possible* reason, and again, I'm not going to touch on the political/regulation side). So *maybe*, a possible solution to that is to minimize the gap between raw ingredients, preparation, and the distribution of meals. To store the raw ingredients in a place where they have good access to be prepared in the kitchen and to be distributed to the students later. And this is where spatial perspective comes in.
+
+**Where?** Right? Where is the proper location to serve this purpose?
+
+We will dive into one approach to find an alternative to that very question. Let's cook!
+
+<Figure src="/assets/blog/images/20241215_2_cooking_spatially.png" alt="Cooking spatially" />
+
+## Before we start…
+
+First, let's establish some assumptions…
+
+1. For simplicity's sake, let's assume that the "storage" (where raw ingredients will be stored) and the "kitchen" (where raw ingredients will be cooked) are under the same roof.
+2. The meals will then be distributed directly from the kitchen to the schools.
+3. These storage/kitchen locations are already predefined.
+
+Our task then will be to decide "how suitable" the location is. There are many different factors to consider when deciding the suitability of a location—for example, we can use the number of students around the location, ease of access, number of schools, etc. In this project, however, we are not going so far as to give a score of suitability, but only to calculate some parameters that perhaps can be used to do suitability analysis later.
+
+### Data
+
+There are 3 main pieces of data that we need to have:
+
+1. School location
+2. School composition (number of students)
+3. Kitchen location
+
+To put it briefly, we are going to calculate the distance between the kitchen and the schools in its vicinity, and we will also get insight into the number of students. The number of students can help to approximate the capacity needed for the storage and also to measure the "impact" of the said storage.
+
+### Technical implementation
+
+There's this amazing Python package specifically built to enable downloading, modelling, analyzing, and visualizing street networks and other geospatial features from OpenStreetMap. Enter [OSMnx](https://osmnx.readthedocs.io/en/stable/). We will mainly use this package for the project. We will fetch the network data, find the shortest route, and calculate the distance of the route.
+
+The complete implementation is embedded into a loop. I'll pull it from the loop and walk you through it step by step. The complete implementation will be written at the end of this section.
+
+#### Group the data based on their Kabupaten Name
+
+We are going to need the road network to do the network analysis. The way OSMnx does this is basically to fetch the data from OSM in a certain scope (can be municipality, city, or country even). The time needed to fetch the data and then convert it into a network will depend on how complex (and complete) the data is inside the said scope. To make it efficient, we will use the most optimal scope. Upon trial and error, for areas in Indonesia, I found the most optimal scope is at the Kabupaten level. A more granular level would be beneficial, but I found that OSM was unable to fetch the network data for a query on a level lower than Kabupaten.
+
+```python
+grouped = df.groupby(['kabupaten', 'provinsi'])
+```
+
+#### Find the graph
+
+In network analysis, a graph is a mathematical representation of a road network where intersections are "nodes" and road segments are "edges" connecting those nodes. Think of it as a digital map that algorithms can understand—each road junction becomes a point, and each road segment becomes a line with properties like length and speed limit.
+
+This graph structure is crucial because it allows us to calculate the actual shortest path using real roads, rather than just drawing a straight line between two points (which might go through buildings or water!).
+
+The way we actually fetch the data is by using the `graph_from_place` function.
+
+```python
+place_string = f"{kabupaten}, {provinsi}, Indonesia"
+G = ox.graph.graph_from_place(place_string, network_type="drive")
+```
+
+We fill the `place_string` with different Kabupaten names, and this is where we decide the "scope" of the data we would like to fetch. The `network_type="drive"` ensures we only get roads accessible by cars (perhaps also motorcycles).
+
+#### Create a pair of destination and origin
+
+```python
+# Extract school coordinates (origin point)
+origin_lat = row['school_latitude']
+origin_lon = row['school_longitude'] 
+school_name = row['nearby_school_name']
+
+# Extract asset coordinates (destination point)
+dest_lat = row['asset_latitude']
+dest_lon = row['asset_longitude']
+asset_id = row['id_kunci']
+```
+
+Here we're extracting the latitude and longitude coordinates for both our starting point (school) and ending point (asset). These coordinates will be used to find the actual route between them.
+
+#### Find the nearest node
+
+```python
+# Find nearest nodes
+origin_node = ox.distance.nearest_nodes(G, float(origin_lon), float(origin_lat))
+dest_node = ox.distance.nearest_nodes(G, float(dest_lon), float(dest_lat))
+```
+
+Since our coordinates are exact GPS points but roads are made up of discrete nodes, we need to find the closest road intersection (node) to each of our coordinates. This "snaps" our points to the actual road network so we can calculate a route.
+
+#### Find the shortest path
+
+```python
+route = ox.routing.shortest_path(G, origin_node, dest_node, weight="length")
+```
+
+This calculates the shortest path between our two nodes using Dijkstra's algorithm, optimizing for the shortest distance (`weight="length"`). The result is a list of nodes that form the optimal route.
+
+#### Convert back the shortest path to gdf for visualization
+
+```python
+# Convert route to geographic data format
+route_gdf = ox.routing.route_to_gdf(G, route)
+
+# Calculate total route distance
+route_length = route_gdf['length'].sum()
+```
+
+Finally, we convert our route (list of nodes) back into a geographic format that includes the actual road segments with their lengths. Summing the `length` column gives us the total distance of our route in meters.
+
+### What Did We Cook?
+
+We set out to find parameters that could help answer "how suitable" kitchen locations are for serving schools. Did we deliver? To a certain degree, yes.
+
+We successfully calculated the **ease of access** parameter—real driving distances between kitchens and schools using actual road networks. We also have the foundation to incorporate **number of students** and **number of schools** around each location. So we've got some key ingredients for suitability analysis, but we're still one step away from the actual suitability scoring we hinted at in the beginning.
+
+**But let's be real**—we're not fixing the MBG program overnight. This assumes kitchen locations are predefined, OSM data is accurate, shortest route = best route, and ignores traffic, road conditions, or the fact that some OSM roads are more "aspirational" than actual—we're just measuring "how far is everything from this location?" It's like preparing all the ingredients but not actually cooking the meal.
+
+What we've made is just the *bumbu dasar*. To make it truly useful, add:
+
+- Temporal analysis (traffic, seasonal changes)
+- Capacity modeling (match kitchen output to school demand)
+- Multi-criteria evaluation (beyond just distance)
+- Real-time conditions and alternative routing
+
+But I'm not paid to do it, so this is not my problem. I'll just leave the rest to the next person in the kitchen.
+
+For now, farewell!
+
+## Complete Implementation
+
+```python
+!pip install osmnx
+
+import pandas as pd
+import osmnx as ox
+import random
+from typing import List, Dict, Optional
+from tqdm import tqdm
+import geopandas as gpd
+from geopy.distance import geodesic
+from shapely.geometry import LineString
+
+# Set random seed for reproducible dummy data
+random.seed(42)
+
+def create_dummy_school_asset_data() -> pd.DataFrame:
+    """
+    Creates dummy data with 2 assets in Bandung, each with 15 nearby schools
+    """
+    # Base location: Magelang, Central Java
+    kabupaten = "Magelang"
+    provinsi = "Jawa Tengah"
+    
+    # Two asset locations in Magelang area
+    assets = [
+        {"id": "ASSET_A", "lat": -7.4754, "lon": 110.2177},  # Central Magelang
+        {"id": "ASSET_B", "lat": -7.4634, "lon": 110.2089}   # North Magelang
+    ]
+    
+    data = []
+    
+    for asset in assets:
+        for i in range(1, 16):  # 15 schools per asset
+            # Generate random coordinates within ~5km radius of each asset
+            lat_offset = random.uniform(-0.045, 0.045)  # ~5km variation
+            lon_offset = random.uniform(-0.045, 0.045)
+            
+            school_lat = asset["lat"] + lat_offset
+            school_lon = asset["lon"] + lon_offset
+            
+            # Create dummy school name
+            school_name = f"SD Dummy {asset['id'][-1]}{i:02d}"
+            
+            data.append({
+                'kabupaten': kabupaten,
+                'provinsi': provinsi,
+                'school_latitude': school_lat,
+                'school_longitude': school_lon,
+                'nearby_school_name': school_name,
+                'asset_latitude': asset["lat"],
+                'asset_longitude': asset["lon"],
+                'id_kunci': asset["id"]
+            })
+    
+    return pd.DataFrame(data)
+
+def calculate_routes_and_distances(df: pd.DataFrame) -> List[Dict]:
+    """
+    Main function to calculate shortest routes between schools and assets
+    """
+    results = []
+    
+    # Group the data based on their Kabupaten Name
+    print("Grouping data by kabupaten...")
+    grouped = df.groupby(['kabupaten', 'provinsi'])
+    
+    for (kabupaten, provinsi), group in tqdm(grouped, desc="Processing areas"):
+        print(f"\nProcessing {kabupaten}, {provinsi} with {len(group)} school-asset pairs...")
+        
+        # Find the graph (road network for this kabupaten)
+        place_string = f"{kabupaten}, {provinsi}, Indonesia"
+        print(f"Fetching road network for: {place_string}")
+        
+        try:
+            # Fetch the road network
+            G = ox.graph.graph_from_place(place_string, network_type="drive")
+            print(f"Successfully fetched network with {len(G.nodes)} nodes and {len(G.edges)} edges")
+            
+        except Exception as e:
+            print(f"Error fetching network for {place_string}: {e}")
+            continue
+        
+        # Process each school-asset pair in this kabupaten
+        for idx, row in tqdm(group.iterrows(), total=len(group), desc="Calculating routes"):
+            try:
+                # Create a pair of destination and origin
+                origin_lat = row['school_latitude']
+                origin_lon = row['school_longitude']
+                school_name = row['nearby_school_name']
+                
+                # Get asset coordinates
+                dest_lat = row['asset_latitude']
+                dest_lon = row['asset_longitude']
+                asset_id = row['id_kunci']
+                
+                # Find the nearest node
+                origin_node = ox.distance.nearest_nodes(G, float(origin_lon), float(origin_lat))
+                dest_node = ox.distance.nearest_nodes(G, float(dest_lon), float(dest_lat))
+                
+                # Check if origin and destination are the same node
+                if origin_node == dest_node:
+                    print(f"Same node for {school_name} -> {asset_id}, using straight-line distance")
+                    # Calculate direct distance using geodesic
+                    route_length = geodesic(
+                        (origin_lat, origin_lon), 
+                        (dest_lat, dest_lon)
+                    ).meters
+                    is_straight_line = True
+                else:
+                    # Find the shortest path
+                    route = ox.routing.shortest_path(G, origin_node, dest_node, weight="length")
+                    
+                    if route is None:
+                        print(f"No route found between {school_name} and {asset_id}")
+                        continue
+                    
+                    # Convert to GeoDataFrame and calculate total length
+                    route_gdf = ox.routing.route_to_gdf(G, route)
+                    route_length = route_gdf['length'].sum()
+                    is_straight_line = False
+                
+                # Store results
+                result = {
+                    'kabupaten': kabupaten,
+                    'provinsi': provinsi,
+                    'school_name': school_name,
+                    'asset_id': asset_id,
+                    'route_distance_meters': route_length,
+                    'route_distance_km': route_length / 1000,
+                    'school_coords': (origin_lat, origin_lon),
+                    'asset_coords': (dest_lat, dest_lon),
+                    'is_straight_line': is_straight_line
+                }
+                results.append(result)
+                
+                print(f"✓ {school_name} -> {asset_id}: {route_length/1000:.2f} km {'(straight-line)' if is_straight_line else '(road network)'}")
+                
+            except Exception as e:
+                print(f"Error processing {school_name} -> {asset_id}: {e}")
+                continue
+    
+    return results
+
+print("=== OSMnx School-Asset Route Analysis ===\n")
+
+# Step 1: Create dummy data
+print("Step 1: Creating dummy school-asset data...")
+df = create_dummy_school_asset_data()
+print(f"Created {len(df)} school-asset pairs")
+print("\nSample data:")
+df.head(3)
+
+# Step 2: Calculate routes and distances
+print("\nStep 2: Calculating shortest routes...")
+results = calculate_routes_and_distances(df)
+
+# Step 3: Display results
+print(f"\n=== RESULTS SUMMARY ===")
+print(f"Successfully processed {len(results)} routes")
+
+if results:
+    results_df = pd.DataFrame(results)
+    
+    print("\nDistance Statistics:")
+    print(f"Average distance: {results_df['route_distance_km'].mean():.2f} km")
+    print(f"Min distance: {results_df['route_distance_km'].min():.2f} km")
+    print(f"Max distance: {results_df['route_distance_km'].max():.2f} km")
+    
+    print("\nSample results:")
+    print(results_df[['school_name', 'asset_id', 'route_distance_km']].head(10))
+    
+    # Group by asset to see distribution
+    print("\nDistance summary by asset:")
+    asset_summary = results_df.groupby('asset_id')['route_distance_km'].agg(['count', 'mean', 'min', 'max'])
+    print(asset_summary)
+
+print("\n=== Analysis Complete ===")
+```
