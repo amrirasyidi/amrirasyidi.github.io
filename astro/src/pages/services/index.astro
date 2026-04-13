@@ -1,0 +1,223 @@
+---
+import { getCollection } from 'astro:content';
+import '../../styles/style.css';
+
+const services = (await getCollection('services')).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+
+const testimonials = [
+  {
+    quote: "Working with Amri is fantastic - super results! I would recommend him to others for your work without any hesitation. Great attention to detail, great communication, and great outcomes!",
+    project: "API Integration Project",
+    author: "Joe S. • Urban Studies Foundation",
+  },
+  {
+    quote: "Excellent work, above and beyond.",
+    project: "Google Maps API Custom Website",
+    author: "Richard N. • Beauty Canada",
+  },
+  {
+    quote: "Very impressive, planning to rehire him again.",
+    project: "Spatial Clustering & Analysis",
+    author: "Indonesia • Research Project",
+  },
+  {
+    quote: "i believe he's super expert, fast deliver, good communication and follow all the instruction very well. more proud bcs he's a fellow indonesian. nice work mas thank you banget!",
+    project: "Computer Vision Deployment",
+    author: "Najwa • Research Project",
+  },
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Geospatial and location intelligence services by Amri Rasyidi" />
+    <title>Services - Amri Rasyidi</title>
+  </head>
+  <body class="wide-page">
+    <div class="header">
+      <nav class="nav">
+        <div class="nav-links">
+          <a href="/">Home</a>
+          <a href="/services" class="active">Services</a>
+          <a href="/blog">Blog</a>
+          <a href="/tags">Tags</a>
+        </div>
+      </nav>
+    </div>
+
+    <h1>Location Intelligence Engineered for Impact</h1>
+
+    <div class="hero-statement">
+      <p>I transform complex spatial data into clear business insights. Specializing in <strong>satellite imagery analysis</strong>, <strong>location intelligence</strong>, and <strong>custom GeoAI solutions</strong> for organizations across industries.</p>
+    </div>
+
+    <div class="stats-section">
+      <div class="stats-grid">
+        <div class="stat-item"><div class="stat-number">9</div><div class="stat-label">Projects Delivered</div></div>
+        <div class="stat-item"><div class="stat-number">4</div><div class="stat-label">Countries Served</div></div>
+        <div class="stat-item"><div class="stat-number">3</div><div class="stat-label">Recurring Clients</div></div>
+        <div class="stat-item"><div class="stat-number">5+</div><div class="stat-label">Years of Professional Works</div></div>
+      </div>
+    </div>
+
+    <div class="testimonials-section">
+      <h2>Client Testimonials</h2>
+      <div class="testimonial-grid">
+        {testimonials.map((t) => (
+          <div class="testimonial-card">
+            <p>"{t.quote}"</p>
+            <div class="testimonial-meta">
+              <strong>{t.project}</strong>
+              <span>{t.author}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div class="cta-section">
+      <h2>Ready to Turn Your Location Data Into Insights?</h2>
+      <p>Whether you have satellite imagery, GPS data, or spatial datasets collecting dust—let's explore how to extract business value from it.</p>
+      <div class="contact-options">
+        <a href="#get-in-touch" class="primary-cta">Discuss Your Project</a>
+        <a href="#core-services" class="secondary-cta">See Technical Examples →</a>
+      </div>
+      <div class="cta-note">
+        <p><small>💡 <strong>Free consultation:</strong> I offer proof-of-concept development to validate your solution's feasibility—no strings attached!</small></p>
+      </div>
+    </div>
+
+    <div class="expertise-areas" id="core-services">
+      <h2>Portfolio</h2>
+      <div class="service-grid">
+        {services.map((s) => (
+          <a href={`/services/${s.id}`} class="service-card-link">
+            <div class="service-card">
+              <div class="service-illustration">
+                <img src={s.data.image} alt={s.data.cardTitle} class="service-demo-img" />
+              </div>
+              <div class="service-content">
+                <div class="service-title">{s.data.cardTitle}</div>
+                <p>{s.data.excerpt}</p>
+                <span class="explore-btn">Explore More →</span>
+              </div>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+
+    <div class="how-i-work">
+      <h2>How I Work</h2>
+      <p>I focus on <strong>efficient, tailored solutions</strong> that integrate seamlessly with your existing workflows. Most of my past projects follow this approach:</p>
+      <div class="work-process">
+        <div class="process-step">
+          <strong>Data Assessment</strong>
+          <p>Understand your spatial data landscape and identify the highest-impact opportunities for analysis</p>
+        </div>
+        <div class="process-step">
+          <strong>Proof of Concept</strong>
+          <p>Develop tailored prototype using your actual data to validate approach and demonstrate potential ROI</p>
+        </div>
+        <div class="process-step">
+          <strong>Custom Implementation</strong>
+          <p>Build efficient, production-ready solution with documentation and team training for long-term success</p>
+        </div>
+      </div>
+      <p><strong>My approach prioritizes:</strong> Clean, maintainable code • Seamless integration • Clear documentation • Knowledge transfer to your team</p>
+    </div>
+
+    <div class="contact-form-section" id="get-in-touch">
+      <h2>Get In Touch</h2>
+      <p>Ready to discuss your project? Fill out the form below and I'll get back to you within 24 hours.</p>
+
+      <form action="https://api.web3forms.com/submit" method="POST" class="contact-form" id="contact-form">
+        <input type="hidden" name="access_key" value="da02619a-a1d2-4727-96ba-9f5cd57ae45d" />
+
+        <div class="form-group">
+          <label for="name">Name *</label>
+          <input type="text" id="name" name="name" required />
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email *</label>
+          <input type="email" id="email" name="email" required />
+        </div>
+
+        <div class="form-group">
+          <label for="company">Company/Organization</label>
+          <input type="text" id="company" name="company" />
+        </div>
+
+        <div class="form-group">
+          <label for="subject">Subject *</label>
+          <input type="text" id="subject" name="subject" required />
+        </div>
+
+        <div class="form-group">
+          <label for="message">Message *</label>
+          <textarea id="message" name="message" rows="6" required placeholder="Tell me about your project, timeline, and specific requirements..."></textarea>
+        </div>
+
+        <input type="checkbox" name="botcheck" class="hidden" style="display: none;" />
+
+        <button type="submit" class="submit-btn">
+          <span class="btn-text">Send Message</span>
+          <span class="btn-loading" style="display: none;">Sending...</span>
+        </button>
+      </form>
+
+      <div class="popup-overlay" id="success-popup">
+        <div class="popup-content">
+          <div class="popup-icon">✓</div>
+          <h3>Message Sent Successfully!</h3>
+          <p>Thank you for reaching out. I'll get back to you within 24 hours.</p>
+          <button class="popup-close-btn" id="popup-close-btn">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <script is:inline>
+      (function () {
+        const form = document.getElementById('contact-form');
+        const popup = document.getElementById('success-popup');
+        const closeBtn = document.getElementById('popup-close-btn');
+        const btnText = form.querySelector('.btn-text');
+        const btnLoading = form.querySelector('.btn-loading');
+
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          btnText.style.display = 'none';
+          btnLoading.style.display = 'inline';
+          try {
+            const res = await fetch(form.action, {
+              method: 'POST',
+              body: new FormData(form),
+              headers: { Accept: 'application/json' },
+            });
+            if (res.ok) {
+              form.reset();
+              popup.style.display = 'flex';
+            } else {
+              alert('Something went wrong. Please try again.');
+            }
+          } catch {
+            alert('Network error. Please try again.');
+          } finally {
+            btnText.style.display = 'inline';
+            btnLoading.style.display = 'none';
+          }
+        });
+
+        closeBtn.addEventListener('click', () => {
+          popup.style.display = 'none';
+        });
+      })();
+    </script>
+  </body>
+</html>

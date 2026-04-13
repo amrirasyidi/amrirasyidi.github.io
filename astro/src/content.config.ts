@@ -8,7 +8,19 @@ const blog = defineCollection({
     date: z.coerce.date(),
     excerpt: z.string(),
     tags: z.array(z.string()).default([]),
+    draft: z.boolean().default(false),
   }),
 });
 
-export const collections = { blog };
+const services = defineCollection({
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/services' }),
+  schema: z.object({
+    title: z.string(),
+    cardTitle: z.string(),
+    excerpt: z.string(),
+    image: z.string(),
+    order: z.number().default(99),
+  }),
+});
+
+export const collections = { blog, services };
