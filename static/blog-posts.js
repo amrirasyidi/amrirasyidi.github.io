@@ -1,6 +1,7 @@
 // Single source of truth for all blog posts
 // Add new blog post filenames here - both blog.js and tags.js will use this list
 const BLOG_POSTS = [
+    '20260413-gemma-wsl-local.html',
     '20260408-aef.html',
     '20260307-freelance.html',
     '20251019-sg1.html',

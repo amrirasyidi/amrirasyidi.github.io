@@ -1,0 +1,183 @@
+<!--
+title: Local Gemma 4, WSL, llama.cpp, opencode, and VScode
+date: 2026-04-13
+excerpt: Trying out Gemma 4 on my local machine, through opencode, llama.cpp, and wsl.
+tags: guide
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Local Gemma 4, WSL, llama.cpp, opencode, and VScode</title>
+    <link rel="stylesheet" href="../static/style.css">
+    <link rel="stylesheet" href="../static/prism.css"/>
+</head>
+<body>
+    <div class="header">
+        <nav class="nav">
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="../blog.html" class="active">Blog</a>
+                <a href="../tags.html">Tags</a>
+            </div>
+            <button id="dark-mode-toggle" class="dark-mode-toggle">🌙 Dark</button>
+        </nav>
+    </div>
+
+    <div class="back-link">
+        <a href="../blog.html">← Back to Blog</a>
+    </div>
+
+    <h1>Local Gemma 4, WSL, llama.cpp, opencode, and VScode</h1>
+    
+    <div class="post-meta">
+        Published on [April 13rd, 2026]
+    </div>
+
+    <div class="post-content">
+        <p>
+            With the recent Gemma 4 development, I tried to make it work on my local
+            machine. This one is particularly interesting because of 2 things people (in
+            my twitter bubble) have been talking about:
+            <ul>
+                <li>It's on par performance with paid models.</li>
+                <li>It's ability to be run on a mid-end machine.</li>
+            </ul>
+            Obviously, Gemma 4 is not the first ever model that people talk in high
+            praise, I remember when deepseek got discovered, people start running it on
+            their local machine. However, I also remember, a lot of walkthrough video I
+            saw on youtube, have a high-end machine almost like an enterprise server.
+        </p>
+        
+        <p>
+            As a context, I am on a windows machine, but like any sane person I decided
+            to spun up WSL2 for development purpose. And just like any sane person, I
+            didn't port all of my resource to the WSL, I'm still running on Windows
+            after all. Here's my spec:
+            <ul>
+                <li>GPU: NVIDIA GeForce RTX 4060 Ti (16GB VRAM)</li>
+                <li>CPU: AMD Ryzen 5 7500F 6-Core Processor (12 CPU, 3.7 GHz)</li>
+                <li>RAM: 32 GB (2 x 16 GB)</li>
+                <li>WSL Distro: Ubuntu (I use roughly half of my resource for WSL)</li>
+            </ul>
+        </p>
+
+        <p>
+            I explained the reason behind WSL, now why opencode and llama.cpp? I picked
+            opencode, just because that is the first think I heard about running LLM
+            model on terminal. Then for the actual AI runner, I use llama.cpp because
+            I encountered a <a href="https://github.com/ollama/ollama/issues/15235" target="_blank">problem</a>
+            while trying to run it on ollama (I used ollama to run deepseek-r1 back then).
+        </p>
+
+        <h2>Setup</h2>
+
+        <p>
+            Anyway, here's how to run it (assuming you have installed llama.cpp, opencode
+            and VScode):
+            <ol>
+                <li>
+                    As a safety measure, check if your machine can actually run the model:
+                    <a href="https://www.canirun.ai" target="_blank">https://www.canirun.ai</a>
+                </li>
+                <li>
+                    You need to download the 
+                    <span class="tooltip">
+                        <strong>model</strong>
+                        <span class="tooltip-text">
+                            I picked the <code>UD-Q4_K_M</code> variant because it's the
+                            biggest one I can safely run on my machine. You can adjust yours.
+                        </span>
+                    </span>   
+                    from <a href="https://huggingface.co/unsloth/gemma-4-26B-A4B-it-GGUF?show_file_info=gemma-4-26B-A4B-it-UD-Q4_K_M.gguf" target="_blank">https://huggingface.co/unsloth/gemma-4-26B-A4B-it-GGUF</a>
+                    <br>You can also use the command:
+                    <code>llama-cli -hf unsloth/gemma-4-26B-A4B-it-GGUF:UD-Q4_K_M</code>.
+                    <br>But it will download AND start the inferencing server on your local.
+                    I would avoid this because there would be an additional argument we
+                    need to "properly" use the model. And we need to configure the 
+                    <code>.wslconfig</code> too.
+                </li>
+                <li>
+                    Make sure you have this on the 
+                    <span class="tooltip">
+                        <code>.wslconfig</code>:
+                        <span class="tooltip-text">
+                            You should be able to find the <code>.wslconfig</code> at <code>C:\Users\< YourUsername >\.wslconfig</code>. 
+                            <br><br>If you are at that directory but didn't see the file, you can make it
+                            instead and then fill it accordingly.
+                        </span>
+                    </span>   
+                    <pre>[wsl2]
+networkingMode=mirrored</pre>
+                    Essentially, those lines make your WSL instance share the exact same IP 
+                    addresses and network configuration as your Windows host.
+                    <br>This is important because in this setup, we will start the
+                    inferencing server on windows machine, but we would access it through
+                    opencode inside WSL. Not setting it like this will add unnecessary
+                    headache.
+                </li>
+                <li>
+                    Next you need to create opencode.json (mine is in <code>~/.config/opencode/</code>) 
+                    then put (something like) this inside:
+                    <pre>{
+    "$schema": "https://opencode.ai/config.json",
+    "provider": {
+        "llama-local": {
+            "name": "llama-server (local)",
+            "npm": "@ai-sdk/openai-compatible",
+            "options": {
+                "baseURL": "http://127.0.0.1:8080/v1"
+            },
+            "models": {
+                "https://huggingface.co/unsloth/gemma-4-26B-A4B-it-GGUF": {
+                    "name": "gemma-4-26B-A4B-it-GGUF (local)"
+                }
+            }
+        }
+    }
+}</pre>
+                Later, when we start the inferencing server, the default address should
+                be: <code>http://127.0.0.1:8080/v1</code>, you should see it once you
+                run the model. If that's not the case somehow, you can always adjust it.
+                </li>
+                <li>
+                    Finally, you can start serving the model, use this command (adjust the path):
+                    <pre>llama-server.exe -m path\to\model\gemma-4-26B-A4B-it-UD-Q4_K_M.gguf -fa on -c 65536</pre>
+                </li>
+                The <code>-fa on</code> flag is to turn on <strong>flash attention</strong>.
+                Turning this on significantly reduces memory usage and speeds up processing, especially for long conversations.
+                <br>The <code>-c 65536</code>is to set the <strong>context size</strong>
+                to roughly 64K tokens. I tried running the model without this flag (i.e 
+                default setting). But using the default will immediately start compaction
+                even at the first prompt. The size you can assign will depend on your
+                machine, the more memory it has, the more context size you can set I 
+                guess.
+            </ol>
+        </p>
+
+        <h2>Finally</h2>
+        
+        <p>
+        <figure>
+            <img src="../assets/blog/images/20260413_ss.png" alt="proof">
+            <figcaption>Running at ~90% memory usage</figcaption>
+        </figure>
+            The model run quite decently on my machine on ~30 token/sec. However, even
+            with extended context size, I found that the model keep compacting the
+            context for every 3-4 prompts. In comparison, sometimes I use the free MiniMax
+            M2.5 and it can reach around 250k context size before need a compaction. 
+            Another thing I noticed (and expected) is that my memory usage reached on 
+            average 90-98% everytime I use the model, which I don't think very sustainable
+            for me.
+        </p>
+
+    <div class="tags-section">
+        <strong>Tags:</strong>
+        <a href="../tags.html?tag=guide" class="tag">guide</a>
+    </div>
+
+    <script src="../static/dark-mode.js"></script>
+    <script src="../static/prism.js"></script>
+</body>
+</html>
