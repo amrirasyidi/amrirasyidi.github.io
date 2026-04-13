@@ -641,6 +641,7 @@ img, video, iframe {
     transition: all 0.3s ease;
     display: flex;
     gap: 20px;
+    align-items: center;
 }
 
 .blog-post:last-child { 

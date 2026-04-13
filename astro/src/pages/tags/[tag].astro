@@ -69,23 +69,30 @@ function readingTime(body: string): number {
     <div id="blog-posts">
       {posts.map((post) => (
         <div class="blog-post">
-          <div class="post-date">
-            {post.data.date.toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            })}
-            {' '}&middot;{' '}
-            {readingTime(post.body ?? '')} min read
-          </div>
-          <div class="post-title">
-            <a href={`/blog/${post.id}`}>{post.data.title}</a>
-          </div>
-          <div class="post-excerpt">{post.data.excerpt}</div>
-          <div class="tags">
-            {post.data.tags.map((t) => (
-              <a href={`/tags/${t}`} class={`tag${t === tag ? ' active' : ''}`}>{t}</a>
-            ))}
+          {post.data.image && (
+            <div class="post-thumbnail">
+              <img src={post.data.image} alt={post.data.title} />
+            </div>
+          )}
+          <div class="post-content">
+            <div class="post-date">
+              {post.data.date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              })}
+              {' '}&middot;{' '}
+              {readingTime(post.body ?? '')} min read
+            </div>
+            <div class="post-title">
+              <a href={`/blog/${post.id}`}>{post.data.title}</a>
+            </div>
+            <div class="post-excerpt">{post.data.excerpt}</div>
+            <div class="tags">
+              {post.data.tags.map((t) => (
+                <a href={`/tags/${t}`} class={`tag${t === tag ? ' active' : ''}`}>{t}</a>
+              ))}
+            </div>
           </div>
         </div>
       ))}
