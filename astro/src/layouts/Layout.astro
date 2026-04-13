@@ -1,0 +1,37 @@
+---
+import '../styles/style.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  active?: 'home' | 'services' | 'blog' | 'tags' | null;
+  bodyClass?: string;
+}
+
+const { title, description = '', active = null, bodyClass } = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+    <slot name="head" />
+  </head>
+  <body class={bodyClass}>
+    <div class="header">
+      <nav class="nav">
+        <div class="nav-links">
+          <a href="/" class={active === 'home' ? 'active' : undefined}>Home</a>
+          {import.meta.env.DEV && (
+            <a href="/services" class={active === 'services' ? 'active' : undefined}>Services</a>
+          )}
+          <a href="/blog" class={active === 'blog' ? 'active' : undefined}>Blog</a>
+          <a href="/tags" class={active === 'tags' ? 'active' : undefined}>Tags</a>
+        </div>
+      </nav>
+    </div>
+    <slot />
+  </body>
+</html>

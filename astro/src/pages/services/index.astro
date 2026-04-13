@@ -1,6 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
-import '../../styles/style.css';
+import Layout from '../../layouts/Layout.astro';
 
 const services = (await getCollection('services')).sort(
   (a, b) => a.data.order - b.data.order,
@@ -30,27 +30,13 @@ const testimonials = [
 ];
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Geospatial and location intelligence services by Amri Rasyidi" />
-    <title>Services - Amri Rasyidi</title>
-  </head>
-  <body class="wide-page">
-    <div class="header">
-      <nav class="nav">
-        <div class="nav-links">
-          <a href="/">Home</a>
-          <a href="/services" class="active">Services</a>
-          <a href="/blog">Blog</a>
-          <a href="/tags">Tags</a>
-        </div>
-      </nav>
-    </div>
-
-    <h1>Location Intelligence Engineered for Impact</h1>
+<Layout
+  title="Services - Amri Rasyidi"
+  description="Geospatial and location intelligence services by Amri Rasyidi"
+  active="services"
+  bodyClass="wide-page"
+>
+  <h1>Location Intelligence Engineered for Impact</h1>
 
     <div class="hero-statement">
       <p>I transform complex spatial data into clear business insights. Specializing in <strong>satellite imagery analysis</strong>, <strong>location intelligence</strong>, and <strong>custom GeoAI solutions</strong> for organizations across industries.</p>
@@ -220,6 +206,5 @@ const testimonials = [
           popup.style.display = 'none';
         });
       })();
-    </script>
-  </body>
-</html>
+  </script>
+</Layout>

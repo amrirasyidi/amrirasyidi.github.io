@@ -1,0 +1,21 @@
+---
+import { Image } from 'astro:assets';
+import { resolveBlogImage } from '../lib/blogImages';
+
+const { src, alt, ...rest } = Astro.props as { src: string; alt?: string; [k: string]: any };
+const isRemote = /^https?:\/\//.test(src);
+const resolved = isRemote ? null : resolveBlogImage(src);
+---
+{isRemote || !resolved ? (
+  <img src={src} alt={alt ?? ''} loading="lazy" decoding="async" {...rest} />
+) : (
+  <Image
+    src={resolved}
+    alt={alt ?? ''}
+    loading="lazy"
+    decoding="async"
+    widths={[480, 960, 1440, 1920]}
+    sizes="(max-width: 768px) 100vw, 760px"
+    {...rest}
+  />
+)}

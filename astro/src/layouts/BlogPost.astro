@@ -1,5 +1,5 @@
 ---
-import '../styles/style.css';
+import Layout from './Layout.astro';
 import TableOfContents from '../components/TableOfContents.astro';
 
 interface Heading {
@@ -24,26 +24,7 @@ const published = date.toLocaleDateString('en-US', {
 });
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content={excerpt} />
-    <title>{title} - Amri Rasyidi</title>
-  </head>
-  <body>
-    <div class="header">
-      <nav class="nav">
-        <div class="nav-links">
-          <a href="/">Home</a>
-          {import.meta.env.DEV && <a href="/services">Services</a>}
-          <a href="/blog" class="active">Blog</a>
-          <a href="/tags">Tags</a>
-        </div>
-      </nav>
-    </div>
-
+<Layout title={`${title} - Amri Rasyidi`} description={excerpt} active="blog">
     <div class="back-link">
       <a href="/blog">← Back to Blog</a>
     </div>
@@ -139,5 +120,4 @@ const published = date.toLocaleDateString('en-US', {
         });
       })();
     </script>
-  </body>
-</html>
+</Layout>

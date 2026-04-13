@@ -2,7 +2,7 @@
 import { getCollection } from 'astro:content';
 import { Image } from 'astro:assets';
 import { resolveBlogImage } from '../../lib/blogImages';
-import '../../styles/style.css';
+import Layout from '../../layouts/Layout.astro';
 
 const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
@@ -14,14 +14,8 @@ function readingTime(body: string): number {
 }
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Blog posts by Amri Rasyidi" />
-    <title>Blog - Amri Rasyidi</title>
-    <style>
+<Layout title="Blog - Amri Rasyidi" description="Blog posts by Amri Rasyidi" active="blog">
+  <style>
       .blog-header {
         display: flex;
         align-items: center;
@@ -108,21 +102,9 @@ function readingTime(body: string): number {
           max-width: 100%;
         }
       }
-    </style>
-  </head>
-  <body>
-    <div class="header">
-      <nav class="nav">
-        <div class="nav-links">
-          <a href="/">Home</a>
-          {import.meta.env.DEV && <a href="/services">Services</a>}
-          <a href="/blog" class="active">Blog</a>
-          <a href="/tags">Tags</a>
-        </div>
-      </nav>
-    </div>
+  </style>
 
-    <div class="blog-header">
+  <div class="blog-header">
       <h1>Blog</h1>
       <div class="search-box">
         <input type="text" id="search-input" placeholder="Search posts..." autocomplete="off" />
@@ -247,6 +229,5 @@ function readingTime(body: string): number {
             .join('');
         }
       })();
-    </script>
-  </body>
-</html>
+  </script>
+</Layout>
