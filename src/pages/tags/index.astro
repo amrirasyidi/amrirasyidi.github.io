@@ -1,0 +1,28 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+
+const posts = await getCollection('blog', ({ data }) => !data.draft);
+
+const tagCounts = new Map<string, number>();
+for (const post of posts) {
+  for (const tag of post.data.tags) {
+    tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1);
+  }
+}
+
+const sortedTags = [...tagCounts.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+---
+<Layout title="Tags - Amri Rasyidi" description="Browse blog posts by tag" active="tags">
+  <h1>Tags</h1>
+
+  <p>Browse posts by topic. Click on any tag below to view posts from that category:</p>
+
+  <div class="tag-cloud-grid" style="margin-top: 30px;">
+    {sortedTags.map(([tag, count]) => (
+      <a href={`/tags/${tag}`} class="tag">
+        {tag} ({count})
+      </a>
+    ))}
+  </div>
+</Layout>

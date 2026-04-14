@@ -1,0 +1,13 @@
+---
+interface Props {
+  icon?: string;
+  type?: 'idea' | 'warning' | 'info' | 'success' | 'error';
+}
+const { icon, type = 'idea' } = Astro.props;
+const defaults = { idea: '💡', warning: '⚠️', info: 'ℹ️', success: '✅', error: '❌' };
+const glyph = icon ?? defaults[type];
+---
+<div class={`callout-${type}`}>
+  <div class="callout-icon">{glyph}</div>
+  <div class="callout-content"><slot /></div>
+</div>

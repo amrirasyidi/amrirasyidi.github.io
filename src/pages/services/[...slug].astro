@@ -1,0 +1,19 @@
+---
+import { getCollection, render } from 'astro:content';
+import ServicePage from '../../layouts/ServicePage.astro';
+
+export async function getStaticPaths() {
+  const services = await getCollection('services');
+  return services.map((service) => ({
+    params: { slug: service.id },
+    props: { service },
+  }));
+}
+
+const { service } = Astro.props;
+const { Content } = await render(service);
+---
+
+<ServicePage title={service.data.title} excerpt={service.data.excerpt}>
+  <Content />
+</ServicePage>

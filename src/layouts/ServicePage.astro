@@ -1,0 +1,30 @@
+---
+import Layout from './Layout.astro';
+
+interface Props {
+  title: string;
+  excerpt: string;
+}
+
+const { title, excerpt } = Astro.props;
+---
+<Layout title={`${title} - Amri Rasyidi`} description={excerpt} active="services" bodyClass="wide-page">
+  <div class="back-link">
+    <a href="/services">← Back to Services</a>
+  </div>
+
+  <h1>{title}</h1>
+
+  <div class="post-content">
+    <slot />
+  </div>
+
+  <div class="cta-section">
+    <h2>Ready to Start Your Project?</h2>
+    <p>Let's discuss how this can work for your specific use case.</p>
+    <div class="contact-options">
+      <a href="/services#get-in-touch" class="primary-cta">Discuss This Service</a>
+      <a href="/services" class="secondary-cta">← All Services</a>
+    </div>
+  </div>
+</Layout>

@@ -1,0 +1,123 @@
+---
+import Layout from './Layout.astro';
+import TableOfContents from '../components/TableOfContents.astro';
+
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface Props {
+  title: string;
+  date: Date;
+  excerpt: string;
+  tags: string[];
+  headings?: Heading[];
+}
+
+const { title, date, excerpt, tags, headings = [] } = Astro.props;
+const published = date.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+
+<Layout title={`${title} - Amri Rasyidi`} description={excerpt} active="blog">
+    <div class="back-link">
+      <a href="/blog">← Back to Blog</a>
+    </div>
+
+    <div data-pagefind-body>
+      <h1>{title}</h1>
+
+      <div class="post-meta">Published on {published}</div>
+
+      <TableOfContents headings={headings} />
+
+      <div class="post-content">
+        <slot />
+      </div>
+
+      <div class="tags-section">
+        <strong>Tags:</strong>
+        {tags.map((tag) => (
+          <a href={`/tags/${tag}`} class="tag">{tag}</a>
+        ))}
+      </div>
+    </div>
+
+    <div id="image-lightbox" class="lightbox" aria-hidden="true">
+      <img alt="" />
+    </div>
+
+    <style>
+      .post-content img {
+        cursor: zoom-in;
+      }
+      .lightbox {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.9);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        cursor: zoom-out;
+        padding: 20px;
+      }
+      .lightbox.open {
+        display: flex;
+      }
+      .lightbox img {
+        max-width: 100%;
+        max-height: 100%;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+      }
+    </style>
+
+    <script is:inline>
+      (function () {
+        const lightbox = document.getElementById('image-lightbox');
+        const lightboxImg = lightbox.querySelector('img');
+        const content = document.querySelector('.post-content');
+        if (!content) return;
+
+        content.addEventListener('click', function (e) {
+          const img = e.target.closest('img');
+          if (!img || !content.contains(img)) return;
+          e.preventDefault();
+          let fullSrc = img.src;
+          if (img.srcset) {
+            const entries = img.srcset.split(',').map((s) => {
+              const [url, w] = s.trim().split(/\s+/);
+              return { url, w: parseInt(w) || 0 };
+            });
+            entries.sort((a, b) => b.w - a.w);
+            if (entries[0]) fullSrc = entries[0].url;
+          }
+          lightboxImg.src = fullSrc;
+          lightboxImg.alt = img.alt || '';
+          lightbox.classList.add('open');
+          lightbox.setAttribute('aria-hidden', 'false');
+          document.body.style.overflow = 'hidden';
+        });
+
+        function close() {
+          lightbox.classList.remove('open');
+          lightbox.setAttribute('aria-hidden', 'true');
+          lightboxImg.src = '';
+          document.body.style.overflow = '';
+        }
+
+        lightbox.addEventListener('click', close);
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape' && lightbox.classList.contains('open')) close();
+        });
+      })();
+    </script>
+</Layout>

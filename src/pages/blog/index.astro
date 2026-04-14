@@ -1,0 +1,233 @@
+---
+import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
+import { resolveBlogImage } from '../../lib/blogImages';
+import Layout from '../../layouts/Layout.astro';
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+
+function readingTime(body: string): number {
+  const words = body.split(/\s+/).length;
+  return Math.ceil(words / 200);
+}
+---
+
+<Layout title="Blog - Amri Rasyidi" description="Blog posts by Amri Rasyidi" active="blog">
+  <style>
+      .blog-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 30px;
+        gap: 20px;
+      }
+      .blog-header h1 {
+        margin: 0;
+        white-space: nowrap;
+      }
+      .search-box {
+        position: relative;
+        max-width: 300px;
+        width: 100%;
+      }
+      .search-box input {
+        width: 100%;
+        padding: 8px 36px 8px 12px;
+        border: 1px solid var(--border-medium);
+        border-radius: 6px;
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+        font-size: 14px;
+        outline: none;
+        box-sizing: border-box;
+      }
+      .search-box input:focus {
+        border-color: var(--accent-primary);
+      }
+      .search-box .search-icon {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-secondary);
+        pointer-events: none;
+        font-size: 14px;
+      }
+      .search-box .clear-btn {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: var(--text-secondary);
+        cursor: pointer;
+        font-size: 16px;
+        padding: 0 2px;
+        display: none;
+      }
+      .search-box .clear-btn:hover {
+        color: var(--text-primary);
+      }
+      .search-results-count {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-secondary);
+        margin-bottom: 20px;
+        display: none;
+      }
+      .search-result-item {
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid var(--border-light);
+      }
+      .search-result-item:last-child {
+        border-bottom: none;
+      }
+      .search-result-item mark {
+        background: rgba(88, 166, 255, 0.3);
+        color: inherit;
+        padding: 1px 2px;
+        border-radius: 2px;
+      }
+      @media (max-width: 600px) {
+        .blog-header {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        .search-box {
+          max-width: 100%;
+        }
+      }
+  </style>
+
+  <div class="blog-header">
+      <h1>Blog</h1>
+      <div class="search-box">
+        <input type="text" id="search-input" placeholder="Search posts..." autocomplete="off" />
+        <span class="search-icon">&#128269;</span>
+        <button class="clear-btn" id="clear-search" type="button" aria-label="Clear search">&times;</button>
+      </div>
+    </div>
+
+    <div id="search-results-count" class="search-results-count"></div>
+
+    <div id="search-results" style="display: none;"></div>
+
+    <div id="blog-posts">
+      {posts.map((post) => (
+        <div class="blog-post">
+          {post.data.image && resolveBlogImage(post.data.image) && (
+            <div class="post-thumbnail">
+              <Image src={resolveBlogImage(post.data.image)!} alt={post.data.title} width={120} height={120} />
+            </div>
+          )}
+          <div class="post-content">
+            <div class="post-date">
+              {post.data.date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              })}
+              {' '}&middot;{' '}
+              {readingTime(post.body ?? '')} min read
+            </div>
+            <div class="post-title">
+              <a href={`/blog/${post.id}`}>{post.data.title}</a>
+            </div>
+            <div class="post-excerpt">{post.data.excerpt}</div>
+            <div class="tags">
+              {post.data.tags.map((tag) => (
+                <a href={`/tags/${tag}`} class="tag">{tag}</a>
+              ))}
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <script is:inline>
+      (async function () {
+        let pagefind;
+
+        const input = document.getElementById('search-input');
+        const clearBtn = document.getElementById('clear-search');
+        const searchIcon = document.querySelector('.search-icon');
+        const resultsCount = document.getElementById('search-results-count');
+        const resultsContainer = document.getElementById('search-results');
+        const postsContainer = document.getElementById('blog-posts');
+
+        async function loadPagefind() {
+          if (pagefind) return pagefind;
+          try {
+            pagefind = await import('/pagefind/pagefind.js');
+            await pagefind.init();
+          } catch (e) {
+            console.warn('Pagefind not available — run a build first to generate the index.');
+          }
+          return pagefind;
+        }
+
+        let debounceTimer;
+        input.addEventListener('input', function () {
+          const query = this.value.trim();
+          clearBtn.style.display = query ? 'block' : 'none';
+          searchIcon.style.display = query ? 'none' : 'block';
+
+          clearTimeout(debounceTimer);
+          if (!query) {
+            clearSearch();
+            return;
+          }
+          debounceTimer = setTimeout(() => doSearch(query), 200);
+        });
+
+        clearBtn.addEventListener('click', function () {
+          input.value = '';
+          clearSearch();
+          input.focus();
+        });
+
+        function clearSearch() {
+          clearBtn.style.display = 'none';
+          searchIcon.style.display = 'block';
+          resultsCount.style.display = 'none';
+          resultsContainer.style.display = 'none';
+          postsContainer.style.display = 'block';
+        }
+
+        async function doSearch(query) {
+          const pf = await loadPagefind();
+          if (!pf) return;
+
+          const search = await pf.search(query);
+          const results = await Promise.all(search.results.map((r) => r.data()));
+
+          postsContainer.style.display = 'none';
+          resultsContainer.style.display = 'block';
+          resultsCount.style.display = 'block';
+          resultsCount.textContent = `Search results (${results.length} post${results.length !== 1 ? 's' : ''})`;
+
+          if (results.length === 0) {
+            resultsContainer.innerHTML = '<p style="color: var(--text-secondary);">No posts found.</p>';
+            return;
+          }
+
+          resultsContainer.innerHTML = results
+            .map((r) => {
+              const url = r.url;
+              const title = r.meta?.title || 'Untitled';
+              const excerpt = r.excerpt || '';
+              return `<div class="search-result-item">
+                <div class="post-title"><a href="${url}">${title}</a></div>
+                <div class="post-excerpt">${excerpt}</div>
+              </div>`;
+            })
+            .join('');
+        }
+      })();
+  </script>
+</Layout>

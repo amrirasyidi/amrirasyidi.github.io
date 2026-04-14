@@ -1,0 +1,278 @@
+---
+title: Blog Post Template - All Formatting Options
+date: 2024-01-01
+excerpt: A comprehensive template showing all available formatting options for blog posts.
+tags: [template, formatting, guide]
+draft: true
+---
+
+{/* Import components you need — delete unused ones */}
+import Callout from '../../components/Callout.astro';
+import Details from '../../components/Details.astro';
+import Figure from '../../components/Figure.astro';
+import Tooltip from '../../components/Tooltip.astro';
+import TwoCol from '../../components/TwoCol.astro';
+
+Your opening paragraph. Just type — no `<p>` tags needed.
+
+---
+
+## Text Formatting
+
+**bold text**, *italic text*, ~~strikethrough~~, `inline code`
+
+Markdown handles 90% of text. For special styling, use raw HTML:
+
+<p style="color: #f97583;">Colored text with inline style.</p>
+<p style="text-align: center;"><strong>Centered text</strong></p>
+
+### Tooltip
+
+Hover for extra info: <Tooltip term="technical term">Explanation appears on hover. Supports **bold**, *italic*, `code`, and <br />line breaks inside.</Tooltip>
+
+## Headings
+
+## H2 — Main Sections
+### H3 — Subsections
+#### H4 — Sub-subsections
+
+All headings auto-generate IDs via rehype-slug (e.g. `#main-sections`).
+Link to them: [jump to tables](#tables).
+
+## Lists
+
+Numbered:
+
+1. First step
+2. Second step
+3. Third step with nested:
+   1. Sub-step A
+   2. Sub-step B
+
+Bullets:
+
+- Key point one
+- Key point two
+- Key point with nested:
+  - Detail A
+  - Detail B
+
+## Code
+
+Inline: `variable_name`, `function()`, `pip install package`
+
+Fenced code block with syntax highlighting (Shiki, build-time):
+
+```python
+import pandas as pd
+
+df = pd.read_csv('data.csv')
+print(df.head())
+```
+
+```sql
+SELECT *
+FROM table_name
+WHERE condition = 'value';
+```
+
+```bash
+pip install osmnx
+conda install -c conda-forge geopandas
+```
+
+File tree (plain text block):
+
+```
+.
+├── db
+│   ├── datareading.db
+│   └── datareading.db.tmp
+├── notebook
+│   └── analysis.ipynb
+└── sql
+    └── query.sql
+```
+
+## Images and Media
+
+### Using Figure component (recommended)
+
+<Figure src="/assets/blog/images/your-image.jpg" alt="Description">
+  Caption describing the image content
+</Figure>
+
+### With ID for cross-referencing
+
+<Figure id="important-diagram" src="/assets/blog/images/diagram.jpg" alt="Important diagram">
+  This diagram can be [referenced later](#important-diagram)
+</Figure>
+
+### Raw HTML for custom styling
+
+<img src="/assets/blog/images/your-image.jpg" alt="Description"
+     style="border-radius: 8px; display: block; margin: 0 auto; width: 100%; max-width: 400px;" />
+
+### Video
+
+<video controls style="width: 100%; max-width: 600px; display: block; margin: 0 auto;">
+  <source src="/assets/blog/videos/your-video.mp4" type="video/mp4" />
+  Your browser doesn't support video.
+</video>
+
+## Layout
+
+### Two-column
+
+<TwoCol>
+  <Fragment slot="left">
+    Left column content. Text, images, lists — anything.
+
+    - Point one
+    - Point two
+  </Fragment>
+  <Fragment slot="right">
+    <Figure slot="right" src="/assets/blog/images/side-image.jpg" alt="Side content" />
+  </Fragment>
+</TwoCol>
+
+---
+
+## Tables
+
+Simple markdown table:
+
+| Column 1 | Column 2 | Column 3 |
+|----------|----------|----------|
+| Cell 1   | Cell 2   | Cell 3   |
+| Cell 4   | Cell 5   | Cell 6   |
+
+Complex table (use raw HTML — supports bold, tooltips, multi-line):
+
+<table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+  <thead>
+    <tr>
+      <th>Feature</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Bold cell</strong></td>
+      <td>
+        Multi-line content with <Tooltip term="tooltip">Works inside tables too!</Tooltip>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+## Quotes
+
+Markdown blockquote:
+
+> Use blockquotes for important quotes or key insights.
+
+With attribution:
+
+> "The best way to get started is to quit talking and begin doing."
+>
+> — Walt Disney
+
+Pull quote (raw HTML):
+
+<div style="font-size: 24px; font-style: italic; text-align: center; margin: 30px 0; color: var(--text-muted);">
+  "This is a pull quote that stands out"
+</div>
+
+## Callouts
+
+<Callout type="idea">
+  Tip or insight that deserves special attention.
+</Callout>
+
+<Callout type="warning">
+  Important caveat or potential issue.
+</Callout>
+
+<Callout type="info">
+  Additional context or explanation.
+</Callout>
+
+<Callout type="success">
+  Positive outcome or achievement.
+</Callout>
+
+<Callout type="error">
+  Problem or failure to highlight.
+</Callout>
+
+<Callout icon="📝" type="idea">
+  Custom icon callout.
+</Callout>
+
+## Expandable Sections
+
+<Details summary="Click to expand additional details">
+  Hidden content. Great for optional details, FAQs, or supplementary info.
+
+  - Additional point 1
+  - Additional point 2
+</Details>
+
+## Links
+
+Markdown link: [External Link](https://example.com)
+
+Open in new tab (raw HTML): <a href="https://example.com" target="_blank" rel="noreferrer noopener">External Link</a>
+
+## Footnotes
+
+Markdown footnotes[^1] are supported natively[^2].
+
+[^1]: This is the first footnote.
+[^2]: This is the second footnote.
+
+## Badges
+
+<span style="background: #007bff; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px;">NEW</span>
+<span style="background: #28a745; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px;">UPDATED</span>
+<span style="background: #ffc107; color: black; padding: 2px 8px; border-radius: 12px; font-size: 12px;">BETA</span>
+
+## TL;DR
+
+<div style="background: var(--bg-secondary); border-left: 4px solid var(--accent-primary); padding: 20px; margin: 20px 0;">
+
+**Too Long; Didn't Read:**
+
+- Key takeaway 1
+- Key takeaway 2
+- Key takeaway 3
+
+</div>
+
+## Conclusion
+
+Wrap up your post with key takeaways.
+
+{/*
+=== TEMPLATE USAGE NOTES ===
+
+1. Copy this file, remove the _ prefix, rename to your post date + slug:
+   2024-03-15-my-post-title.mdx
+
+2. Update frontmatter (title, date, excerpt, tags)
+
+3. Delete sections you don't need
+
+4. Delete unused component imports at the top
+
+5. For draft posts, add `draft: true` to frontmatter
+
+6. Images go in /assets/blog/images/ — reference as /assets/blog/images/filename.png
+
+7. MDX gotchas:
+   - curly braces are JSX expressions — escape them for literal braces in text
+   - HTML must be valid JSX: use self-closing tags like br and img
+   - Comments use JSX comment syntax, not HTML comments
+   - Empty lines required before/after markdown inside HTML blocks
+*/}

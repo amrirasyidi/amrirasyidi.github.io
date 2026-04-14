@@ -1,0 +1,105 @@
+---
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+interface Props {
+  headings: Heading[];
+}
+const { headings } = Astro.props;
+const toc = headings.filter((h) => h.depth <= 3);
+---
+
+{toc.length > 0 && (
+  <nav class="toc" aria-label="Table of Contents">
+    <strong class="toc-title">Contents</strong>
+    <ul>
+      {toc.map((h) => (
+        <li class={`toc-item depth-${h.depth}`}>
+          <a href={`#${h.slug}`}>{h.text}</a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+)}
+
+<script>
+  const tocLinks = document.querySelectorAll<HTMLAnchorElement>('.toc a');
+  const headings = Array.from(tocLinks).map((link) => {
+    const id = link.getAttribute('href')!.slice(1);
+    return document.getElementById(id);
+  }).filter(Boolean) as HTMLElement[];
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          tocLinks.forEach((link) => link.classList.remove('active'));
+          const active = document.querySelector(
+            `.toc a[href="#${entry.target.id}"]`,
+          );
+          active?.classList.add('active');
+        }
+      }
+    },
+    { rootMargin: '0px 0px -70% 0px', threshold: 0 },
+  );
+
+  headings.forEach((h) => observer.observe(h));
+</script>
+
+<style>
+  .toc {
+    position: fixed;
+    top: 100px;
+    right: max(calc((100vw - 800px) / 2 - 260px), 16px);
+    width: 220px;
+    max-height: calc(100vh - 140px);
+    overflow-y: auto;
+    font-size: 13px;
+    line-height: 1.5;
+    border-left: 2px solid var(--border-light);
+    padding-left: 12px;
+  }
+
+  .toc-title {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--text-muted);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .toc ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .toc-item {
+    padding: 2px 0;
+  }
+
+  .toc-item.depth-3 {
+    padding-left: 12px;
+  }
+
+  .toc a {
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .toc a:hover,
+  .toc a.active {
+    color: var(--accent-primary);
+  }
+
+  @media (max-width: 1200px) {
+    .toc {
+      display: none;
+    }
+  }
+</style>

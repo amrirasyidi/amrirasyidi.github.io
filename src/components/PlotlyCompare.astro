@@ -1,0 +1,158 @@
+---
+import Figure from './Figure.astro';
+interface Props {
+  datasets: Record<string, Record<string, unknown>>;
+  models: Record<string, Record<string, unknown>>;
+  colorsByDataset: Record<string, string>;
+  colorsByModel: Record<string, string>;
+  datasetFigSrc: string;
+  datasetFigAlt: string;
+  datasetFigCaption: string;
+  modelFigSrc: string;
+  modelFigAlt: string;
+  modelFigCaption: string;
+}
+const props = Astro.props;
+const payload = JSON.stringify({
+  datasets: props.datasets,
+  models: props.models,
+  colorsByDataset: props.colorsByDataset,
+  colorsByModel: props.colorsByModel,
+});
+---
+
+<div class="plotly-compare">
+  <div class="compare-toggle">
+    <label for="compare-select"><strong>Compare:</strong></label>
+    <select id="compare-select">
+      <option value="dataset">Dataset comparison (UNet / ResNet50)</option>
+      <option value="model">Model comparison (TESSERA)</option>
+    </select>
+  </div>
+
+  <div class="chart-grid">
+    <div class="chart-box"><div id="chart-train-loss"></div></div>
+    <div class="chart-box"><div id="chart-val-loss"></div></div>
+    <div class="chart-box"><div id="chart-train-iou"></div></div>
+    <div class="chart-box"><div id="chart-val-iou"></div></div>
+  </div>
+
+  <div id="fig-dataset">
+    <Figure src={props.datasetFigSrc} alt={props.datasetFigAlt} caption={props.datasetFigCaption} />
+  </div>
+  <div id="fig-model" style="display: none;">
+    <Figure src={props.modelFigSrc} alt={props.modelFigAlt} caption={props.modelFigCaption} />
+  </div>
+</div>
+
+<script type="application/json" id="plotly-compare-data" set:html={payload} />
+
+<script>
+  // @ts-nocheck
+  const load = (src: string) =>
+    new Promise<void>((res, rej) => {
+      const s = document.createElement('script');
+      s.src = src;
+      s.onload = () => res();
+      s.onerror = () => rej();
+      document.head.appendChild(s);
+    });
+
+  (async () => {
+    if (!(window as any).Plotly) {
+      await load('https://cdn.plot.ly/plotly-2.35.2.min.js');
+    }
+    const payload = JSON.parse(
+      document.getElementById('plotly-compare-data')!.textContent!,
+    );
+    const { datasets, models, colorsByDataset, colorsByModel } = payload;
+
+    const chartLayout = {
+      height: 250,
+      paper_bgcolor: 'transparent',
+      plot_bgcolor: 'transparent',
+      font: { color: '#c9d1d9', size: 12 },
+      margin: { t: 36, r: 16, b: 44, l: 52 },
+      legend: { orientation: 'h', y: -0.22, x: 0.5, xanchor: 'center', font: { size: 11 } },
+      xaxis: { gridcolor: '#21262d', zeroline: false, dtick: 2 },
+      yaxis: { gridcolor: '#21262d', zeroline: false },
+      hovermode: 'x unified',
+      hoverlabel: { bgcolor: '#000', font: { color: '#fff' } },
+    };
+
+    const chartDefs: [string, string, string, string][] = [
+      ['chart-train-loss', 'train_loss', 'Train Loss', 'Loss'],
+      ['chart-val-loss', 'val_loss', 'Val Loss', 'Loss'],
+      ['chart-train-iou', 'train_OverallJaccardIndex', 'Train IoU', 'IoU'],
+      ['chart-val-iou', 'val_OverallJaccardIndex', 'Val IoU', 'IoU'],
+    ];
+
+    function render(data: any, colors: any) {
+      for (const [id, metric, title, yLabel] of chartDefs) {
+        const traces = [];
+        for (const [name, metrics] of Object.entries<any>(data)) {
+          traces.push({
+            x: metrics[metric].epochs,
+            y: metrics[metric].values,
+            name,
+            mode: 'lines+markers',
+            line: { color: colors[name], width: 2 },
+            marker: { size: 5 },
+            hovertemplate: '%{y:.4f}',
+          });
+        }
+        const layout = {
+          ...chartLayout,
+          title: { text: title, font: { size: 14 } },
+          yaxis: { ...chartLayout.yaxis, title: yLabel },
+        };
+        (window as any).Plotly.react(id, traces, layout, {
+          responsive: true,
+          displayModeBar: false,
+        });
+      }
+    }
+
+    render(datasets, colorsByDataset);
+
+    document.getElementById('compare-select')!.addEventListener('change', function (e) {
+      const isDataset = (e.target as HTMLSelectElement).value === 'dataset';
+      render(isDataset ? datasets : models, isDataset ? colorsByDataset : colorsByModel);
+      (document.getElementById('fig-dataset') as HTMLElement).style.display = isDataset ? 'block' : 'none';
+      (document.getElementById('fig-model') as HTMLElement).style.display = isDataset ? 'none' : 'block';
+    });
+  })();
+</script>
+
+<style>
+  .compare-toggle {
+    margin: 20px 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .compare-toggle select {
+    background: #161b22;
+    color: #c9d1d9;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .chart-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 20px 0;
+  }
+  .chart-box {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 12px;
+  }
+  @media (max-width: 640px) {
+    .chart-grid { grid-template-columns: 1fr; }
+  }
+</style>
