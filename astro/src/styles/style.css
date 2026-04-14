@@ -65,17 +65,15 @@ ul {
 }
 
 ol {
-  counter-reset: item
+  padding-left: 1.5em;
 }
 
-ol li { 
-    display: block;
-    margin-bottom: 8px; 
+ol li {
+  margin-bottom: 8px;
 }
 
-ol li:before {
-  content: counters(item, ".") ".";
-  counter-increment: item
+ol li > p:first-child {
+  margin-top: 0;
 }
 
 /* The container for the hoverable text */
