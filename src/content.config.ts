@@ -21,6 +21,20 @@ const services = defineCollection({
     excerpt: z.string(),
     image: z.string(),
     order: z.number().default(99),
+    capabilities: z.array(z.object({
+      title: z.string(),
+      desc: z.string(),
+    })).default([]),
+    values: z.array(z.object({
+      emoji: z.string(),
+      title: z.string(),
+      desc: z.string(),
+    })).default([]),
+    media: z.array(z.object({
+      type: z.enum(['image', 'video']),
+      src: z.string(),
+      alt: z.string().optional(),
+    })).default([]),
   }),
 });
 

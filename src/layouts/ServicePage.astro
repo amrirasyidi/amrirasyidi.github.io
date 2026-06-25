@@ -1,30 +1,211 @@
 ---
 import Layout from './Layout.astro';
 
+interface Media {
+  type: 'image' | 'video';
+  src: string;
+  alt?: string;
+}
+
+interface Capability {
+  title: string;
+  desc: string;
+}
+
+interface Value {
+  emoji: string;
+  title: string;
+  desc: string;
+}
+
 interface Props {
   title: string;
   excerpt: string;
+  capabilities: Capability[];
+  values: Value[];
+  media: Media[];
 }
 
-const { title, excerpt } = Astro.props;
+const { title, excerpt, capabilities, values, media } = Astro.props;
 ---
+
 <Layout title={`${title} - Amri Rasyidi`} description={excerpt} active="services" bodyClass="wide-page">
-  <div class="back-link">
-    <a href="/services">← Back to Services</a>
+  <!-- Sticky CTA -->
+  <div class="sticky-cta" id="sticky-cta">
+    <a href="/services#contact">Start Your Project →</a>
   </div>
 
-  <h1>{title}</h1>
+  <section class="section">
+    <a href="/services" class="back-link-pill">← All Services</a>
+    <h1 class="service-detail-title">{title}</h1>
+    <p class="service-detail-excerpt">{excerpt}</p>
+  </section>
 
-  <div class="post-content">
-    <slot />
-  </div>
+  <!-- Media Carousel -->
+  <section class="section section-alt media-carousel-section">
+    <div class="media-carousel" id="media-carousel">
+      <div class="media-carousel-viewport">
+        {media.map((m, i) => (
+          <div class="media-carousel-slide" data-index={i}>
+            {m.type === 'image' ? (
+              <img src={m.src} alt={m.alt || ''} loading={i === 0 ? 'eager' : 'lazy'} />
+            ) : (
+              <video src={m.src} muted controls preload="metadata" playsinline></video>
+            )}
+          </div>
+        ))}
+      </div>
+      {media.length > 1 && (
+        <>
+          <button class="carousel-arrow carousel-arrow-prev" aria-label="Previous">‹</button>
+          <button class="carousel-arrow carousel-arrow-next" aria-label="Next">›</button>
+          <div class="carousel-dots">
+            {media.map((_, i) => (
+              <span class="carousel-dot" data-index={i}></span>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  </section>
 
-  <div class="cta-section">
-    <h2>Ready to Start Your Project?</h2>
+  <!-- Capabilities -->
+  <section class="section">
+    <h2 class="section-title">Capabilities</h2>
+    <div class="service-detail-grid">
+      {capabilities.map((c) => (
+        <div class="service-detail-card">
+          <h3>{c.title}</h3>
+          <p>{c.desc}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Business Value -->
+  <section class="section section-alt">
+    <h2 class="section-title">Business Value</h2>
+    <div class="service-detail-grid">
+      {values.map((v) => (
+        <div class="service-detail-card value-card">
+          <div class="value-emoji">{v.emoji}</div>
+          <h3>{v.title}</h3>
+          <p>{v.desc}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section service-detail-cta">
+    <h2>Interested in This Service?</h2>
     <p>Let's discuss how this can work for your specific use case.</p>
-    <div class="contact-options">
-      <a href="/services#get-in-touch" class="primary-cta">Discuss This Service</a>
+    <div class="service-detail-cta-buttons">
+      <a href="/services#contact" class="primary-cta">Discuss This Service</a>
       <a href="/services" class="secondary-cta">← All Services</a>
     </div>
-  </div>
+  </section>
+
+  <script is:inline>
+    (function () {
+      var stickyCta = document.getElementById('sticky-cta');
+      var ticking = false;
+      window.addEventListener('scroll', function () {
+        if (!ticking) {
+          window.requestAnimationFrame(function () {
+            if (window.scrollY > 400) {
+              stickyCta.classList.add('visible');
+            } else {
+              stickyCta.classList.remove('visible');
+            }
+            ticking = false;
+          });
+          ticking = true;
+        }
+      });
+
+      var carousel = document.getElementById('media-carousel');
+      if (!carousel) return;
+      var slides = carousel.querySelectorAll('.media-carousel-slide');
+      var dots = carousel.querySelectorAll('.carousel-dot');
+      var prevBtn = carousel.querySelector('.carousel-arrow-prev');
+      var nextBtn = carousel.querySelector('.carousel-arrow-next');
+      if (slides.length < 2) return;
+
+      var current = 0;
+      var timer = null;
+      var imageInterval = 5000;
+
+      function goTo(index) {
+        slides.forEach(function (s, i) {
+          s.classList.toggle('active', i === index);
+        });
+        dots.forEach(function (d, i) {
+          d.classList.toggle('active', i === index);
+        });
+        current = index;
+        resetTimer();
+      }
+
+      function goNext() {
+        goTo((current + 1) % slides.length);
+      }
+
+      function goPrev() {
+        goTo((current + slides.length - 1) % slides.length);
+      }
+
+      function resetTimer() {
+        if (timer) clearTimeout(timer);
+        var slide = slides[current];
+        var video = slide.querySelector('video');
+        if (video) {
+          video.currentTime = 0;
+          video.play().catch(function () {});
+          video.addEventListener('ended', goNext, { once: true });
+          timer = null;
+        } else {
+          timer = setTimeout(goNext, imageInterval);
+        }
+      }
+
+      prevBtn.addEventListener('click', function () {
+        if (timer) clearTimeout(timer);
+        var slide = slides[current];
+        var video = slide.querySelector('video');
+        if (video) {
+          video.pause();
+          video.removeEventListener('ended', goNext);
+        }
+        goPrev();
+      });
+
+      nextBtn.addEventListener('click', function () {
+        if (timer) clearTimeout(timer);
+        var slide = slides[current];
+        var video = slide.querySelector('video');
+        if (video) {
+          video.pause();
+          video.removeEventListener('ended', goNext);
+        }
+        goNext();
+      });
+
+      dots.forEach(function (d) {
+        d.addEventListener('click', function () {
+          var idx = parseInt(d.dataset.index);
+          if (timer) clearTimeout(timer);
+          var slide = slides[current];
+          var video = slide.querySelector('video');
+          if (video) {
+            video.pause();
+            video.removeEventListener('ended', goNext);
+          }
+          goTo(idx);
+        });
+      });
+
+      goTo(0);
+    })();
+  </script>
 </Layout>

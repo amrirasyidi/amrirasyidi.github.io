@@ -14,6 +14,12 @@ const { service } = Astro.props;
 const { Content } = await render(service);
 ---
 
-<ServicePage title={service.data.title} excerpt={service.data.excerpt}>
+<ServicePage
+  title={service.data.title}
+  excerpt={service.data.excerpt}
+  capabilities={service.data.capabilities}
+  values={service.data.values}
+  media={service.data.media}
+>
   <Content />
 </ServicePage>
