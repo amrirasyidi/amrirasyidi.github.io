@@ -1,43 +1,42 @@
-# Astro Starter Kit: Minimal
+# Personal Website
+
+Astro blog with MDX posts, Pagefind search, tag filtering, dark mode, and GitHub Pages deploy.
+
+## Quick Start
 
 ```sh
-npm create astro@latest -- --template minimal
+npm install        # install deps
+npm run dev        # dev server at localhost:4321
+npm run build      # build + pagefind search index → dist/
+npm run preview    # preview production build locally
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Add a Blog Post
 
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
+```sh
+cp src/content/blog/_template.mdx src/content/blog/YYYY-MM-DD-slug.mdx
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+Frontmatter (file top):
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+```yaml
+---
+title: "Post Title"
+date: 2026-06-25
+excerpt: "One-liner for listing & meta."
+tags: [tag1, tag2]
+image: "/assets/blog/images/20260625_file.png"   # optional thumbnail
+draft: true                                        # optional, hides from listing
+---
+```
 
-Any static assets, like images, can be placed in the `public/` directory.
+- Place images in `src/assets/blog/images/`, reference as `/assets/blog/images/file.ext`
+- Components available: `Callout`, `Details`, `Figure`, `Tooltip`, `TwoCol`, `PlotlyCompare`
 
-## 🧞 Commands
+## Drafts
 
-All commands are run from the root of the project, from a terminal:
+Add `draft: true` to frontmatter. Post stays accessible at its URL but hidden from listing.
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+## Deploy
 
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+Push to `master`. GitHub Actions builds + deploys to GitHub Pages automatically.
