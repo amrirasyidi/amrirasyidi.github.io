@@ -51,9 +51,9 @@ const testimonials = [
     author: "Richard N. • Beauty Canada",
   },
   {
-    quote: "Super expert, fast delivery, good communication, follows instructions perfectly. Very impressed.",
-    project: "Computer Vision Deployment",
-    author: "Najwa • Research Project",
+    quote: "Very impressive, planning to rehire him again.",
+    project: "Spatial Clustering & Analysis",
+    author: "Yusuf • Research Project",
   },
 ];
 
@@ -103,41 +103,53 @@ const statDuration = 3;
   </section>
 
   <!-- Services -->
-  <section id="services" class="section section-alt">
-    <h2 class="section-title">What I Deliver</h2>
-    <p class="section-sub">Specialized geospatial solutions designed to solve specific business challenges. Each service includes proof-of-concept validation and production-ready implementation.</p>
+  <section class="section">
+    <h2 class="section-title">Featured Projects</h2>
     <div class="services-grid">
       {services.map((s, i) => (
         <div class="service-card">
-          <div class={`service-card-icon ${serviceConfig[i].color}`}>{serviceConfig[i].icon}</div>
-          <h3>{s.data.cardTitle}</h3>
-          <p class="service-desc">{s.data.excerpt}</p>
-          <ul class="service-bullets">
-            {serviceConfig[i].bullets.map((b) => (
-              <li class={`${serviceConfig[i].color}-bullet`}>{b}</li>
-            ))}
-          </ul>
-          <a href={`/services/${s.id}`} class="learn-more-link">Learn More →</a>
+          <div class="service-card-img">
+            <img src={s.data.image} alt={s.data.cardTitle} loading="lazy" />
+          </div>
+          <div class="service-card-body">
+            <h3>{s.data.cardTitle}</h3>
+            <p class="service-desc">{s.data.excerpt}</p>
+            <ul class="service-bullets">
+              {serviceConfig[i].bullets.map((b) => (
+                <li class={`${serviceConfig[i].color}-bullet`}>{b}</li>
+              ))}
+            </ul>
+            <a href={`/services/${s.id}`} class="learn-more-link">Learn More →</a>
+          </div>
         </div>
       ))}
     </div>
   </section>
 
   <!-- Testimonials -->
-  <section class="section section-alt">
+  <section class="section section-alt" style="padding-top: 0px;">
     <h2 class="section-title">What Clients Say</h2>
-    <p class="section-sub">Real feedback from real projects. No stock quotes, no fluff.</p>
-    <div class="testimonials-grid">
-      {testimonials.map((t) => (
-        <div class="testimonial-card">
-          <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-          <p class="quote">&ldquo;{t.quote}&rdquo;</p>
-          <div class="author-info">
-            <div class="author-name">{t.author}</div>
-            <div class="author-project">{t.project}</div>
+    <div class="testimonials-carousel">
+      <div class="testimonials-track">
+        {testimonials.map((t) => (
+          <div class="testimonial-card">
+            <p class="quote">&ldquo;{t.quote}&rdquo;</p>
+            <div class="author-info">
+              <div class="author-name">{t.author}</div>
+              <div class="author-project">{t.project}</div>
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+        {testimonials.map((t) => (
+          <div class="testimonial-card">
+            <p class="quote">&ldquo;{t.quote}&rdquo;</p>
+            <div class="author-info">
+              <div class="author-name">{t.author}</div>
+              <div class="author-project">{t.project}</div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   </section>
 
@@ -161,7 +173,7 @@ const statDuration = 3;
       <div class="process-step">
         <div class="process-step-badge"><span>03</span></div>
         <h3>Delivery</h3>
-        <div class="step-time">2-4 weeks</div>
+        <div class="step-time">As required</div>
         <p>Production-ready solution with clean code, documentation, and team training. Deployed and integrated into your workflow — not abandoned after handoff.</p>
       </div>
     </div>
