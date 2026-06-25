@@ -56,6 +56,14 @@ const testimonials = [
     author: "Najwa • Research Project",
   },
 ];
+
+const stats = [
+  { number: "11", label: "Projects Delivered" },
+  { number: "5", label: "Countries Served" },
+  { number: "3", label: "Recurring Clients" },
+];
+
+const statDuration = 3;
 ---
 
 <Layout
@@ -82,19 +90,13 @@ const testimonials = [
         </div>
       </div>
       <div class="hero-right">
-        <div class="stats-carousel">
-          <div class="stat-carousel-item">
-            <div class="stat-carousel-number">9</div>
-            <div class="stat-carousel-label">Projects Delivered</div>
-          </div>
-          <div class="stat-carousel-item">
-            <div class="stat-carousel-number">4</div>
-            <div class="stat-carousel-label">Countries Served</div>
-          </div>
-          <div class="stat-carousel-item">
-            <div class="stat-carousel-number">3/4</div>
-            <div class="stat-carousel-label">Clients Rehire</div>
-          </div>
+        <div class="stats-carousel" data-stat-count={stats.length} data-stat-duration={statDuration} style={`--stat-count: ${stats.length}; --stat-duration: ${statDuration}s;`}>
+          {stats.map((s, i) => (
+            <div class="stat-carousel-item" style={`--i: ${i}`}>
+              <div class="stat-carousel-number">{s.number}</div>
+              <div class="stat-carousel-label">{s.label}</div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
@@ -219,6 +221,20 @@ const testimonials = [
 
   <script is:inline>
     (function () {
+      // Dynamic keyframes for stats carousel
+      const carousel = document.querySelector('.stats-carousel');
+      if (carousel) {
+        const statCount = parseInt(carousel.dataset.statCount);
+        const statDuration = parseFloat(carousel.dataset.statDuration);
+        const totalCycle = statCount * statDuration;
+        const hiddenPct = 100 / statCount;
+        const fadePct = (1 / totalCycle) * 100;
+        const visibleEndPct = Math.max(0, hiddenPct - fadePct);
+        const style = document.createElement('style');
+        style.textContent = '@keyframes statCycle {0%{opacity:0;transform:translateY(12px)}' + fadePct + '%{opacity:1;transform:translateY(0)}' + visibleEndPct + '%{opacity:1;transform:translateY(0)}' + hiddenPct + '%{opacity:0;transform:translateY(-12px)}100%{opacity:0;transform:translateY(-12px)}}';
+        document.head.appendChild(style);
+      }
+
       // Sticky CTA scroll
       const stickyCta = document.getElementById('sticky-cta');
       let ticking = false;

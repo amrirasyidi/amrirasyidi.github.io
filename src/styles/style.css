@@ -1958,13 +1958,13 @@ img, video, iframe {
     display: grid;
     grid-template-columns: 1.6fr 1fr;
     gap: 48px;
-    align-items: start;
+    align-items: center;
 }
 
 /* Stats carousel — fade cycling */
 .wide-page .stats-carousel {
     position: relative;
-    min-height: 220px;
+    min-height: 200px;
 }
 
 .wide-page .stat-carousel-item {
@@ -1975,17 +1975,11 @@ img, video, iframe {
     align-items: center;
     justify-content: center;
     text-align: center;
-    padding: 32px 24px;
-    background: rgba(51, 51, 51, 0.25);
-    border: 1px solid var(--border-light);
     opacity: 0;
     transform: translateY(12px);
-    animation: statCycle 12s infinite;
+    animation: statCycle calc(var(--stat-count) * var(--stat-duration)) infinite;
+    animation-delay: calc(var(--i) * var(--stat-duration));
 }
-
-.wide-page .stat-carousel-item:nth-child(1) { animation-delay: 0s; }
-.wide-page .stat-carousel-item:nth-child(2) { animation-delay: 4s; }
-.wide-page .stat-carousel-item:nth-child(3) { animation-delay: 8s; }
 
 .wide-page .stat-carousel-number {
     font-size: 52px;
@@ -2000,14 +1994,6 @@ img, video, iframe {
     color: var(--text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.5px;
-}
-
-@keyframes statCycle {
-    0%   { opacity: 0; transform: translateY(12px); }
-    8%   { opacity: 1; transform: translateY(0); }
-    30%  { opacity: 1; transform: translateY(0); }
-    40%  { opacity: 0; transform: translateY(-12px); }
-    100% { opacity: 0; transform: translateY(-12px); }
 }
 
 /* Service Cards */
@@ -2304,7 +2290,7 @@ img, video, iframe {
     }
 
     .wide-page .stats-carousel {
-        min-height: 140px;
+        min-height: 120px;
     }
 
     .wide-page .contact-form .form-row {
