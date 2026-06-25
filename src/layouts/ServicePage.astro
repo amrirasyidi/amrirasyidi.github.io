@@ -30,13 +30,8 @@ const { title, excerpt, capabilities, values, media } = Astro.props;
 ---
 
 <Layout title={`${title} - Amri Rasyidi`} description={excerpt} active="services" bodyClass="wide-page">
-  <!-- Sticky CTA -->
-  <div class="sticky-cta" id="sticky-cta">
-    <a href="/services#contact">Start Your Project →</a>
-  </div>
-
   <section class="section">
-    <a href="/services" class="back-link-pill">← All Services</a>
+    <a href="/services#services" class="back-link-pill">← All Services</a>
     <h1 class="service-detail-title">{title}</h1>
     <p class="service-detail-excerpt">{excerpt}</p>
   </section>
@@ -72,27 +67,44 @@ const { title, excerpt, capabilities, values, media } = Astro.props;
   <!-- Capabilities -->
   <section class="section">
     <h2 class="section-title">Capabilities</h2>
-    <div class="service-detail-grid">
-      {capabilities.map((c) => (
-        <div class="service-detail-card">
-          <h3>{c.title}</h3>
-          <p>{c.desc}</p>
-        </div>
-      ))}
+    <div class="service-detail-carousel">
+      <div class="service-detail-track">
+        {capabilities.map((c) => (
+          <div class="service-detail-card capability-card">
+            <h3>{c.title}</h3>
+            <p>{c.desc}</p>
+          </div>
+        ))}
+        {capabilities.map((c) => (
+          <div class="service-detail-card capability-card">
+            <h3>{c.title}</h3>
+            <p>{c.desc}</p>
+          </div>
+        ))}
+      </div>
     </div>
   </section>
 
   <!-- Business Value -->
   <section class="section section-alt">
     <h2 class="section-title">Business Value</h2>
-    <div class="service-detail-grid">
-      {values.map((v) => (
-        <div class="service-detail-card value-card">
-          <div class="value-emoji">{v.emoji}</div>
-          <h3>{v.title}</h3>
-          <p>{v.desc}</p>
-        </div>
-      ))}
+    <div class="service-detail-carousel">
+      <div class="service-detail-track">
+        {values.map((v) => (
+          <div class="service-detail-card value-card">
+            <div class="value-emoji">{v.emoji}</div>
+            <h3>{v.title}</h3>
+            <p>{v.desc}</p>
+          </div>
+        ))}
+        {values.map((v) => (
+          <div class="service-detail-card value-card">
+            <div class="value-emoji">{v.emoji}</div>
+            <h3>{v.title}</h3>
+            <p>{v.desc}</p>
+          </div>
+        ))}
+      </div>
     </div>
   </section>
 
@@ -102,28 +114,12 @@ const { title, excerpt, capabilities, values, media } = Astro.props;
     <p>Let's discuss how this can work for your specific use case.</p>
     <div class="service-detail-cta-buttons">
       <a href="/services#contact" class="primary-cta">Discuss This Service</a>
-      <a href="/services" class="secondary-cta">← All Services</a>
+      <a href="/services#services" class="secondary-cta">← All Services</a>
     </div>
   </section>
 
   <script is:inline>
     (function () {
-      var stickyCta = document.getElementById('sticky-cta');
-      var ticking = false;
-      window.addEventListener('scroll', function () {
-        if (!ticking) {
-          window.requestAnimationFrame(function () {
-            if (window.scrollY > 400) {
-              stickyCta.classList.add('visible');
-            } else {
-              stickyCta.classList.remove('visible');
-            }
-            ticking = false;
-          });
-          ticking = true;
-        }
-      });
-
       var carousel = document.getElementById('media-carousel');
       if (!carousel) return;
       var slides = carousel.querySelectorAll('.media-carousel-slide');

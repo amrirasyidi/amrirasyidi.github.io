@@ -74,19 +74,17 @@ const statDuration = 3;
 >
   <!-- Sticky CTA -->
   <div class="sticky-cta" id="sticky-cta">
-    <a href="#contact">Start Your Project →</a>
+    <a href="#services">Explore Projects</a>
   </div>
 
   <!-- Hero -->
   <section class="services-hero section">
     <div class="hero-layout">
       <div class="hero-left">
-        <div class="badge-pill">🛰️ Geospatial Intelligence</div>
         <h1>Stop Guessing.<br>See What Your Location Data Is Really Worth.</h1>
         <p class="hero-sub">Satellite imagery analysis, AI computer vision, and custom GeoAI — built to ship working software, not slide decks.</p>
         <div class="hero-ctas">
           <a href="#contact" class="primary-cta">Get a Free Consultation →</a>
-          <a href="#services" class="secondary-cta">View Case Studies</a>
         </div>
       </div>
       <div class="hero-right">
@@ -103,11 +101,11 @@ const statDuration = 3;
   </section>
 
   <!-- Services -->
-  <section class="section">
+  <section id="services" class="section">
     <h2 class="section-title">Featured Projects</h2>
     <div class="services-grid">
       {services.map((s, i) => (
-        <div class="service-card">
+        <a href={`/services/${s.id}`} class="service-card">
           <div class="service-card-img">
             <img src={s.data.image} alt={s.data.cardTitle} loading="lazy" />
           </div>
@@ -119,9 +117,8 @@ const statDuration = 3;
                 <li class={`${serviceConfig[i].color}-bullet`}>{b}</li>
               ))}
             </ul>
-            <a href={`/services/${s.id}`} class="learn-more-link">Learn More →</a>
           </div>
-        </div>
+        </a>
       ))}
     </div>
   </section>
@@ -233,6 +230,17 @@ const statDuration = 3;
 
   <script is:inline>
     (function () {
+      // Smooth scroll for anchor links
+      document.querySelectorAll('a[href^="#"]').forEach(function (link) {
+        link.addEventListener('click', function (e) {
+          var target = document.querySelector(this.getAttribute('href'));
+          if (target) {
+            e.preventDefault();
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        });
+      });
+
       // Dynamic keyframes for stats carousel
       const carousel = document.querySelector('.stats-carousel');
       if (carousel) {
